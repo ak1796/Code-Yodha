@@ -27,7 +27,7 @@ export default function SilentCrisis() {
              </h1>
              <p className="text-text-secondary font-medium opacity-60 italic">{t('SilentCrisisDesc')}</p>
           </div>
-          <div className="bg-white px-8 py-4 rounded-3xl shadow-soft border border-border flex items-center gap-4">
+          <div className="bg-white px-8 py-4 rounded-3xl shadow-soft border border-[#162F6A]/30 flex items-center gap-4">
              <div className="w-10 h-10 rounded-xl bg-crimson text-white flex items-center justify-center shadow-lg shadow-crimson/20">
                 <AlertTriangle size={20} />
              </div>
@@ -40,7 +40,7 @@ export default function SilentCrisis() {
 
        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
           {/* Ward Table */}
-          <div className="lg:col-span-8 bg-white rounded-[3.5rem] shadow-soft border border-border overflow-hidden">
+          <div className="lg:col-span-8 bg-white rounded-[3.5rem] shadow-soft border border-[#162F6A]/30 overflow-hidden">
              <table className="w-full text-left">
                 <thead>
                    <tr className="border-b border-border bg-bg/30">
@@ -88,7 +88,7 @@ export default function SilentCrisis() {
           {/* Intervention Sidebar */}
           <div className="lg:col-span-4 h-full">
              {selectedWard ? (
-                <div className="bg-navy rounded-[3.5rem] p-10 text-white shadow-2xl h-full space-y-10 animate-slide-in-right">
+                <div className="bg-navy rounded-[3.5rem] p-10 text-white shadow-2xl h-full space-y-10 animate-slide-in-right border border-[#162F6A]">
                    <div className="space-y-2">
                       <h3 className="text-2xl font-sora font-extrabold uppercase tracking-tight text-saffron">{selectedWard.name} {t('Intervention')}</h3>
                       <p className="text-[10px] font-black text-white/40 uppercase tracking-widest italic">{t('MitigationActive')}</p>
@@ -106,7 +106,7 @@ export default function SilentCrisis() {
                    </div>
                 </div>
              ) : (
-                <div className="h-full bg-white rounded-[3.5rem] border-4 border-dashed border-border flex flex-col items-center justify-center p-10 text-center opacity-40">
+                <div className="h-full bg-white rounded-[3.5rem] border-4 border-dashed border-[#162F6A]/30 flex flex-col items-center justify-center p-10 text-center opacity-40">
                    <HelpCircle size={64} className="mb-4 text-navy" />
                    <h3 className="text-xl font-sora font-extrabold text-navy uppercase tracking-tighter">{t('SelectWardNode')}</h3>
                    <p className="text-xs font-bold uppercase tracking-widest mt-2">{t('SelectWardDesc')}</p>

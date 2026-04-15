@@ -5,7 +5,7 @@ import { MapPin, Repeat, UserCheck, AlertTriangle } from 'lucide-react';
 export default function CivicMemoryTable({ data = [] }) {
   if (data.length === 0) {
     return (
-      <div className="bg-surface rounded-xl border border-border p-12 text-center text-text-secondary">
+      <div className="bg-surface rounded-xl border border-[#162F6A]/30 p-12 text-center text-text-secondary">
         <Repeat className="mx-auto mb-4 opacity-10" size={64} />
         <p className="font-medium text-navy text-lg">Civic Memory Initializing...</p>
         <p className="text-sm mt-1">AI is analyzing 2-year history to identify recurring patterns.</p>
@@ -14,7 +14,7 @@ export default function CivicMemoryTable({ data = [] }) {
   }
 
   return (
-    <div className="bg-surface rounded-xl border border-border overflow-hidden shadow-soft">
+    <div className="bg-surface rounded-xl border border-[#162F6A]/30 overflow-hidden shadow-soft">
       <table className="w-full text-left border-collapse">
         <thead className="bg-[#1A2D5A] text-white">
           <tr>
@@ -46,7 +46,7 @@ export default function CivicMemoryTable({ data = [] }) {
               <td className="px-6 py-4">
                 <div className="flex flex-wrap gap-1">
                    {item.contractors?.map((c, i) => (
-                     <span key={i} className="text-[10px] font-bold border border-border px-2 py-0.5 rounded-full text-text-secondary whitespace-nowrap">
+                     <span key={i} className="text-[10px] font-bold border border-[#162F6A]/20 px-2 py-0.5 rounded-full text-text-secondary whitespace-nowrap">
                        {c}
                      </span>
                    ))}

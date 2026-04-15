@@ -34,7 +34,7 @@ export default function SLABreachManager() {
 
   return (
     <div className="p-10 lg:p-16 space-y-12 animate-fade-in max-w-7xl mx-auto pb-32">
-       <header className="flex justify-between items-center bg-white p-10 rounded-[3.5rem] shadow-soft border border-border">
+       <header className="flex justify-between items-center bg-white p-10 rounded-[3.5rem] shadow-soft border border-[#162F6A]/30">
           <div className="flex items-center gap-6">
              <div className="w-16 h-16 rounded-3xl bg-crimson text-white flex items-center justify-center shadow-xl shadow-crimson/20 pulse-sm">
                 <AlertTriangle size={32} />
@@ -45,28 +45,28 @@ export default function SLABreachManager() {
              </div>
           </div>
           <div className="flex items-center gap-4">
-             <div className="bg-bg px-6 py-4 rounded-2xl border border-border flex flex-col items-end">
+             <div className="bg-bg px-6 py-4 rounded-2xl border border-[#162F6A]/30 flex flex-col items-end">
                 <span className="text-[10px] font-black text-text-secondary opacity-40 uppercase tracking-widest">{t('GlobalBreaches')}</span>
                 <span className="text-2xl font-sora font-black text-crimson tabular-nums">{t('ActiveNodes', { count: breaches.length })}</span>
              </div>
           </div>
        </header>
 
-       <div className="bg-white rounded-[3.5rem] shadow-soft border border-border overflow-hidden">
-          <div className="p-10 border-b border-border flex justify-between items-center bg-bg/50">
+       <div className="bg-white rounded-[3.5rem] shadow-soft border border-[#162F6A]/30 overflow-hidden">
+          <div className="p-10 border-b border-[#162F6A]/30 flex justify-between items-center bg-bg/50">
              <div className="relative w-full max-w-md">
                 <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-navy opacity-30" />
                 <input 
                   type="text" 
                   placeholder={t('SearchDirectory')}
-                  className="w-full bg-white border border-border rounded-2xl pl-12 pr-6 py-4 text-xs font-bold uppercase tracking-widest text-navy focus:ring-2 ring-navy/10 outline-none"
+                  className="w-full bg-white border border-[#162F6A]/30 rounded-2xl pl-12 pr-6 py-4 text-xs font-bold uppercase tracking-widest text-navy focus:ring-2 ring-navy/10 outline-none"
                 />
              </div>
           </div>
 
           <table className="w-full text-left">
              <thead>
-                <tr className="border-b border-border bg-white">
+                <tr className="border-b border-[#162F6A]/20 bg-white">
                    <Th label="Overdue Ticket" />
                    <Th label="Category" />
                    <Th label="Primary Specialist" />

@@ -56,7 +56,7 @@ export default function TrustPanel() {
               </div>
            </div>
         </div>
-        <div className="flex items-center gap-4 bg-white px-8 py-5 rounded-3xl shadow-soft border border-border">
+        <div className="flex items-center gap-4 bg-white px-8 py-5 rounded-3xl shadow-soft border border-[#162F6A]/30">
            <Award size={24} className="text-saffron" />
            <div>
               <span className="text-[10px] font-black uppercase tracking-widest text-text-secondary opacity-40 leading-none">Global Accuracy Index</span>
@@ -74,7 +74,7 @@ export default function TrustPanel() {
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
          {/* Optimized Stacked Matrix */}
-         <div className="lg:col-span-12 bg-white rounded-[3.5rem] p-12 shadow-soft border border-border relative overflow-hidden group">
+         <div className="lg:col-span-12 bg-white rounded-[3.5rem] p-12 shadow-soft border border-[#162F6A]/30 relative overflow-hidden group">
             <div className="flex flex-col lg:flex-row justify-between lg:items-center mb-12 gap-8 relative z-10">
                <div>
                   <h3 className="text-2xl font-sora font-black text-navy uppercase tracking-tighter flex items-center gap-3">
@@ -119,7 +119,7 @@ export default function TrustPanel() {
          </div>
       </div>
 
-      <div className="p-10 bg-navy rounded-[3rem] text-white flex flex-col md:flex-row justify-between items-center gap-10 shadow-2xl relative overflow-hidden">
+      <div className="p-10 bg-navy rounded-[3rem] text-white flex flex-col md:flex-row justify-between items-center gap-10 shadow-2xl relative overflow-hidden border border-[#162F6A]">
          <div className="relative z-10 max-w-xl">
             <h3 className="text-xl font-sora font-extrabold uppercase tracking-tight text-saffron mb-4 italic">Strategic AATS Intervention</h3>
             <p className="text-sm font-medium opacity-60 leading-relaxed italic">The Jurisdictional Stack indicates a severe imbalance on the Encroachment & Drainage vectors. Recommend immediate administrative override for Ward F/North Node.</p>
@@ -138,7 +138,7 @@ export default function TrustPanel() {
 
 function DepartmentCard({ dept }) {
    return (
-      <div className="bg-white rounded-3xl p-5 shadow-sm border border-border group hover:shadow-xl hover:-translate-y-1 transition-all duration-500 relative overflow-hidden">
+      <div className="bg-white rounded-3xl p-5 shadow-sm border border-[#162F6A]/30 group hover:shadow-xl hover:-translate-y-1 transition-all duration-500 relative overflow-hidden">
          <div className="flex justify-between items-start mb-4 relative z-10">
             <div className={`p-2.5 rounded-xl text-white shadow-lg transition-transform group-hover:rotate-12`} style={{backgroundColor: dept.color}}>
                {React.cloneElement(dept.icon, { size: 14 })}

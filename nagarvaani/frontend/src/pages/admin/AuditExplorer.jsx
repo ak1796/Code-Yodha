@@ -103,7 +103,7 @@ export default function AuditExplorer() {
 
   return (
     <div className="p-10 lg:p-16 space-y-12 animate-fade-in max-w-7xl mx-auto pb-32">
-       <header className="flex justify-between items-center bg-white p-10 rounded-[3.5rem] shadow-soft border border-border">
+       <header className="flex justify-between items-center bg-white p-10 rounded-[3.5rem] shadow-soft border border-[#162F6A]/30">
           <div className="flex items-center gap-6">
              <div className="w-16 h-16 rounded-3xl bg-navy text-white flex items-center justify-center shadow-xl shadow-navy/20">
                 <Terminal size={32} />
@@ -115,7 +115,7 @@ export default function AuditExplorer() {
           </div>
           <button 
             onClick={exportCSV}
-            className="bg-white border-2 border-border text-navy px-8 py-5 rounded-2xl font-black uppercase tracking-widest text-[10px] flex items-center gap-3 hover:bg-gray-50 transition shadow-sm"
+            className="bg-white border-2 border-[#162F6A]/30 text-navy px-8 py-5 rounded-2xl font-black uppercase tracking-widest text-[10px] flex items-center gap-3 hover:bg-gray-50 transition shadow-sm"
           >
              <Download size={18} /> {t('ExportForensicCSV')}
           </button>
@@ -123,8 +123,8 @@ export default function AuditExplorer() {
 
        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
           <div className="lg:col-span-4 space-y-10">
-             <div className="bg-white rounded-[3rem] p-10 shadow-soft border border-border space-y-10">
-                <h3 className="text-sm font-black text-navy uppercase tracking-widest border-b border-border pb-6">{t('JurisdictionalSearch')}</h3>
+             <div className="bg-white rounded-[3rem] p-10 shadow-soft border border-[#162F6A]/30 space-y-10">
+                <h3 className="text-sm font-black text-navy uppercase tracking-widest border-b border-[#162F6A]/30 pb-6">{t('JurisdictionalSearch')}</h3>
                 <div className="space-y-6">
                    <div className="space-y-2">
                       <p className="text-[10px] font-black uppercase tracking-widest text-text-secondary opacity-40 ml-2">{t('TicketNodeID')}</p>
@@ -134,7 +134,7 @@ export default function AuditExplorer() {
                            type="text" 
                            value={searchId}
                            onChange={(e) => setSearchId(e.target.value)}
-                           className="w-full bg-bg border border-border rounded-2xl pl-12 pr-6 py-4 text-xs font-bold tracking-widest text-navy outline-none focus:ring-2 ring-navy/10"
+                           className="w-full bg-bg border border-[#162F6A]/30 rounded-2xl pl-12 pr-6 py-4 text-xs font-bold tracking-widest text-navy outline-none focus:ring-2 ring-navy/10"
                            placeholder={t('EnterTrackingID')}
                          />
                       </div>
@@ -156,7 +156,7 @@ export default function AuditExplorer() {
                 </div>
              </div>
 
-             <div className="bg-navy rounded-[3rem] p-10 text-white shadow-2xl space-y-8 relative overflow-hidden">
+             <div className="bg-navy rounded-[3rem] p-10 text-white shadow-2xl space-y-8 relative overflow-hidden border border-[#162F6A]">
                 <div className="relative z-10 flex items-center gap-4">
                    <ShieldCheck className="text-saffron" size={32} />
                    <h4 className="text-xl font-sora font-extrabold uppercase tracking-tight">{t('GovernanceBadge')}</h4>
@@ -167,8 +167,8 @@ export default function AuditExplorer() {
           </div>
 
           <div className="lg:col-span-8">
-             <div className={`bg-white rounded-[3.5rem] p-12 shadow-soft border border-border relative ${isSearching ? 'animate-pulse' : ''}`}>
-                <div className="flex justify-between items-center mb-16 border-b border-border pb-10">
+             <div className={`bg-white rounded-[3.5rem] p-12 shadow-soft border border-[#162F6A]/30 relative ${isSearching ? 'animate-pulse' : ''}`}>
+                <div className="flex justify-between items-center mb-16 border-b border-[#162F6A]/30 pb-10">
                    <div>
                       <h3 className="text-2xl font-sora font-extrabold text-navy tracking-tighter uppercase whitespace-normal break-all">
                         {ticketMeta ? t('IncidentLifeCycle', { id: ticketMeta.id.substring(0, 8) }) : t('InteractiveLedger')}
@@ -195,7 +195,7 @@ export default function AuditExplorer() {
                     
                     {trail.map((entry, idx) => (
                         <div key={idx} className="relative pl-14 animate-fade-in">
-                          <div className="absolute left-0 top-1 w-10 h-10 rounded-2xl bg-white border-2 border-border shadow-sm flex items-center justify-center z-10">
+                          <div className="absolute left-0 top-1 w-10 h-10 rounded-2xl bg-white border-2 border-[#162F6A]/30 shadow-sm flex items-center justify-center z-10">
                               {getIcon(entry.action?.toLowerCase())}
                           </div>
                           <div className="space-y-1">

@@ -71,7 +71,7 @@ export default function AdminTickets() {
               placeholder={t('SearchPlaceholder')} 
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="pl-10 pr-4 py-2 bg-surface border border-border rounded-xl text-sm focus:ring-2 focus:ring-navy/10 outline-none w-64"
+              className="pl-10 pr-4 py-2 bg-surface border border-[#162F6A]/30 rounded-xl text-sm focus:ring-2 focus:ring-navy/10 outline-none w-64"
             />
           </div>
         </div>
@@ -79,8 +79,8 @@ export default function AdminTickets() {
 
       <div className="flex gap-8 flex-1 overflow-hidden">
         {/* Main List */}
-        <div className="flex-1 bg-surface rounded-3xl border border-border shadow-soft overflow-hidden flex flex-col">
-          <div className="p-4 border-b border-border bg-bg/20 flex gap-4">
+        <div className="flex-1 bg-surface rounded-3xl border border-[#162F6A]/30 shadow-soft overflow-hidden flex flex-col">
+          <div className="p-4 border-b border-[#162F6A]/30 bg-bg/20 flex gap-4">
             <select 
               value={filter.city} 
               onChange={(e) => setFilter({...filter, city: e.target.value})}
@@ -125,7 +125,7 @@ export default function AdminTickets() {
               </div>
             ) : (
               <table className="w-full text-left border-collapse">
-                <thead className="sticky top-0 bg-surface/90 backdrop-blur-md z-10 border-b border-border">
+                <thead className="sticky top-0 bg-surface/90 backdrop-blur-md z-10 border-b border-[#162F6A]/30">
                   <tr className="text-[10px] uppercase tracking-widest text-text-secondary">
                     <th className="px-6 py-4 font-bold">{t('TicketDetails')}</th>
                     <th className="px-6 py-4 font-bold">{t('Location')}</th>
@@ -134,7 +134,7 @@ export default function AdminTickets() {
                     <th className="px-6 py-4 font-bold"></th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-border">
+                <tbody className="divide-y divide-[#162F6A]/10">
                   {filteredTickets.map(ticket => (
                     <tr 
                       key={ticket.id} 
@@ -213,7 +213,7 @@ export default function AdminTickets() {
                 </button>
              </div>
            ) : (
-             <div className="flex-1 bg-surface border border-border rounded-3xl p-8 flex flex-col items-center justify-center text-center opacity-40 italic">
+             <div className="flex-1 bg-surface border border-[#162F6A]/30 rounded-3xl p-8 flex flex-col items-center justify-center text-center opacity-40 italic">
                 <div className="w-16 h-16 rounded-full bg-navy/5 flex items-center justify-center mb-4">
                    <Filter className="text-navy" size={24} />
                 </div>

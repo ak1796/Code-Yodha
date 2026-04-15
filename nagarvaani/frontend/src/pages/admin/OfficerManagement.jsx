@@ -109,7 +109,7 @@ export default function OfficerManagement() {
 
   return (
     <div className="p-10 lg:p-16 space-y-12 animate-fade-in max-w-7xl mx-auto pb-32">
-       <header className="flex justify-between items-center bg-white p-10 rounded-[3.5rem] shadow-soft border border-border">
+       <header className="flex justify-between items-center bg-white p-10 rounded-[3.5rem] shadow-soft border border-[#162F6A]/30">
           <div className="flex items-center gap-6">
              <div className="w-16 h-16 rounded-3xl bg-navy text-white flex items-center justify-center shadow-xl shadow-navy/20">
                 <Users size={32} />
@@ -127,8 +127,8 @@ export default function OfficerManagement() {
           </button>
        </header>
 
-       <div className="bg-white rounded-[3.5rem] shadow-soft border border-border overflow-hidden">
-          <div className="p-10 border-b border-border flex justify-between items-center bg-bg/50">
+       <div className="bg-white rounded-[3.5rem] shadow-soft border border-[#162F6A]/30 overflow-hidden">
+          <div className="p-10 border-b border-[#162F6A]/30 flex justify-between items-center bg-bg/50">
              <div className="relative w-full max-w-md">
                 <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-navy opacity-30" />
                 <input 

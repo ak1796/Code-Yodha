@@ -94,7 +94,7 @@ export default function StrategicAnalytics() {
 
        {/* Top Row: Volume and Sources */}
        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-          <div className="lg:col-span-8 bg-white rounded-[3.5rem] p-12 shadow-soft border border-border group relative overflow-hidden">
+          <div className="lg:col-span-8 bg-white rounded-[3.5rem] p-12 shadow-soft border border-[#162F6A]/30 group relative overflow-hidden">
              <div className="flex justify-between items-center mb-12">
                 <div>
                    <h3 className="text-xl font-sora font-extrabold text-navy uppercase tracking-tighter">{t('JurisdictionalThroughput')}</h3>
@@ -127,7 +127,7 @@ export default function StrategicAnalytics() {
              <div className="absolute -right-20 -top-20 w-80 h-80 bg-navy/5 rounded-full blur-[100px] group-hover:scale-125 transition-transform duration-1000" />
           </div>
 
-          <div className="lg:col-span-4 bg-white rounded-[3.5rem] p-12 shadow-soft border border-border flex flex-col justify-between">
+          <div className="lg:col-span-4 bg-white rounded-[3.5rem] p-12 shadow-soft border border-[#162F6A]/30 flex flex-col justify-between">
              <div className="space-y-2 mb-10">
                 <h3 className="text-xl font-sora font-extrabold text-navy uppercase tracking-tighter">{t('ChannelOrigin')}</h3>
                 <p className="text-[10px] font-black text-text-secondary opacity-40 uppercase tracking-widest mt-1">{t('SourceFreq')}</p>
@@ -181,7 +181,7 @@ export default function StrategicAnalytics() {
              <div className="absolute -left-20 -bottom-20 w-80 h-80 bg-saffron/10 rounded-full blur-[100px]" />
           </div>
 
-          <div className="lg:col-span-7 bg-white rounded-[3.5rem] p-12 shadow-soft border border-border">
+          <div className="lg:col-span-7 bg-white rounded-[3.5rem] p-12 shadow-soft border border-[#162F6A]/30">
              <div className="flex justify-between items-center mb-10">
                 <h3 className="text-xl font-sora font-extrabold text-navy uppercase tracking-tighter">{t('OfficerPerfRegression')}</h3>
                 <span className="text-[10px] font-black text-text-secondary opacity-40 uppercase tracking-widest italic">{t('RankingMatrix')}</span>
@@ -212,7 +212,7 @@ function ReportButton({ icon, label, onClick }) {
 
 function RankingRow({ rank, name, score, dep }) {
    return (
-      <div className="flex items-center justify-between p-6 bg-bg/40 rounded-3xl border border-border hover:border-navy/20 transition-all group">
+      <div className="flex items-center justify-between p-6 bg-bg/40 rounded-3xl border border-[#162F6A]/30 hover:border-navy/20 transition-all group">
          <div className="flex items-center gap-6">
             <span className="text-xl font-sora font-black text-navy opacity-20">{rank}</span>
             <div>

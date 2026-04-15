@@ -56,7 +56,7 @@ export default function AdminDashboard() {
              </h1>
              <p className="text-text-secondary font-medium opacity-60 italic">{t('GlobalCommandInterface')}</p>
           </div>
-          <div className="bg-bg px-6 py-4 rounded-3xl border border-border flex items-center gap-4 shadow-sm">
+          <div className="bg-bg px-6 py-4 rounded-3xl border border-[#162F6A]/30 flex items-center gap-4 shadow-sm">
              <div className="w-2 h-2 bg-emerald rounded-full animate-pulse shadow-[0_0_10px_#10B981]" />
              <span className="text-[10px] font-black uppercase tracking-widest text-navy">{t('NodeConnection')}</span>
           </div>
@@ -74,7 +74,7 @@ export default function AdminDashboard() {
 
        {/* Chart + Distribution */}
        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-          <div className="lg:col-span-8 bg-white rounded-[3.5rem] p-12 shadow-soft border border-border group relative overflow-hidden">
+          <div className="lg:col-span-8 bg-white rounded-[3.5rem] p-12 shadow-soft border border-[#162F6A]/30 group relative overflow-hidden">
              <div className="flex gap-4 items-center border-border">
                 <BarChart3 className="text-navy" size={40} />
                 <div>
@@ -106,7 +106,7 @@ export default function AdminDashboard() {
              </div>
           </div>
 
-          <div className="lg:col-span-4 bg-navy rounded-[3.5rem] p-12 text-white shadow-2xl relative overflow-hidden flex flex-col justify-between">
+          <div className="lg:col-span-4 bg-navy rounded-[3.5rem] p-12 text-white shadow-2xl relative overflow-hidden flex flex-col justify-between border border-[#162F6A]">
              <div className="relative z-10 space-y-8">
                 <h3 className="text-xl font-sora font-extrabold uppercase tracking-tight text-saffron">{t('SensorDistribution')}</h3>
                 <div className="space-y-6">
@@ -124,7 +124,7 @@ export default function AdminDashboard() {
        </div>
 
        {/* Innovation Card: Silent Crisis Detection */}
-       <div className="bg-white rounded-[3.5rem] p-12 shadow-soft border border-border group relative overflow-hidden">
+       <div className="bg-white rounded-[3.5rem] p-12 shadow-soft border border-[#162F6A]/30 group relative overflow-hidden">
           <div className="relative z-10 flex flex-col md:flex-row gap-8 items-center">
              <div className="w-24 h-24 rounded-[2rem] bg-navy text-white flex items-center justify-center shadow-2xl">
                 <Users size={40} />
@@ -147,7 +147,7 @@ export default function AdminDashboard() {
        </div>
 
        {/* Hotspots */}
-       <div className="bg-white rounded-[3.5rem] p-12 shadow-soft border border-border">
+       <div className="bg-white rounded-[3.5rem] p-12 shadow-soft border border-[#162F6A]/30">
           <div className="flex justify-between items-center mb-10">
              <h3 className="text-xl font-sora font-extrabold text-navy uppercase tracking-tighter">{t('HighPriorityHotspots')}</h3>
              <Link to="/admin/heatmap" className="text-[10px] font-black uppercase tracking-widest text-navy bg-bg px-6 py-2 rounded-xl hover:bg-navy hover:text-white transition">{t('ViewLiveMap')}</Link>
@@ -170,7 +170,7 @@ function StatCard({ label, val, icon, color, pulse, sub, highlight }) {
       crimson: 'text-crimson bg-crimson-light/10 pulse-sm border border-crimson/20'
    };
    return (
-      <div className="p-8 rounded-[2.5rem] bg-white border border-border shadow-soft group hover:-translate-y-2 transition-transform duration-500 overflow-hidden relative">
+      <div className="p-8 rounded-[2.5rem] bg-white border border-[#162F6A]/10 shadow-soft group hover:-translate-y-2 transition-transform duration-500 overflow-hidden relative">
          <div className="flex justify-between items-start mb-6">
             <div className={`p-3 rounded-xl transition-transform group-hover:rotate-12 ${colors[color]}`}>
                {icon}
@@ -207,7 +207,7 @@ function SourceItem({ icon, label, val, color }) {
 
 function HotspotCard({ loc, count, category, status, nodesLabel }) {
    return (
-      <div className="p-6 rounded-3xl bg-bg border border-border hover:border-navy/20 transition-all cursor-pointer">
+      <div className="p-6 rounded-3xl bg-bg border border-[#162F6A]/30 hover:border-navy/20 transition-all cursor-pointer">
          <div className="flex justify-between items-start mb-4">
             <span className="text-[10px] font-black text-navy uppercase tracking-widest bg-white px-3 py-1 rounded-full shadow-sm">{category}</span>
             <span className={`text-[8px] font-black uppercase tracking-widest ${status === 'Critical' ? 'text-crimson' : 'text-navy/40'}`}>{status}</span>
