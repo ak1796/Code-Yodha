@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useRealtimeTickets } from '../../hooks/useRealtimeTickets';
 import ComplaintCard from '../../components/complaint/ComplaintCard';
 import ComplaintForm from '../../components/complaint/ComplaintForm';
-import { Plus, LogOut, Shield, MessageSquare, Activity, ChevronRight, X } from 'lucide-react';
+import { Plus, LogOut, Shield, MessageSquare, Activity, ChevronRight, X, Info } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import CitizenMap from '../../components/map/CitizenMap';
@@ -169,7 +169,7 @@ export default function CitizenDashboard() {
       </main>
 
       {showForm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-6 sm:p-12 backdrop-blur-md bg-navy/20 animate-fade-in overflow-y-auto overflow-x-hidden">
+        <div className="fixed inset-0 z-[2000] flex items-center justify-center p-6 sm:p-12 backdrop-blur-md bg-navy/20 animate-fade-in overflow-y-auto overflow-x-hidden">
            <div className="bg-surface max-w-4xl w-full rounded-[2.5rem] shadow-2xl relative my-auto">
               <button
                 onClick={() => setShowForm(false)}

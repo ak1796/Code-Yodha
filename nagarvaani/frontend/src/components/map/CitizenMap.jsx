@@ -86,13 +86,13 @@ export default function CitizenMap({ tickets = [] }) {
 
   return (
     <div className="relative w-full h-[500px] rounded-[2.5rem] overflow-hidden border border-border shadow-2xl bg-surface group">
-       {/* City Selector Layer */}
-       <div className="absolute top-6 left-6 z-[400] flex gap-2">
+       {/* City Selector Layer - Top Right to avoid Sidebar Toggle */}
+       <div className="absolute top-4 right-4 z-[400] flex flex-wrap justify-end gap-2 max-w-[calc(100%-2rem)]">
           {Object.keys(citiesConfig).map(city => (
             <button 
               key={city}
               onClick={() => setSelectedCity(city)}
-              className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${selectedCity === city ? 'bg-navy text-white shadow-lg' : 'bg-white/80 backdrop-blur text-navy/40 hover:bg-white'}`}
+              className={`px-3 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all shadow-md ${selectedCity === city ? 'bg-navy text-white shadow-lg shadow-navy/20' : 'bg-white/80 backdrop-blur-md text-navy/60 hover:bg-white'}`}
             >
               {city}
             </button>
