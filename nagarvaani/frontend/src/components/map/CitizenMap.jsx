@@ -38,13 +38,23 @@ export default function CitizenMap({ tickets = [] }) {
       .catch(err => console.error("GeoJSON load failed:", err));
   }, [selectedCity, config.filename]);
 
+  const normalizeWard = (v) => {
+    if (!v) return "";
+    let s = String(v).trim().toLowerCase();
+    s = s.replace(/^ward\s*[- ]*/, "");
+    if (s.includes('/')) return s;
+    return s.split(/[ \((]/)[0];
+  };
+
   // Identify Silent Crisis Zones Algorithmicly
   useEffect(() => {
     if (!geoData) return;
     
     const zones = geoData.features.map(feature => {
       const wardName = feature.properties[config.nameProp];
-      const wardTickets = tickets.filter(t => t.ward === wardName).length;
+      const normWard = normalizeWard(wardName);
+
+      const wardTickets = tickets.filter(t => normalizeWard(t.ward) === normWard).length;
       const population = getEstimatedPopulation(selectedCity, wardName);
       
       // Silence Ratio: High Population / Low Complaints
@@ -52,6 +62,7 @@ export default function CitizenMap({ tickets = [] }) {
       
       return {
         name: wardName,
+        normWard,
         isSilent: silenceRatio > 3000, // Threshold for "Silent Crisis"
         ratio: silenceRatio
       };

@@ -16,7 +16,14 @@ import { getEstimatedPopulation } from "../../assets/data/populationMapping";
 
 const normalizeWardValue = (value) => {
   if (value === null || value === undefined) return "";
-  return String(value).trim().toLowerCase();
+  // Stringify, trim, lowercase
+  let s = String(value).trim().toLowerCase();
+  // Remove "ward" prefix if exists (handle spaces and dashes)
+  s = s.replace(/^ward\s*[- ]*/, "");
+  // Pull just the first token to catch "A (Colaba)" or "A123" if needed, 
+  // but be careful with "F/N". Let's handle special slash cases.
+  if (s.includes('/')) return s; // Keep F/N, G/S as is
+  return s.split(/[ \((]/)[0];
 };
 
 // Mumbai ward labels aligned to BMC's 24 administrative wards.
