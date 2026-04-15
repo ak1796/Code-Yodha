@@ -1,0 +1,43 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Testing
+coverage/
+
+# Production Build
+dist/
+build/
+.next/
+out/
+
+# Environment Variables (Secrets)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.env
+
+# Supabase
+.supabase/
+
+# Deployment
+.vercel/
+.netlify/
+
+# System Files
+.DS_Store
+Thumbs.db
+*.swp
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# IDEs
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
