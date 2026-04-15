@@ -12,6 +12,7 @@ const { autoAssignOfficer } = require('../services/autoAssignService');
 const { encryptComplaint, generateToken } = require('../services/whistleblowerService');
 const { sendEmail, sendPushNotification } = require('../services/notificationService');
 const auditService = require('../services/auditService');
+const { sendCitizenConfirmation } = require('../services/emailService');
 const { authenticate } = require('../middleware/auth');
 const { complaintLimiter } = require('../middleware/rateLimiter');
 const { cleanComplaintText } = require('../utils/cleaner');
@@ -33,8 +34,8 @@ router.post('/', upload.single('photo'), complaintLimiter, async (req, res) => {
   try {
     // 1. VALIDATE & MAP JURISDICTION
     const cleanedText = cleanComplaintText(finalDescription || '');
-    if (!cleanedText || cleanedText.split(/\s+/).length < 10) {
-      return res.status(400).json({ error: 'Text must be at least 10 words after cleaning' });
+    if (!cleanedText || cleanedText.split(/\s+/).length < 3) {
+      return res.status(400).json({ error: 'Text must be at least 3 words after cleaning' });
     }
 
     const category = (req.body.category || req.body.complaint_type || 'OTHER').toUpperCase();
@@ -85,7 +86,8 @@ router.post('/', upload.single('photo'), complaintLimiter, async (req, res) => {
         status: 'filed',
         sla_deadline: slaDeadline.toISOString(),
         embedding: embedding,
-        creator_id: user_id || null
+        creator_id: user_id || null,
+        email: email
       }).select().single();
 
       if (ticketError) {
@@ -103,7 +105,6 @@ router.post('/', upload.single('photo'), complaintLimiter, async (req, res) => {
       raw_text: finalDescription,
       category,
       department,
-      email,
       lat: parseFloat(lat) || null,
       lng: parseFloat(lng) || null,
       city: city || 'Mumbai',
@@ -116,6 +117,12 @@ router.post('/', upload.single('photo'), complaintLimiter, async (req, res) => {
     if (complaintError) {
       console.error('❌ Complaint Insertion Failure:', complaintError);
       throw complaintError;
+    }
+
+    // 4.5 SEND CONFIRMATION EMAIL TO CITIZEN
+    if (email) {
+      console.log('📧 Dispatching Confirmation Pulse to Citizen:', email);
+      sendCitizenConfirmation(email, masterTicketId, category).catch(e => console.error('Email error:', e.message));
     }
 
     // 5. AUDIT & DISPATCH

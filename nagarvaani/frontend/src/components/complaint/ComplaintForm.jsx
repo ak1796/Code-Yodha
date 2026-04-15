@@ -109,7 +109,7 @@ export default function HighFidelityComplaintForm({ onSubmit, isSubmitting: pare
     house_no: '',
     street: '',
     area: '',
-    city: 'MUMBAI',
+    city: 'Mumbai',
     landmark: '',
     ward: '',
     lat: null,
@@ -125,7 +125,7 @@ export default function HighFidelityComplaintForm({ onSubmit, isSubmitting: pare
     c_house_no: '',
     c_street: '',
     c_area: '',
-    c_city: 'MUMBAI',
+    c_city: 'Mumbai',
     c_state: 'Maharashtra',
     c_country: 'India',
     c_std: '',
@@ -441,7 +441,7 @@ export default function HighFidelityComplaintForm({ onSubmit, isSubmitting: pare
                  <select 
                    value={formData.complaint_type} 
                    onChange={e => setFormData({ ...formData, complaint_type: e.target.value, complaint_subtype: '' })}
-                   className={`w-full bg-bg border ${errors.complaint_type ? 'border-crimson' : 'border-border'} rounded-2xl px-6 py-4 text-xs font-bold uppercase tracking-widest text-navy outline-none`}
+                   className={`w-full bg-bg border ${errors.complaint_type ? 'border-crimson' : 'border-border'} rounded-2xl px-6 py-4 text-xs font-bold tracking-widest text-navy outline-none`}
                  >
                     <option value="">-- SELECT --</option>
                     {COMPLAINT_TYPES.map(t => <option key={t.name} value={t.name}>{t.name}</option>)}
@@ -452,7 +452,7 @@ export default function HighFidelityComplaintForm({ onSubmit, isSubmitting: pare
                  <select 
                    value={formData.complaint_subtype} 
                    onChange={e => setFormData({ ...formData, complaint_subtype: e.target.value })}
-                   className={`w-full bg-bg border ${errors.complaint_subtype ? 'border-crimson' : 'border-border'} rounded-2xl px-6 py-4 text-xs font-bold uppercase tracking-widest text-navy outline-none`}
+                   className={`w-full bg-bg border ${errors.complaint_subtype ? 'border-crimson' : 'border-border'} rounded-2xl px-6 py-4 text-xs font-bold tracking-widest text-navy outline-none`}
                  >
                     <option value="">-- SELECT --</option>
                     {(SUBTYPES[formData.complaint_type] || SUBTYPES['DEFAULT']).map(s => <option key={s} value={s}>{s}</option>)}
@@ -463,7 +463,7 @@ export default function HighFidelityComplaintForm({ onSubmit, isSubmitting: pare
                  <input 
                    type="text" 
                    placeholder="Enter PPO number if available"
-                   className="w-full bg-bg border border-border rounded-2xl px-6 py-4 text-xs font-bold uppercase tracking-widest text-navy outline-none"
+                   className="w-full bg-bg border border-border rounded-2xl px-6 py-4 text-xs font-bold tracking-widest text-navy outline-none"
                    value={formData.ppo_no}
                    onChange={e => setFormData({ ...formData, ppo_no: e.target.value })}
                  />
@@ -482,7 +482,7 @@ export default function HighFidelityComplaintForm({ onSubmit, isSubmitting: pare
                  <textarea 
                    maxLength={150}
                    placeholder="Describe your complaint briefly (Semantic analysis will be performed)"
-                   className={`w-full h-32 bg-bg border ${errors.description ? 'border-crimson' : 'border-border'} rounded-2xl px-6 py-4 text-xs font-bold uppercase tracking-widest text-navy outline-none resize-none`}
+                   className={`w-full h-32 bg-bg border ${errors.description ? 'border-crimson' : 'border-border'} rounded-2xl px-6 py-4 text-xs font-bold tracking-widest text-navy outline-none resize-none`}
                    value={formData.description}
                    onChange={e => setFormData({ ...formData, description: e.target.value })}
                  />
@@ -514,7 +514,7 @@ export default function HighFidelityComplaintForm({ onSubmit, isSubmitting: pare
                  <Label label="Landmark (Max 60 chars)" />
                  <textarea 
                    maxLength={60}
-                   className="w-full bg-bg border border-border rounded-2xl px-6 py-4 text-xs font-bold uppercase tracking-widest text-navy outline-none h-14 resize-none"
+                   className="w-full bg-bg border border-border rounded-2xl px-6 py-4 text-xs font-bold tracking-widest text-navy outline-none h-14 resize-none"
                    placeholder="Nearby identified landmark"
                    value={formData.landmark}
                    onChange={e => setFormData({ ...formData, landmark: e.target.value })}
@@ -525,7 +525,7 @@ export default function HighFidelityComplaintForm({ onSubmit, isSubmitting: pare
                  <select 
                    value={formData.ward} 
                    onChange={handleWardChange}
-                   className={`w-full bg-bg border ${errors.ward ? 'border-crimson' : 'border-border'} rounded-2xl px-6 py-4 text-xs font-bold uppercase tracking-widest text-navy outline-none`}
+                   className={`w-full bg-bg border ${errors.ward ? 'border-crimson' : 'border-border'} rounded-2xl px-6 py-4 text-xs font-bold tracking-widest text-navy outline-none`}
                  >
                     <option value="">-- SELECT --</option>
                     {WARDS.map(w => <option key={w.name} value={w.name}>{w.name}</option>)}
@@ -537,7 +537,7 @@ export default function HighFidelityComplaintForm({ onSubmit, isSubmitting: pare
                  <select 
                    value={formData.council} 
                    onChange={e => setFormData({ ...formData, council: e.target.value })}
-                   className="w-full bg-bg border border-border rounded-2xl px-6 py-4 text-xs font-bold uppercase tracking-widest text-navy outline-none"
+                   className="w-full bg-bg border border-border rounded-2xl px-6 py-4 text-xs font-bold tracking-widest text-navy outline-none"
                  >
                     <option value="">-- SELECT --</option>
                     {COUNCILS.map(c => <option key={c} value={c}>{c}</option>)}
@@ -673,7 +673,7 @@ function Input({ label, placeholder, required, val, onChange, error }) {
        <input 
          type="text" 
          placeholder={placeholder}
-         className={`w-full bg-bg border ${error ? 'border-crimson' : 'border-border'} rounded-2xl px-6 py-4 text-xs font-bold uppercase tracking-widest text-navy outline-none focus:ring-2 ring-navy/10 transition-all`}
+         className={`w-full bg-bg border ${error ? 'border-crimson' : 'border-border'} rounded-2xl px-6 py-4 text-xs font-bold tracking-widest text-navy outline-none focus:ring-2 ring-navy/10 transition-all`}
          value={val}
          onChange={e => onChange(e.target.value)}
        />

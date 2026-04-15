@@ -26,9 +26,11 @@ const whatsappRouter = require('./routes/webhooks/whatsapp');
 const redditRouter = require('./routes/webhooks/reddit');
 const voiceRouter = require('./routes/voice');
 const bmcRouter = require('./routes/bmc');
+const grievanceRouter = require('./routes/grievance');
 
 app.use('/api/auth', authRouter);
 app.use('/api/complaints', complaintsRouter);
+app.use('/api/grievance', grievanceRouter);
 app.use('/api/tickets', ticketsRouter);
 app.use('/api/admin', adminRouter);
 app.use('/api/admin/officers', officersRouter);
