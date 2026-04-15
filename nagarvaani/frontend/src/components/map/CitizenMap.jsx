@@ -116,7 +116,13 @@ export default function CitizenMap({ tickets = [] }) {
           </div>
        </div>
 
-       <MapContainer center={config.center} zoom={11} className="w-full h-full z-10" zoomControl={false}>
+       <MapContainer 
+         key={`citizen-map-${selectedCity}-${tickets.length}`} // Force re-render on data sync
+         center={config.center} 
+         zoom={11} 
+         className="w-full h-full z-10" 
+         zoomControl={false}
+       >
           <TileLayer 
             url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -145,7 +151,7 @@ export default function CitizenMap({ tickets = [] }) {
             />
           )}
 
-          {tickets.filter(t => t.city === selectedCity).map(ticket => (
+          {tickets.filter(t => t.city === selectedCity && t.lat && t.lng).map(ticket => (
             <Marker 
               key={ticket.id} 
               position={[ticket.lat, ticket.lng]} 
