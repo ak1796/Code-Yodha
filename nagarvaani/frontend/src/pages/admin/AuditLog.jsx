@@ -3,13 +3,11 @@ import { supabase } from '../../lib/supabaseClient';
 import AuditTable from '../../components/admin/AuditTable';
 import { History, Shield, Filter, Download, Activity, RefreshCw } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { useTranslation } from 'react-i18next';
 
 export default function AuditLog() {
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('ALL');
-  const { t } = useTranslation();
 
   const fetchLogs = async () => {
     setLoading(true);

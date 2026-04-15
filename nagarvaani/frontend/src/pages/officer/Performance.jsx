@@ -22,7 +22,6 @@ const MOCK_BAR_DATA = [
 
 export default function Performance() {
   const { profile } = useAuth();
-  const { t } = useTranslation();
   const [history, setHistory] = useState([]);
 
   useEffect(() => {
@@ -67,7 +66,7 @@ export default function Performance() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
              <KPICard label={t('JurisdictionsClosed')} val="14" sub={t('ThisWeek')} icon={<CheckCircle size={24}/>} color="emerald" />
              <KPICard label={t('AvgResolutionTime')} val="38.2h" sub={t('ResolutionDeltaWindow')} icon={<Clock size={24}/>} color="navy" trend="down" />
-             <KPICard label={t('SLACompliance')} val="86.4%" sub="Grade: A+" icon={<ShieldCheck size={24}/>} color="saffron" trend="up" />
+             <KPICard label={t('SLACompliance')} val="86.4%" sub={t('GradeAPlus')} icon={<ShieldCheck size={24}/>} color="saffron" trend="up" />
              <KPICard label={t('CitizenSentiment')} val="4.2" sub={t('VoterTrust')} icon={<Star size={24}/>} color="crimson" />
           </div>
 
@@ -181,6 +180,7 @@ export default function Performance() {
 }
 
 function KPICard({ label, val, sub, icon, color, trend }) {
+   const { t } = useTranslation();
    const colors = {
       emerald: 'text-emerald bg-emerald-light/10',
       navy: 'text-navy bg-navy/5',
@@ -196,7 +196,7 @@ function KPICard({ label, val, sub, icon, color, trend }) {
             {trend && (
                <div className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-[8px] font-black ${trend === 'up' ? 'bg-emerald-light/30 text-emerald' : 'bg-crimson-light/30 text-crimson'}`}>
                   {trend === 'up' ? <ArrowUpRight size={10}/> : <ArrowDownRight size={10}/>}
-                  {trend === 'up' ? 'Trending' : '-12%'}
+                  {trend === 'up' ? t('Trending') : '-12%'}
                </div>
             )}
          </div>

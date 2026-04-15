@@ -26,9 +26,9 @@ export default function OfficerSidebar() {
         .eq('id', profile.id);
 
       if (error) throw error;
-      toast.success(nextVal ? "Field status: ACTIVE" : "Field status: AWAY");
+      toast.success(nextVal ? t('FieldStatusActive') : t('FieldStatusAway'));
     } catch (err) {
-      toast.error("Sync failed");
+      toast.error(t('SyncFailed'));
       setIsOnline(!nextVal);
     }
   };

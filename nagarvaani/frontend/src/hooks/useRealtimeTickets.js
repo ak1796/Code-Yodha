@@ -22,8 +22,8 @@ export function useRealtimeTickets(officerId) {
           // Officers see tickets in their department (Step 5)
           query = query.eq('category', profile.department);
         } else if (profile.role === 'citizen') {
-          // Transparency Grid: Citizens see city-wide public signals (filtered by city in Component)
-          // No specific eq() here so they can see all city nodes for transparency
+          // Citizens see all public tickets for transparency on the map
+          query = query.eq('city', profile.city || 'Mumbai');
         }
 
         const { data, error } = await query
@@ -41,14 +41,20 @@ export function useRealtimeTickets(officerId) {
 
     fetchTickets();
 
-    // Real-time subscription
-    let channelName = `city-signals-${profile.city}`;
-    let filterStr = `city=eq.${profile.city}`;
-
-    if (isOfficer) {
-      channelName = `dept-tickets-${profile.department}`;
+    // Real-time subscription logic
+    let channelName, filterStr;
+    if (profile.role === 'admin') {
+      channelName = 'admin-global-sync';
+      filterStr = undefined; // Global sync
+    } else if (profile.role === 'officer') {
+      channelName = `dept-sync-${profile.department}`;
       filterStr = `category=eq.${profile.department}`;
+    } else {
+      channelName = `city-sync-${profile.city || 'Mumbai'}`;
+      filterStr = `city=eq.${profile.city || 'Mumbai'}`;
     }
+    
+    console.log(`📡 [Sync] Initializing ${channelName}...`);
 
     const channel = supabase
       .channel(channelName)

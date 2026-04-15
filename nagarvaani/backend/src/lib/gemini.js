@@ -42,13 +42,12 @@ async function callGemini(systemPrompt, userText) {
 }
 
 function mockGeminiResponse(prompt) {
-  const p = prompt.toLowerCase();
-  if (p.includes('spam detection')) return { classification: 'COMPLAINT', confidence: 0.95 };
-  if (p.includes('categories')) return { category: null, severity: 'HIGH', extracted_location: 'Mumbai', summary: 'Mock summary (AI Quota Limited)' };
-  if (p.includes('keywords')) return { keywords_found: ['mock_keyword'], keyword_score: 0.7 };
-  if (p.includes('sentiment')) return { sentiment_score: 0.5, detected_language: 'en' };
-  if (p.includes('insights') || p.includes('memory')) return { insights: ['Chronic leak in Ward A detected.', 'Seasonal flooding predicted for July.', 'Contractor X audit recommended.'] };
-  if (p.includes('verified')) return { verified: true, confidence: 0.85, reason: "Mock verified" };
+  if (prompt.includes('spam detection')) return { classification: 'COMPLAINT', confidence: 0.95 };
+  if (prompt.includes('categories')) return { category: 'WATER', severity: 'HIGH', extracted_location: 'Mumbai', summary: 'Mock summary' };
+  if (prompt.includes('keywords')) return { keywords_found: ['mock_keyword'], keyword_score: 0.7 };
+  if (prompt.includes('sentiment')) return { sentiment_score: 0.5, detected_language: 'en' };
+  if (prompt.includes('insights') || prompt.includes('memory')) return { insights: ['Chronic leak in Ward A detected.', 'Seasonal flooding predicted for July.', 'Contractor X audit recommended.'] };
+  if (prompt.includes('verified')) return { verified: true, confidence: 0.85, reason: "Mock verified" };
   return {};
 }
 
@@ -66,7 +65,7 @@ exports.geminiCategorize = async (text) => {
 Classify this complaint and extract structured information.
 Identify the specific city mentioned or implied (e.g., Mumbai, Nashik, Thane).
 Return ONLY valid JSON, no markdown, no explanation.
-Categories: WATER, ELECTRICITY, ROADS, GARBAGE, DRAINAGE, PARKS, PUBLIC_SAFETY, OTHER
+Categories: WATER, ELECTRICITY, ROADS, GARBAGE, PARKS, PUBLIC_SAFETY, OTHER
 Severity: LOW, MEDIUM, HIGH
 Format: {"category": "WATER", "severity": "HIGH", "extracted_location": "Location", "extracted_city": "Mumbai", "summary": "One sentence summary"}`;
   return callGemini(prompt, text);

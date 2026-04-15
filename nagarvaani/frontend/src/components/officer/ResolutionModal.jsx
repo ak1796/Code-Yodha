@@ -46,14 +46,14 @@ export default function ResolutionModal({ ticketId, onClose, onSuccess }) {
       setAiResult({
         success: true,
         confidence,
-        msg: "Gemini Vision confirmed visible improvement. The 'after' image shows the road is clear and the pipe is repaired compared to the 'before' image."
+        msg: t('AIVerifySuccess')
       });
       await finalizeTicket();
     } else {
       setAiResult({
         success: false,
         confidence,
-        msg: "AI could not verify sufficient improvement. The two images appear too similar — no visible physical change detected."
+        msg: t('AIVerifyFail')
       });
     }
   };
@@ -84,7 +84,7 @@ export default function ResolutionModal({ ticketId, onClose, onSuccess }) {
       }
     } catch (err) {
       console.error(err);
-      toast.error("Forensic verification failed: Authority rejected evidence suite");
+      toast.error(t('AuthorityRejected'));
     }
   };
 
@@ -95,8 +95,8 @@ export default function ResolutionModal({ ticketId, onClose, onSuccess }) {
           {/* Header */}
           <div className="p-10 border-b border-border flex justify-between items-center bg-bg shadow-sm">
              <div>
-                <h3 className="text-2xl font-sora font-extrabold text-navy tracking-tighter uppercase">Resolution Evidence Suite</h3>
-                <p className="text-[10px] font-bold text-text-secondary uppercase tracking-[0.2em] opacity-40 mt-1 italic">Protocol UGIRP-SECURE-882: Resolution Verification</p>
+                <h3 className="text-2xl font-sora font-extrabold text-navy tracking-tighter uppercase">{t('ResolutionEvidenceSuite')}</h3>
+                <p className="text-[10px] font-bold text-text-secondary uppercase tracking-[0.2em] opacity-40 mt-1 italic">{t('EvidenceProtocol')}</p>
              </div>
              <button onClick={onClose} className="w-12 h-12 rounded-xl bg-white shadow-sm flex items-center justify-center hover:bg-gray-50 transition border border-border">
                 <X size={20} />
@@ -107,15 +107,15 @@ export default function ResolutionModal({ ticketId, onClose, onSuccess }) {
              {step === 1 && (
                 <div className="space-y-12 animate-fade-in">
                    <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-                      <PhotoUpload label="Before Physical Intervention" help="Evidence of burst pipe / original issue" onUpload={setBeforePhoto} photo={beforePhoto} />
-                      <PhotoUpload label="After Technical Fulfillment" help="Evidence of repair / dry road / clear zone" onUpload={setAfterPhoto} photo={afterPhoto} />
+                      <PhotoUpload label={t('BeforeIntervention')} help={t('BeforeHelp')} onUpload={setBeforePhoto} photo={beforePhoto} />
+                      <PhotoUpload label={t('AfterFulfillment')} help={t('AfterHelp')} onUpload={setAfterPhoto} photo={afterPhoto} />
                    </div>
                    <div className="bg-bg rounded-[2.5rem] p-10 border border-border flex items-center justify-between">
                       <div className="space-y-2">
                          <h4 className="flex items-center gap-3 text-sm font-black text-navy uppercase tracking-widest">
-                            <MapPin size={20} className="text-crimson" /> Jurisdictional Lock
+                            <MapPin size={20} className="text-crimson" /> {t('JurisdictionalLock')}
                          </h4>
-                         <p className="text-xs text-text-secondary font-medium italic">Physical presence within 500m of the node is mandatory for resolution.</p>
+                         <p className="text-xs text-text-secondary font-medium italic">{t('PresenceMandatory')}</p>
                       </div>
                       <button 
                         onClick={handleLocationDetection} 
@@ -125,19 +125,19 @@ export default function ResolutionModal({ ticketId, onClose, onSuccess }) {
                         disabled={isVerifyingGPS}
                       >
                          {isVerifyingGPS ? <RefreshCw size={16} className="animate-spin"/> : <Search size={16}/>}
-                         {officerLocation ? 'GPS VERIFIED' : 'Detect My Location'}
+                         {officerLocation ? t('GPSVerified') : t('DetectLocation')}
                       </button>
                    </div>
                    
                    {officerLocation && (
                       <div className="p-6 bg-emerald-light/10 border-2 border-dashed border-emerald/20 rounded-3xl flex items-center justify-between">
                          <div className="flex items-center gap-8">
-                            <LocationCoord label="Incident" val="19.1136, 72.8697" />
-                            <LocationCoord label="Officer" val={`${officerLocation.lat.toFixed(4)}, ${officerLocation.lng.toFixed(4)}`} />
+                            <LocationCoord label={t('Incident')} val="19.1136, 72.8697" />
+                            <LocationCoord label={t('Officer')} val={`${officerLocation.lat.toFixed(4)}, ${officerLocation.lng.toFixed(4)}`} />
                          </div>
                          <div className="flex flex-col items-end">
-                            <span className="text-xl font-sora font-black text-emerald">187m Offset</span>
-                            <span className="text-[9px] font-black text-emerald uppercase tracking-widest opacity-60">Verified: Within 500m Limit</span>
+                            <span className="text-xl font-sora font-black text-emerald">{t('OffsetDistance', { dist: 187 })}</span>
+                            <span className="text-[9px] font-black text-emerald uppercase tracking-widest opacity-60">{t('WithinLimit')}</span>
                          </div>
                       </div>
                    )}
@@ -148,7 +148,7 @@ export default function ResolutionModal({ ticketId, onClose, onSuccess }) {
                         onClick={verifyResolution}
                         className="w-full bg-navy text-white py-6 rounded-2xl font-black uppercase tracking-widest text-xs hover:scale-[1.02] active:scale-95 transition shadow-2xl disabled:opacity-20 disabled:cursor-not-allowed"
                       >
-                         Initiate AI Evidence Audit 
+                         {t('InitiateAIAudit')} 
                       </button>
                    </div>
                 </div>
@@ -165,8 +165,8 @@ export default function ResolutionModal({ ticketId, onClose, onSuccess }) {
                             </div>
                          </div>
                          <div className="space-y-4">
-                            <h3 className="text-2xl font-sora font-extrabold text-navy uppercase tracking-tighter">Gemini Vision Intelligence Ingesting...</h3>
-                            <p className="text-xs font-bold text-text-secondary uppercase tracking-[0.2em] opacity-40">Verifying pixel-delta between before and after infrastructure state</p>
+                            <h3 className="text-2xl font-sora font-extrabold text-navy uppercase tracking-tighter">{t('GeminiIngesting')}</h3>
+                            <p className="text-xs font-bold text-text-secondary uppercase tracking-[0.2em] opacity-40">{t('VerifyingPixelDelta')}</p>
                          </div>
                          <div className="max-w-xs mx-auto h-1.5 bg-gray-100 rounded-full overflow-hidden">
                             <div className="h-full bg-navy animate-progress" />
@@ -180,10 +180,10 @@ export default function ResolutionModal({ ticketId, onClose, onSuccess }) {
                                   {aiResult.success ? <CheckCircle size={40} /> : <AlertTriangle size={40} />}
                                </div>
                                <div>
-                                  <h3 className="text-4xl font-sora font-black tracking-tighter uppercase">{aiResult.success ? 'AI Verified' : 'Resolution Rejected'}</h3>
+                                  <h3 className="text-4xl font-sora font-black tracking-tighter uppercase">{aiResult.success ? t('AIVerified') : t('ResolutionRejected')}</h3>
                                   <div className="flex items-center justify-center gap-3 mt-4">
                                      <Activity size={18} className="animate-pulse" />
-                                     <span className="text-xs font-black uppercase tracking-widest">Confidence Coefficient: {aiResult.confidence}%</span>
+                                     <span className="text-xs font-black uppercase tracking-widest">{t('ConfidenceCoefficient')}: {aiResult.confidence}%</span>
                                   </div>
                                </div>
                                <p className="text-sm font-bold opacity-80 max-w-lg leading-relaxed italic">"{aiResult.msg}"</p>
@@ -192,13 +192,13 @@ export default function ResolutionModal({ ticketId, onClose, onSuccess }) {
                          </div>
 
                          {aiResult.success ? (
-                            <p className="text-xs font-black text-emerald uppercase tracking-[0.4em] animate-pulse">Ticket Successfully Fulfilled & Archived</p>
+                            <p className="text-xs font-black text-emerald uppercase tracking-[0.4em] animate-pulse">{t('TicketArchived')}</p>
                          ) : (
                             <button 
                               onClick={() => setStep(1)} 
                               className="px-12 py-5 bg-navy text-white rounded-2xl font-black uppercase tracking-widest text-[10px] hover:scale-105 transition shadow-xl"
                             >
-                               Recapture Evidence Suite
+                               {t('RecaptureEvidence')}
                             </button>
                          )}
                       </div>

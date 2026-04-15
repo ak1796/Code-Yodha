@@ -5,10 +5,10 @@ import { useTranslation } from 'react-i18next';
 import { useRealtimeTickets } from '../../hooks/useRealtimeTickets';
 import ComplaintCard from '../../components/complaint/ComplaintCard';
 import ComplaintForm from '../../components/complaint/ComplaintForm';
-import CitizenMap from '../../components/map/CitizenMap';
 import { Plus, LogOut, Shield, MessageSquare, Activity, ChevronRight, X, Info } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
+import CitizenMap from '../../components/map/CitizenMap';
 
 export default function CitizenDashboard() {
   const { profile, signOut } = useAuth();
@@ -102,30 +102,36 @@ export default function CitizenDashboard() {
               </div>
            </div>
 
-           <div className="bg-surface p-8 rounded-3xl shadow-soft border border-border flex flex-col justify-between">
-              <div className="flex justify-between items-start mb-6">
-                 <div className="w-12 h-12 bg-amber-light text-amber rounded-2xl flex items-center justify-center">
-                    <MessageSquare size={28} />
-                 </div>
-                 <span className="text-navy font-bold text-2xl font-sora tracking-tighter">{myTickets.length}</span>
-              </div>
-              <div>
-                 <h3 className="text-xl font-sora font-extrabold text-navy">{t('ActiveReports')}</h3>
-                 <p className="text-xs text-text-secondary mt-1 font-medium italic">{t('LiveTrackingCases')}</p>
-              </div>
-           </div>
-        </div>
-        
-        {/* Transparency Intelligence Grid */}
-        <section className="mb-12 space-y-6">
-           <div className="flex items-center justify-between px-2">
-              <h2 className="text-2xl font-sora font-extrabold text-navy tracking-tight flex items-center gap-3">
-                <Info size={24} className="text-navy/20" /> {t('TransparencyGrid')}
-              </h2>
-              <div className="text-[10px] font-bold text-text-secondary uppercase tracking-[0.2em]">{t('LiveMunicipalSignals')}</div>
-           </div>
-           <CitizenMap tickets={tickets} />
-        </section>
+            <div className="bg-surface p-8 rounded-3xl shadow-soft border border-border flex flex-col justify-between">
+               <div className="flex justify-between items-start mb-6">
+                  <div className="w-12 h-12 bg-amber-light text-amber rounded-2xl flex items-center justify-center">
+                     <MessageSquare size={28} />
+                  </div>
+                  <span className="text-navy font-bold text-2xl font-sora tracking-tighter">{myTickets.length}</span>
+               </div>
+               <div>
+                  <h3 className="text-xl font-sora font-extrabold text-navy">{t('ActiveReports')}</h3>
+                  <p className="text-xs text-text-secondary mt-1 font-medium italic">{t('LiveTrackingCases')}</p>
+               </div>
+            </div>
+         </div>
+
+         {/* TRANSPARENCY MAP SECTION */}
+         <section className="mb-16 space-y-6">
+            <div className="flex items-center justify-between px-2">
+               <h2 className="text-2xl font-sora font-extrabold text-navy tracking-tight">{t('TransparencyGrid')}</h2>
+               <div className="text-[10px] font-bold text-text-secondary uppercase tracking-[0.2em]">{t('CivilSignals')}</div>
+            </div>
+            <CitizenMap tickets={tickets} />
+            <div className="bg-white/50 p-6 rounded-[2rem] border border-border flex items-center gap-6">
+               <div className="w-12 h-12 rounded-2xl bg-navy/5 flex items-center justify-center text-navy opacity-20">
+                  <Info size={24} />
+               </div>
+               <p className="text-xs font-medium text-text-secondary italic leading-relaxed">
+                  {t('GridDescription')}
+               </p>
+            </div>
+         </section>
 
         <div className="space-y-6">
            <div className="flex items-center justify-between px-2">

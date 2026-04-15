@@ -18,7 +18,7 @@ export default function AuditExplorer() {
 
   const handleSearch = async () => {
     const input = searchId.trim();
-    if (!input) return toast.error("Please enter an Accountability Token");
+    if (!input) return toast.error(t('EnterAccountabilityToken'));
     
     const normalizedInput = input.toLowerCase();
 
@@ -31,7 +31,7 @@ export default function AuditExplorer() {
         { action: 'OFFICER_ASSIGNED', created_at: new Date().toISOString(), status_from: 'filed', status_to: 'assigned', new_value: 'Officer Ramesh' },
         { action: 'RESOLUTION_SUBMITTED', created_at: new Date().toISOString(), status_from: 'assigned', status_to: 'resolved' }
       ]);
-      return toast.success("Manifesting Forensic Sample Trace...");
+      return toast.success(t('ManifestingSample'));
     }
 
     setIsSearching(true);
@@ -63,7 +63,7 @@ export default function AuditExplorer() {
       }
 
       if (!resolvedTicket) {
-        toast.error("Accountability Token not found in Cloud Registry");
+        toast.error(t('NodeNotFound'));
         setTrail([]);
         setTicketMeta(null);
         return;
@@ -82,23 +82,23 @@ export default function AuditExplorer() {
       
       if (data && data.length > 0) {
         setTrail(data);
-        toast.success("Holographic Audit manifestation complete");
+        toast.success(t('AuditFound'));
       } else {
-        toast.success("Node located, but no forensic trail recorded yet.");
+        toast.success(t('NodeLocatedNoTrail'));
         setTrail([]);
       }
     } catch (err) {
       console.error(err);
-      toast.error("Forensic scan failed");
+      toast.error(t('ForensicScanFailed'));
     } finally {
       setIsSearching(false);
     }
   };
 
   const exportCSV = () => {
-    if (trail.length === 0) return toast.error("No forensic trail to export");
-    toast.success("Generating Immutable Forensic CSV...");
-    setTimeout(() => toast.success(`Export Complete: UGIRP_forensic_${ticketMeta?.id.substring(0, 8)}.csv`), 1500);
+    if (trail.length === 0) return toast.error(t('NoForensicTrail'));
+    toast.success(t('GeneratingForensicCSV'));
+    setTimeout(() => toast.success(t('ForensicExportComplete', { id: ticketMeta?.id.substring(0, 8) })), 1500);
   };
 
   return (
@@ -127,7 +127,7 @@ export default function AuditExplorer() {
                 <h3 className="text-sm font-black text-navy uppercase tracking-widest border-b border-border pb-6">{t('JurisdictionalSearch')}</h3>
                 <div className="space-y-6">
                    <div className="space-y-2">
-                      <p className="text-[10px] font-black uppercase tracking-widest text-text-secondary opacity-40 ml-2">Ticket ID / Node ID</p>
+                      <p className="text-[10px] font-black uppercase tracking-widest text-text-secondary opacity-40 ml-2">{t('TicketNodeID')}</p>
                       <div className="relative">
                          <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-navy opacity-30" />
                          <input 
@@ -150,7 +150,7 @@ export default function AuditExplorer() {
                         onClick={() => { setSearchId('SAMPLE'); handleSearch(); }}
                         className="text-[9px] font-black text-navy opacity-30 hover:opacity-100 transition uppercase tracking-widest underline underline-offset-4"
                       >
-                         Try SAMPLE Trace Node
+                         {t('TrySampleNode')}
                       </button>
                    </div>
                 </div>
@@ -187,7 +187,7 @@ export default function AuditExplorer() {
                 {trail.length === 0 ? (
                   <div className="py-20 text-center space-y-6">
                      <History size={64} className="mx-auto text-navy opacity-10" />
-                     <p className="text-xs font-black text-navy opacity-30 uppercase tracking-[0.2em]">Input a valid token to decrypt the forensic trail</p>
+                     <p className="text-xs font-black text-navy opacity-30 uppercase tracking-[0.2em]">{t('InputTokenDecryption')}</p>
                   </div>
                 ) : (
                   <div className="space-y-12 relative">
@@ -205,11 +205,11 @@ export default function AuditExplorer() {
                               <h4 className="text-sm font-extrabold text-navy leading-tight">{entry.action}</h4>
                               <div className="flex flex-wrap gap-4 mt-2">
                                 <p className="text-[9px] font-black text-emerald uppercase tracking-widest flex items-center gap-1.5">
-                                    <Activity size={10} /> {entry.status_from ? `Status: ${entry.status_from} → ${entry.status_to}` : `State: ${entry.status_to || 'SYNCED'}`}
+                                    <Activity size={10} /> {entry.status_from ? `${t('ForensicStatus')} ${entry.status_from} → ${entry.status_to}` : `${t('ForensicState')} ${entry.status_to || 'SYNCED'}`}
                                 </p>
                                 {entry.new_value && (
                                   <p className="text-[9px] font-black text-saffron uppercase tracking-widest flex items-center gap-1.5">
-                                    <Zap size={10} /> Value: {entry.new_value}
+                                    <Zap size={10} /> {t('ForensicValue')} {entry.new_value}
                                   </p>
                                 )}
                               </div>

@@ -13,7 +13,7 @@ export default function AnonymousTracker() {
 
   const handleTrack = async (e) => {
     e.preventDefault();
-    if (token.length < 16) return toast.error("Invalid token format");
+    if (token.length < 16) return toast.error(t('InvalidTokenFormat'));
     setLoading(true);
     try {
       const { data, error } = await supabase
@@ -88,7 +88,7 @@ export default function AnonymousTracker() {
                    <Activity size={18} className="text-navy opacity-40 mt-1" />
                    <div>
                       <p className="text-[10px] text-text-secondary font-bold uppercase tracking-widest">{t('PublicImpact')}</p>
-                      <p className="text-sm font-bold text-navy">{ticket.affected_count} residents affected by this {ticket.category?.toLowerCase()} issue.</p>
+                      <p className="text-sm font-bold text-navy">{t('AffectedResidentsSummary', { count: ticket.affected_count, category: ticket.category?.toLowerCase() })}</p>
                    </div>
                 </div>
                 <p className="text-[10px] text-center text-text-secondary italic">{t('IdentityHidden')}</p>
