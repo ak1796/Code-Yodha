@@ -32,15 +32,15 @@ export default function Auth() {
       if (isLogin) {
         const { error } = await signIn(email, password);
         if (error) throw error;
-        toast.success(t('VerifySuccess', { role: t(activeRole.charAt(0).toUpperCase() + activeRole.slice(1)) }));
+        toast.success(`Identity Verified: Accessing ${activeRole.charAt(0).toUpperCase() + activeRole.slice(1)} Dashboard`);
         setTimeout(() => navigate(activeRole === 'admin' ? '/admin/heatmap' : `/${activeRole}/dashboard`), 500);
       } else {
         const { error } = await signUp(email, password, fullName, activeRole, { department, city });
         if (error) throw error;
-        toast.success(t('RegisterSuccess', { role: t(activeRole.charAt(0).toUpperCase() + activeRole.slice(1)) }));
+        toast.success(`${activeRole.charAt(0).toUpperCase() + activeRole.slice(1)} Registered. Accessing your dashboard...`);
       }
     } catch (error) {
-      toast.error(error.message || error || t('AuthError'));
+      toast.error(error.message || error || "Credential rejection: Check your entry.");
     } finally {
       setLoading(false);
     }
@@ -94,7 +94,7 @@ export default function Auth() {
                     {ROLE_CONFIG[role].icon}
                   </div>
                   <div className="text-[10px] font-bold uppercase tracking-widest text-navy text-center leading-none">
-                    {t(role.charAt(0).toUpperCase() + role.slice(1))}
+                    {role}
                   </div>
                 </button>
               ))}

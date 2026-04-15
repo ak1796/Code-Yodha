@@ -53,7 +53,7 @@ export default function OfficerDashboard() {
                        {profile?.department} {t('Specialist')}
                     </span>
                     <span className="text-[10px] font-bold text-text-secondary opacity-40 uppercase tracking-widest">
-                       {t('Ward')}: {profile?.ward_name || t('MumbaiHQ')}
+                       {t('Ward')}: {profile?.ward_name || 'Mumbai HQ'}
                     </span>
                  </div>
               </div>
@@ -94,7 +94,7 @@ export default function OfficerDashboard() {
            <StatsCard label={t('AssignedToday')} value={realtimeStats.assignedToday} icon={<Plus size={22} />} color="navy" />
            <StatsCard label={t('ResolvedToday')} value={realtimeStats.resolvedToday} icon={<CheckCircle size={22} />} color="emerald" />
            <StatsCard label={t('SLABreaches')} value={realtimeStats.breaches} icon={<AlertCircle size={22} />} color="crimson" pulse={realtimeStats.breaches > 0} />
-           <StatsCard label={t('PerformanceScore')} value={`${realtimeStats.performance}%`} icon={<TrendingUp size={22} />} color="saffron" sub={t('GradeElite')} />
+           <StatsCard label={t('PerformanceScore')} value={`${realtimeStats.performance}%`} icon={<TrendingUp size={22} />} color="saffron" sub="Grade: Elite" />
         </div>
 
         {/* Ticket Area */}

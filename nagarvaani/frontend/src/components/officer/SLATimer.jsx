@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Clock, AlertTriangle } from 'lucide-react';
 
+import { useTranslation } from 'react-i18next';
+
 export default function SLATimer({ deadline, isResolved }) {
+  const { t } = useTranslation();
   const [timeLeft, setTimeLeft] = useState(null);
   const [status, setStatus] = useState('NORMAL');
 

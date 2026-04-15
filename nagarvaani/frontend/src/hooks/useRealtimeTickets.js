@@ -22,8 +22,8 @@ export function useRealtimeTickets(officerId) {
           // Officers see tickets in their department (Step 5)
           query = query.eq('category', profile.department);
         } else if (profile.role === 'citizen') {
-          // Citizens see all public tickets for transparency on the map
-          query = query.eq('city', profile.city || 'Mumbai');
+          // Citizens see tickets they created
+          query = query.eq('creator_id', profile.id);
         }
 
         const { data, error } = await query
@@ -41,20 +41,14 @@ export function useRealtimeTickets(officerId) {
 
     fetchTickets();
 
-    // Real-time subscription logic
-    let channelName, filterStr;
-    if (profile.role === 'admin') {
-      channelName = 'admin-global-sync';
-      filterStr = undefined; // Global sync
-    } else if (profile.role === 'officer') {
-      channelName = `dept-sync-${profile.department}`;
+    // Real-time subscription
+    let channelName = `citizen-tickets-${profile.id}`;
+    let filterStr = `creator_id=eq.${profile.id}`;
+
+    if (isOfficer) {
+      channelName = `dept-tickets-${profile.department}`;
       filterStr = `category=eq.${profile.department}`;
-    } else {
-      channelName = `city-sync-${profile.city || 'Mumbai'}`;
-      filterStr = `city=eq.${profile.city || 'Mumbai'}`;
     }
-    
-    console.log(`📡 [Sync] Initializing ${channelName}...`);
 
     const channel = supabase
       .channel(channelName)
@@ -69,7 +63,7 @@ export function useRealtimeTickets(officerId) {
         } else if (payload.eventType === 'UPDATE') {
           setTickets(prev => prev.map(t => t.id === payload.new.id ? payload.new : t));
         } else if (payload.eventType === 'DELETE') {
-          setTickets(prev => prev.filter(t => t.id !== payload.old.id));
+          setTickets(prev => prev.filter(t => t.id === payload.old.id));
         }
       })
       .subscribe();

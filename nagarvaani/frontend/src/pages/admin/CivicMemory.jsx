@@ -106,7 +106,7 @@ export default function CivicMemory() {
                        <td className="py-8">
                           <div className="flex items-center gap-3">
                              <span className="text-xl font-sora font-black text-navy">{zone.recurrences}x</span>
-                             <span className="text-[9px] font-black uppercase tracking-widest text-crimson px-2 py-0.5 bg-crimson/10 rounded-full animate-pulse">{t('Chronic')}</span>
+                             <span className="text-[9px] font-black uppercase tracking-widest text-crimson px-2 py-0.5 bg-crimson/10 rounded-full animate-pulse">Chronic</span>
                           </div>
                        </td>
                        <td className="py-8">
@@ -153,9 +153,9 @@ export default function CivicMemory() {
             <h4 className="text-xs font-black text-navy uppercase tracking-[0.2em] opacity-40 flex items-center gap-3">
                <TrendingUp size={16} /> {t('PatternIntelligence')}
             </h4>
-            <InsightRow title={t('MonsoonMultiplier')} desc={t('MonsoonDesc')} />
-            <InsightRow title={t('AutumnFlux')} desc={t('AutumnDesc')} />
-            <InsightRow title={t('TouristPeak')} desc={t('TouristDesc')} />
+            <InsightRow title="Monsoon Multiplier" desc="Roads complaints in Kurla West spike 3x every July/August. Pre-monsoon intervention in June has historically reduced this by 40%." />
+            <InsightRow title="Autumn Flux" desc="Water supply complaints in Andheri increase every October-November during pipeline maintenance season." />
+            <InsightRow title="Tourist Peak Load" desc="Garbage complaints peak every December-January in tourist areas of Colaba and Marine Lines." />
          </div>
       </div>
     </div>

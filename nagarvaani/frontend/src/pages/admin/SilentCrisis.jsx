@@ -23,17 +23,17 @@ export default function SilentCrisis() {
        <header className="flex justify-between items-center">
           <div className="space-y-2">
              <h1 className="text-4xl font-sora font-extrabold text-navy tracking-tight uppercase flex items-center gap-4">
-                <EyeOff className="text-navy opacity-20" size={40} /> {t('SilentCrisisMatrix')}
+                <EyeOff className="text-navy opacity-20" size={40} /> Silent Crisis Matrix
              </h1>
-             <p className="text-text-secondary font-medium opacity-60 italic">{t('SilentCrisisDesc')}</p>
+             <p className="text-text-secondary font-medium opacity-60 italic">Algorithmic Identification of Under-served Municipal Wards.</p>
           </div>
           <div className="bg-white px-8 py-4 rounded-3xl shadow-soft border border-border flex items-center gap-4">
              <div className="w-10 h-10 rounded-xl bg-crimson text-white flex items-center justify-center shadow-lg shadow-crimson/20">
                 <AlertTriangle size={20} />
              </div>
              <div>
-                <span className="text-[10px] font-black uppercase tracking-widest text-text-secondary opacity-40">{t('GlobalBlindSpots')}</span>
-                <p className="text-sm font-extrabold text-navy uppercase tracking-tighter">{t('CriticalNodes', { count: '02' })}</p>
+                <span className="text-[10px] font-black uppercase tracking-widest text-text-secondary opacity-40">Global Blind Spots</span>
+                <p className="text-sm font-extrabold text-navy uppercase tracking-tighter">02 Critical Nodes</p>
              </div>
           </div>
        </header>
@@ -44,11 +44,11 @@ export default function SilentCrisis() {
              <table className="w-full text-left">
                 <thead>
                    <tr className="border-b border-border bg-bg/30">
-                      <Th label={t('WardJurisdictions')} />
-                      <Th label={t('Population')} />
-                      <Th label={t('Complaints')} />
-                      <Th label={t('SilenceRatio')} />
-                      <Th label={t('RiskLevel')} />
+                      <Th label="Ward Jurisdictions" />
+                      <Th label="Population" />
+                      <Th label="Complaints" />
+                      <Th label="Silence Ratio" />
+                      <Th label="Risk Level" />
                    </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
@@ -65,7 +65,7 @@ export default function SilentCrisis() {
                             </div>
                          </td>
                          <td className="py-8 font-bold text-navy opacity-60 text-xs">{ward.population.toLocaleString()}</td>
-                         <td className="py-8 font-bold text-navy opacity-60 text-xs">{ward.complaints} {t('Filed')}</td>
+                         <td className="py-8 font-bold text-navy opacity-60 text-xs">{ward.complaints} Filed</td>
                          <td className="py-8">
                             <div className="flex flex-col">
                                <span className="text-xs font-black text-navy opacity-80">1:{ward.ratio.toLocaleString()}</span>
@@ -90,8 +90,8 @@ export default function SilentCrisis() {
              {selectedWard ? (
                 <div className="bg-navy rounded-[3.5rem] p-10 text-white shadow-2xl h-full space-y-10 animate-slide-in-right">
                    <div className="space-y-2">
-                      <h3 className="text-2xl font-sora font-extrabold uppercase tracking-tight text-saffron">{selectedWard.name} {t('Intervention')}</h3>
-                      <p className="text-[10px] font-black text-white/40 uppercase tracking-widest italic">{t('MitigationActive')}</p>
+                      <h3 className="text-2xl font-sora font-extrabold uppercase tracking-tight text-saffron">{selectedWard.name} Intervention</h3>
+                      <p className="text-[10px] font-black text-white/40 uppercase tracking-widest italic">Mitigation Protocol ACTIVE</p>
                    </div>
 
                    <div className="space-y-6">
@@ -102,14 +102,14 @@ export default function SilentCrisis() {
                    </div>
 
                    <div className="pt-8 border-t border-white/10 italic text-[10px] font-medium opacity-40">
-                      {t('AuthorizingMsg')}
+                      Authorizing an action will log the task in the Field Operative Ledger and assign a tactical unit within 2 hours.
                    </div>
                 </div>
              ) : (
                 <div className="h-full bg-white rounded-[3.5rem] border-4 border-dashed border-border flex flex-col items-center justify-center p-10 text-center opacity-40">
                    <HelpCircle size={64} className="mb-4 text-navy" />
-                   <h3 className="text-xl font-sora font-extrabold text-navy uppercase tracking-tighter">{t('SelectWardNode')}</h3>
-                   <p className="text-xs font-bold uppercase tracking-widest mt-2">{t('SelectWardDesc')}</p>
+                   <h3 className="text-xl font-sora font-extrabold text-navy uppercase tracking-tighter">Select Ward Node</h3>
+                   <p className="text-xs font-bold uppercase tracking-widest mt-2">To view recommended crisis interventions.</p>
                 </div>
              )}
           </div>

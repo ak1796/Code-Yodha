@@ -11,11 +11,13 @@ import {
   AlertTriangle, ShieldAlert, Clock, Globe, ShieldCheck, Mail, History
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
 export default function TicketDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { profile } = useAuth();
+  const { t } = useTranslation();
   const [ticket, setTicket] = useState(null);
   const [auditLog, setAuditLog] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -54,7 +56,7 @@ export default function TicketDetail() {
       setAuditLog(logData || []);
     } catch (err) {
       console.error(err);
-      toast.error(t('FailedSyncJurisdiction'));
+      toast.error("Failed to sync jurisdictional data");
     } finally {
       setLoading(false);
     }
@@ -62,7 +64,7 @@ export default function TicketDetail() {
 
   const updateStatus = async (newStatus) => {
     try {
-      const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
+      const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5176';
       const token = localStorage.getItem('nv_token');
       
       const res = await axios.patch(`${backendUrl}/api/tickets/${id}/status`, 
@@ -71,12 +73,12 @@ export default function TicketDetail() {
       );
 
       if (res.status === 200) {
-        toast.success(t('NodeTransition', { status: newStatus.toUpperCase() }));
+        toast.success(`Node transition: ${newStatus.toUpperCase()}`);
         fetchTicketData(); // Refresh UI
       }
     } catch (err) {
       console.error(err);
-      const msg = err.response?.data?.message || err.response?.data?.error || t('TransitionBlocked');
+      const msg = err.response?.data?.message || err.response?.data?.error || "Transition blocked by system authorization";
       toast.error(msg);
     }
   };
@@ -84,7 +86,7 @@ export default function TicketDetail() {
   if (loading || !ticket) return (
     <div className="min-h-screen bg-bg flex items-center justify-center">
        <div className="p-20 text-center animate-pulse py-40 text-navy font-sora font-extrabold text-2xl tracking-tighter">
-          {t('DecipheringNode')}
+          DECIPHERING ENCRYPTED NODE...
        </div>
     </div>
   );
@@ -108,13 +110,13 @@ export default function TicketDetail() {
                    <div className="space-y-4">
                       <div className="flex items-center gap-4">
                          <span className="px-5 py-1.5 bg-navy text-white text-[10px] font-black rounded-full uppercase tracking-widest">UGIRP-{id.substring(0, 5)}</span>
-                         <span className="text-text-secondary opacity-30 text-xs font-bold uppercase tracking-widest italic">{ticket.category} / {profile?.department || t('Admin')} {t('Jurisdiction')}</span>
+                         <span className="text-text-secondary opacity-30 text-xs font-bold uppercase tracking-widest italic">{ticket.category} / {profile?.department || 'CITY'} JURISDICTION</span>
                       </div>
                       <h1 className="text-4xl lg:text-5xl font-sora font-extrabold text-navy tracking-tighter leading-tight max-w-2xl">{ticket.title}</h1>
                       <div className="flex items-center gap-6 pt-4">
                          <Badge icon={<MapPin size={14}/>} label={ticket.address || 'Andheri West, Mumbai'} />
                          <Badge icon={<ShieldAlert size={14}/>} label={`Priority ${ticket.priority_score}`} color="crimson" />
-                         <Badge icon={<Clock size={14}/>} label={t('AutoAssigned')} />
+                         <Badge icon={<Clock size={14}/>} label="Auto-Assigned" />
                       </div>
                    </div>
                    <SLATimer deadline={ticket.sla_deadline} isResolved={ticket.status === 'resolved'} />
@@ -128,7 +130,7 @@ export default function TicketDetail() {
                    <h3 className="flex items-center gap-3 text-xs font-black uppercase tracking-widest text-text-secondary mb-6 border-b border-border pb-4">
                       <Globe size={18} className="text-navy" /> {t('OriginalSignal')}
                    </h3>
-                   <p className="text-navy font-bold leading-relaxed opacity-80 italic">"{ticket.original_description || t('SignalDetectedDialect')}"</p>
+                   <p className="text-navy font-bold leading-relaxed opacity-80 italic">"{ticket.original_description || 'Municipal signal detected in local dialect. AI translation active.'}"</p>
                 </div>
                 <div className="bg-navy rounded-[3rem] p-10 shadow-2xl text-white">
                    <h3 className="flex items-center gap-3 text-xs font-black uppercase tracking-widest text-white/40 mb-6 border-b border-white/10 pb-4">
@@ -143,26 +145,26 @@ export default function TicketDetail() {
                 <div className="flex justify-between items-center">
                    <h3 className="text-xl font-sora font-extrabold text-navy uppercase tracking-tighter">{t('JurisdictionalClusterMap')}</h3>
                    <div className="flex gap-4">
-                      <Metric label={t('MergedNodes')} val={ticket.cluster_size || 1} />
+                      <Metric label="Merged Nodes" val={ticket.cluster_size || 1} />
                       <Metric label={t('PublicSignals')} val={Math.floor((ticket.cluster_size || 1) * 0.6)} />
                    </div>
                 </div>
                 <div className="h-[400px] rounded-[2.5rem] overflow-hidden border-4 border-gray-50 bg-gray-100 flex items-center justify-center text-navy font-bold">
                    <MapComponent lat={ticket.lat} lng={ticket.lng} />
                 </div>
-                <p className="text-xs font-bold text-text-secondary uppercase tracking-[0.2em] opacity-40 italic text-center">{t('VisualizingTelemetry')}</p>
+                <p className="text-xs font-bold text-text-secondary uppercase tracking-[0.2em] opacity-40 italic text-center">Visualizing jurisdictional telemetry across the municipal grid.</p>
              </div>
 
              {/* Accountability Section: USP 9 SLA */}
              <div className="bg-white rounded-[3.5rem] p-12 shadow-soft border border-border grid grid-cols-1 md:grid-cols-2 gap-12">
                 <div>
                    <h4 className="flex items-center gap-3 text-sm font-black text-navy uppercase tracking-widest mb-10 border-b border-border pb-6">
-                      <AlertTriangle size={20} className="text-crimson" /> USP 9 {t('AccountabilityWindow')}
+                      <AlertTriangle size={20} className="text-crimson" /> USP 9 Accountability Window
                    </h4>
                    <div className="space-y-8">
-                      <TimelineRow label={t('FirstDetected')} val={new Date(ticket.created_at).toLocaleString()} highlight />
-                      <TimelineRow label={t('SLAType')} val={`${ticket.category} ${t('ResponseGrid')}`} />
-                      <TimelineRow label={t('SLACounterOffset')} val={t('ZeroOffsetDesc')} />
+                      <TimelineRow label="First Detected" val={new Date(ticket.created_at).toLocaleString()} highlight />
+                      <TimelineRow label="SLA Type" val={`${ticket.category} Response Grid`} />
+                      <TimelineRow label="SLA Counter Offset" val="Zero (Pre-form filing window included)" />
                    </div>
                 </div>
                 <div className="bg-bg rounded-3xl p-8 flex flex-col justify-center">
@@ -175,7 +177,7 @@ export default function TicketDetail() {
                       <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
                          <div className="w-3/4 h-full bg-crimson" />
                       </div>
-                      <p className="text-[9px] font-bold text-crimson uppercase tracking-widest italic opacity-60">{t('SystemInitiatedAccountability')}</p>
+                      <p className="text-[9px] font-bold text-crimson uppercase tracking-widest italic opacity-60">System initiated accountability before official report.</p>
                    </div>
                 </div>
              </div>
@@ -185,7 +187,7 @@ export default function TicketDetail() {
           <div className="lg:col-span-4 space-y-12">
              {/* Action Control */}
              <div className="bg-navy rounded-[3rem] p-10 shadow-2xl text-white space-y-10">
-                <h3 className="text-lg font-sora font-extrabold uppercase tracking-tight text-saffron">{t('ActionTerminal')}</h3>
+                <h3 className="text-lg font-sora font-extrabold uppercase tracking-tight text-saffron">Action Terminal</h3>
                 
                 <div className="space-y-4">
                    {['filed', 'assigned', 'in_progress'].includes(ticket.status) && (
@@ -212,7 +214,7 @@ export default function TicketDetail() {
                 </div>
 
                 <div className="pt-8 border-t border-white/10 italic text-[10px] font-medium opacity-40">
-                   {t('NodeStatusTrigger')}
+                   Changing node status will trigger real-time dispatch to citizen dashboard and audit ledger.
                 </div>
              </div>
 
@@ -222,7 +224,7 @@ export default function TicketDetail() {
                    <h3 className="text-sm font-black text-navy uppercase tracking-widest flex items-center gap-3">
                       <History size={18} /> {t('ForensicLedger')}
                    </h3>
-                   <span className="px-3 py-1 bg-emerald-light/20 text-emerald text-[8px] font-black rounded-full uppercase tracking-widest">{t('TamperProof')}</span>
+                   <span className="px-3 py-1 bg-emerald-light/20 text-emerald text-[8px] font-black rounded-full uppercase tracking-widest">Tamper-Proof</span>
                 </div>
 
                 <div className="space-y-10 relative">
@@ -240,7 +242,7 @@ export default function TicketDetail() {
                    {!auditLog.length && (
                       <div className="relative pl-10 opacity-30">
                         <div className="absolute left-1.5 top-2 w-3 h-3 rounded-full bg-navy opacity-40" />
-                        <p className="text-xs font-bold leading-tight">{t('AwaitingSpecialist')}</p>
+                        <p className="text-xs font-bold leading-tight">Awaiting Specialist Action...</p>
                       </div>
                    )}
                 </div>

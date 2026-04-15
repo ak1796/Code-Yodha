@@ -123,40 +123,17 @@ export default function AdminDashboard() {
           </div>
        </div>
 
-       {/* Innovation Card: Silent Crisis Detection */}
-       <div className="bg-white rounded-[3.5rem] p-12 shadow-soft border border-border group relative overflow-hidden">
-          <div className="relative z-10 flex flex-col md:flex-row gap-8 items-center">
-             <div className="w-24 h-24 rounded-[2rem] bg-navy text-white flex items-center justify-center shadow-2xl">
-                <Users size={40} />
-             </div>
-             <div className="flex-1 space-y-2">
-                <div className="flex items-center gap-3">
-                   <span className="px-3 py-1 bg-crimson/10 text-crimson text-[10px] font-black rounded-full uppercase tracking-widest">{t('InnovationModule')}</span>
-                   <span className="text-[10px] font-bold text-navy/20 uppercase tracking-[0.2em]">{t('SilentCrisisDetection')} v1.0</span>
-                </div>
-                <h3 className="text-2xl font-sora font-black text-navy uppercase tracking-tighter">{t('UnderServedId')}</h3>
-                <p className="text-xs font-medium text-text-secondary italic leading-relaxed max-w-2xl">
-                   {t('SilentCrisisInnovationDesc')}
-                </p>
-             </div>
-             <Link to="/admin/heatmap" className="bg-navy text-white px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] hover:bg-navy-light transition shadow-xl">
-                {t('OpenRiskMatrix')}
-             </Link>
-          </div>
-          <div className="absolute right-0 top-0 w-64 h-full bg-navy/5 -skew-x-12 translate-x-32" />
-       </div>
-
        {/* Hotspots */}
        <div className="bg-white rounded-[3.5rem] p-12 shadow-soft border border-border">
           <div className="flex justify-between items-center mb-10">
              <h3 className="text-xl font-sora font-extrabold text-navy uppercase tracking-tighter">{t('HighPriorityHotspots')}</h3>
-             <Link to="/admin/heatmap" className="text-[10px] font-black uppercase tracking-widest text-navy bg-bg px-6 py-2 rounded-xl hover:bg-navy hover:text-white transition">{t('ViewLiveMap')}</Link>
+             <button className="text-[10px] font-black uppercase tracking-widest text-navy bg-bg px-6 py-2 rounded-xl hover:bg-navy hover:text-white transition">{t('ViewLiveMap')}</button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-             <HotspotCard loc="Kurla West" count="47" category={t('WATER_SUPPLY')} status={t('Active')} nodesLabel={t('NodesActive')} />
-             <HotspotCard loc="Dharavi G/N" count="12" category={t('SilentCrisis')} status={t('Breached')} nodesLabel={t('PopulationDelta')} />
-             <HotspotCard loc="Govandi M/E" count="5" category={t('HEALTH')} status={t('Risk')} nodesLabel={t('LowEngagement')} />
-             <HotspotCard loc="Bandra East" count="6" category={t('ELECTRICITY')} status={t('Resolved')} nodesLabel={t('NodesActive')} />
+             <HotspotCard loc="Kurla West" count="47" category="Water" status="Critical" nodesLabel={t('NodesActive')} />
+             <HotspotCard loc="Dharavi Block 2" count="12" category="Garbage" status="Silent" nodesLabel={t('NodesActive')} />
+             <HotspotCard loc="Andheri Node" count="31" category="Roads" status="Active" nodesLabel={t('NodesActive')} />
+             <HotspotCard loc="Bandra East" count="6" category="Elec" status="Stable" nodesLabel={t('NodesActive')} />
           </div>
        </div>
     </div>

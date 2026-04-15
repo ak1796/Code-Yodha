@@ -33,7 +33,8 @@
     "node-cron": "^4.2.1",
     "node-telegram-bot-api": "^0.67.0",
     "nodemailer": "^8.0.4",
-    "snoowrap": "^1.23.0"
+    "snoowrap": "^1.23.0",
+    "twilio": "^5.13.1"
   },
   "devDependencies": {
     "nodemon": "^3.1.14"

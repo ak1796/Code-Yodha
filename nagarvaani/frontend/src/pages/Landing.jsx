@@ -50,7 +50,7 @@ export default function Landing() {
 
       <main className="max-w-7xl mx-auto px-6 pt-40 md:pt-48 text-center relative">
         <div className="inline-flex items-center gap-2 px-6 py-2 bg-gray-100 rounded-full text-[10px] font-bold text-navy uppercase tracking-[0.2em] mb-10 shadow-sm animate-fade-in animate-bounce-subtle">
-           <Globe size={14} className="text-navy animate-spin-slow" /> {t('IntelligenceForCities')}
+           <Globe size={14} className="text-navy animate-spin-slow" /> Intelligence For Indian Cities
         </div>
         
         <h1 className="text-6xl md:text-8xl font-sora font-extrabold text-navy tracking-tighter leading-[0.95] animate-fade-in-up">
@@ -59,7 +59,7 @@ export default function Landing() {
         </h1>
         
         <p className="mt-8 text-xl text-text-secondary max-w-3xl mx-auto font-medium leading-relaxed opacity-80 px-4 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-           {t('LandingHeroDesc')}
+           Replace bureaucracy with **actionable intelligence**. NagarVaani (नगरवाणी) empowers millions to resolve civic issues via AI-driven categorization, deduplication, and SLA accountability.
         </p>
 
         <div className="mt-12 flex flex-col sm:flex-row gap-6 justify-center animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
@@ -73,32 +73,32 @@ export default function Landing() {
 
         {/* Dynamic Metric Cards */}
         <div className="mt-32 grid grid-cols-1 md:grid-cols-4 gap-8 animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
-           <MetricCard label={t('ResolvedActions')} value="14.2K" color="navy" icon={<Activity />} />
-           <MetricCard label={t('ResolutionRate')} value="98%" color="emerald" icon={<Zap />} />
-           <MetricCard label={t('PublicTrust')} value="85" color="amber" icon={<Users />} />
-           <MetricCard label={t('SLACompliance')} value="92%" color="navy" icon={<TrendingUp />} />
+           <MetricCard label="Resolved Actions" value="14.2K" color="navy" icon={<Activity />} />
+           <MetricCard label="Resolution Rate" value="98%" color="emerald" icon={<Zap />} />
+           <MetricCard label="Public Trust" value="85" color="amber" icon={<Users />} />
+           <MetricCard label="SLA Compliance" value="92%" color="navy" icon={<TrendingUp />} />
         </div>
 
         {/* Feature Grid */}
         <section className="mt-40 grid grid-cols-1 lg:grid-cols-2 gap-12 text-left pb-40">
            <FeatureSection 
-             title={t('FeatureAITitle')}
-             desc={t('FeatureAIDesc')}
+             title="AI-Powered Ingestion" 
+             desc="Submit complaints in any language using Voice-to-Text. Gemini 1.5 Flash immediately categorizes, assesses sentiment, and extracts precise severity scores."
              icon={<Zap className="text-saffron" size={48} />}
            />
            <FeatureSection 
-             title={t('FeatureAnonTitle')}
-             desc={t('FeatureAnonDesc')}
+             title="Anonymous Decryption" 
+             desc="Encrypted whistleblower channels protect citizens reporting corruption, with unique tokens allowing live status tracking without identity exposure."
              icon={<Shield className="text-navy" size={48} />}
            />
            <FeatureSection 
-             title={t('FeatureMemoryTitle')} 
-             desc={t('FeatureMemoryDesc')}
+             title="Civic Memory Analysis" 
+             desc="Institutional memory identifies recurring infrastructure failures and seasonal patterns, linking them to specific contractors for accountability."
              icon={<MessageSquare className="text-emerald" size={48} />}
            />
            <FeatureSection 
-             title={t('FeatureTrustTitle')}
-             desc={t('FeatureTrustDesc')}
+             title="Aam Aadmi Trust Score" 
+             desc="Real-time performance rankings for municipal departments. Transparency that drives competition and service delivery excellence."
              icon={<Activity className="text-amber" size={48} />}
            />
         </section>

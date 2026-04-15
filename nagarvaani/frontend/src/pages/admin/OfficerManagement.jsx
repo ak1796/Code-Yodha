@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { 
   Users, MapPin, Search, Filter, Plus, 
@@ -6,6 +7,7 @@ import {
   AlertTriangle, Trash2, UserPlus
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { supabase } from '../../lib/supabaseClient';
 
 export default function OfficerManagement() {
   const { t } = useTranslation();

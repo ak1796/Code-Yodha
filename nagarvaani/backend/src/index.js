@@ -9,6 +9,7 @@ const app = express();
 app.use(helmet());
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));
 
 // Basic health check
@@ -22,6 +23,7 @@ const officersRouter = require('./routes/officers');
 const votesRouter = require('./routes/votes');
 const authRouter = require('./routes/auth');
 const telegramRouter = require('./routes/webhooks/telegram');
+const whatsappRouter = require('./routes/webhooks/whatsapp');
 const redditRouter = require('./routes/webhooks/reddit');
 const voiceRouter = require('./routes/voice');
 const bmcRouter = require('./routes/bmc');
@@ -33,12 +35,17 @@ app.use('/api/admin', adminRouter);
 app.use('/api/admin/officers', officersRouter);
 app.use('/api/tickets', votesRouter); 
 app.use('/webhooks/telegram', telegramRouter);
+app.use('/webhooks/whatsapp', whatsappRouter);
 app.use('/webhooks/reddit', redditRouter);
 app.use('/api/voice', voiceRouter);
 app.use('/api/data/bmc', bmcRouter);
 
 // Initialize Cron Jobs
 require('./cron/allCrons');
+
+// Initialize Telegram Bot
+const { initTelegramBot } = require('./services/telegramBotService');
+initTelegramBot();
 
 const PORT = process.env.PORT || 3001;
 
