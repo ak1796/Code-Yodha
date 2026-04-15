@@ -28,7 +28,7 @@ export default {
           DEFAULT: '#F39C12',
           light: '#FEF9E7',
         },
-        bg: '#F8F9FC',
+        bg: '#F0F8FF',
         surface: '#FFFFFF',
         border: '#E2E6EF',
         text: {

@@ -22,7 +22,7 @@ export default function OfficerLayout({ children }) {
   ];
 
   return (
-    <div className="min-h-screen bg-[#F0F2F5] flex font-sans antialiased text-navy overflow-hidden">
+    <div className="min-h-screen bg-[#F0F8FF] flex font-sans antialiased text-navy overflow-hidden">
       {/* Sidebar Navigation */}
       <aside className="w-20 lg:w-72 bg-navy text-white flex flex-col transition-all duration-300 z-50 fixed lg:static h-screen shadow-2xl">
          <div className="p-8 py-10 lg:px-10 flex flex-col gap-1 w-full relative">

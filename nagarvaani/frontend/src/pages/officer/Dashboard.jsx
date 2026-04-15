@@ -38,7 +38,7 @@ export default function OfficerDashboard() {
   }, [tickets, filter]);
 
   return (
-    <div className="min-h-screen bg-[#F0F2F5] p-8 lg:p-12 animate-fade-in relative">
+    <div className="min-h-screen bg-[#F0F8FF] p-8 lg:p-12 animate-fade-in relative">
       <div className="max-w-7xl mx-auto space-y-12">
         {/* Top Header */}
         <header className="flex justify-between items-center bg-white p-8 rounded-[3rem] shadow-soft border border-border">

@@ -19,9 +19,9 @@ export default function Auth() {
   const { t, i18n } = useTranslation();
 
   const ROLE_CONFIG = {
-    citizen: { title: t('CitizenPortal'), color: 'bg-navy', icon: <User size={24} />, desc: t('VoiceYourConcerns') },
-    officer: { title: t('OfficerOperations'), color: 'bg-emerald', icon: <Activity size={24} />, desc: t('ResolveFiledIssues') },
-    admin: { title: t('CommandCenter'), color: 'bg-crimson', icon: <Shield size={24} />, desc: t('HighLevelAudits') }
+    citizen: { title: t('CitizenPortal'), color: 'bg-[#162F6A]', icon: <User size={24} />, desc: t('VoiceYourConcerns') },
+    officer: { title: t('OfficerOperations'), color: 'bg-[#162F6A]', icon: <Activity size={24} />, desc: t('ResolveFiledIssues') },
+    admin: { title: t('CommandCenter'), color: 'bg-[#162F6A]', icon: <Shield size={24} />, desc: t('HighLevelAudits') }
   };
 
   const handleAuth = async (e) => {
@@ -74,11 +74,11 @@ export default function Auth() {
            <div className={`w-16 h-16 ${ROLE_CONFIG[activeRole].color} rounded-3xl flex items-center justify-center text-white shadow-2xl mb-4 transition-colors duration-500`}>
               <Activity size={32} />
            </div>
-           <h1 className="text-4xl font-sora font-extrabold text-navy tracking-tight">NagarVaani</h1>
+           <h1 className="text-4xl font-sora font-extrabold text-[#162F6A] tracking-tight">NagarVaani</h1>
            <p className="text-text-secondary font-medium mt-1 uppercase tracking-widest text-[10px] opacity-60">{t('CivicPlatform')}</p>
         </div>
 
-        <div className="bg-surface rounded-[40px] p-8 card-shadow border border-border">
+        <div className="bg-surface rounded-[40px] p-8 card-shadow border border-[#162F6A]/20">
             <div className="grid grid-cols-3 gap-3 mb-8">
               {Object.keys(ROLE_CONFIG).filter(r => isLogin || r !== 'admin').map((role) => (
                 <button
@@ -86,14 +86,14 @@ export default function Auth() {
                   onClick={() => setActiveRole(role)}
                   className={`flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition-all duration-300 ${
                     activeRole === role
-                    ? `border-navy bg-navy/5 shadow-inner`
+                    ? `border-[#162F6A] bg-[#162F6A]/5 shadow-inner`
                     : 'border-transparent hover:bg-gray-50 opacity-60'
                   }`}
                 >
-                  <div className={`${activeRole === role ? 'text-navy' : 'text-text-secondary'}`}>
+                  <div className={`${activeRole === role ? 'text-[#162F6A]' : 'text-text-secondary'}`}>
                     {ROLE_CONFIG[role].icon}
                   </div>
-                  <div className="text-[10px] font-bold uppercase tracking-widest text-navy text-center leading-none">
+                  <div className="text-[10px] font-bold uppercase tracking-widest text-[#162F6A] text-center leading-none">
                     {t(role.charAt(0).toUpperCase() + role.slice(1))}
                   </div>
                 </button>
@@ -103,20 +103,20 @@ export default function Auth() {
           <div className="flex p-1 bg-gray-100 rounded-2xl mb-8">
              <button
                onClick={() => setIsLogin(true)}
-               className={`flex-1 py-3 rounded-xl font-bold text-xs uppercase tracking-widest transition-all ${isLogin ? 'bg-navy text-white shadow-lg' : 'text-text-secondary hover:text-navy'}`}
+               className={`flex-1 py-3 rounded-xl font-bold text-xs uppercase tracking-widest transition-all ${isLogin ? 'bg-[#162F6A] text-white shadow-lg' : 'text-text-secondary hover:text-[#162F6A]'}`}
              >
                 {t('Login')}
              </button>
              <button
                onClick={() => setIsLogin(false)}
-               className={`flex-1 py-3 rounded-xl font-bold text-xs uppercase tracking-widest transition-all ${!isLogin ? 'bg-navy text-white shadow-lg' : 'text-text-secondary hover:text-navy'}`}
+               className={`flex-1 py-3 rounded-xl font-bold text-xs uppercase tracking-widest transition-all ${!isLogin ? 'bg-[#162F6A] text-white shadow-lg' : 'text-text-secondary hover:text-[#162F6A]'}`}
              >
                 {t('Register')}
              </button>
           </div>
 
           <div className="text-center mb-8">
-            <h2 className="text-2xl font-sora font-extrabold text-navy leading-tight">
+            <h2 className="text-2xl font-sora font-extrabold text-[#162F6A] leading-tight">
               {isLogin ? ROLE_CONFIG[activeRole].title : t('RegisterAs', { role: activeRole.charAt(0).toUpperCase() + activeRole.slice(1) })}
             </h2>
             <p className="text-xs text-text-secondary mt-1 font-medium">{isLogin ? ROLE_CONFIG[activeRole].desc : t('InitializeIdentity')}</p>
@@ -127,13 +127,13 @@ export default function Auth() {
               <>
                 <div className="space-y-1.5 group">
                   <label className="flex items-center gap-2 text-[10px] font-bold text-text-secondary uppercase tracking-widest ml-1 opacity-60 transition-opacity">
-                     <User size={12} className="text-navy" /> {t('FullName')}
+                     <User size={12} className="text-[#162F6A]" /> {t('FullName')}
                   </label>
                   <input
                     type="text"
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
-                    className="w-full px-5 py-3 border border-border rounded-2xl outline-none focus:border-navy focus:ring-4 focus:ring-navy/5 text-sm font-bold transition"
+                    className="w-full px-5 py-3 border border-border rounded-2xl outline-none focus:border-[#162F6A] focus:ring-4 focus:ring-[#162F6A]/5 text-sm font-bold transition"
                     placeholder="e.g. Rohini Patil"
                     required={!isLogin}
                   />
@@ -143,13 +143,13 @@ export default function Auth() {
 
             <div className="space-y-1.5 group">
               <label className="flex items-center gap-2 text-[10px] font-bold text-text-secondary uppercase tracking-widest ml-1 opacity-60 transition-opacity">
-                 <Mail size={12} className="text-navy" /> {activeRole} {t('Email')}
+                 <Mail size={12} className="text-[#162F6A]" /> {activeRole} {t('Email')}
               </label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-5 py-4 border border-border rounded-2xl outline-none focus:border-navy focus:ring-4 focus:ring-navy/5 text-sm font-bold transition"
+                className="w-full px-5 py-4 border border-border rounded-2xl outline-none focus:border-[#162F6A] focus:ring-4 focus:ring-[#162F6A]/5 text-sm font-bold transition"
                 placeholder={activeRole === 'citizen' ? 'citizen@mumbai.gov' : activeRole === 'admin' ? 'admin@mcgm.gov' : 'officer01@mcgm.gov'}
                 required
               />
@@ -157,13 +157,13 @@ export default function Auth() {
 
             <div className="space-y-1.5 group">
               <label className="flex items-center gap-2 text-[10px] font-bold text-text-secondary uppercase tracking-widest ml-1 opacity-60 transition-opacity">
-                 <Lock size={12} className="text-navy" /> {t('Credentials')}
+                 <Lock size={12} className="text-[#162F6A]" /> {t('Credentials')}
               </label>
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-5 py-4 border border-border rounded-2xl outline-none focus:border-navy focus:ring-4 focus:ring-navy/5 text-sm font-bold transition"
+                className="w-full px-5 py-4 border border-border rounded-2xl outline-none focus:border-[#162F6A] focus:ring-4 focus:ring-[#162F6A]/5 text-sm font-bold transition"
                 placeholder="••••••••"
                 required
               />

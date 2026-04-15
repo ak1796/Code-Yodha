@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+import { supabase } from '../../lib/supabaseClient';
 import { useTranslation } from 'react-i18next';
 import { Shield, Lock, Key, ArrowRight, Eye, User, FileText, AlertTriangle, CheckCircle } from 'lucide-react';
 import toast from 'react-hot-toast';

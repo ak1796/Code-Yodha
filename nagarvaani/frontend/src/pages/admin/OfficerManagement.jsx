@@ -1,3 +1,5 @@
+import React, { useState, useEffect } from 'react';
+import { supabase } from '../../lib/supabaseClient';
 import { useTranslation } from 'react-i18next';
 import { 
   Users, MapPin, Search, Filter, Plus, 
