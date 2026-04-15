@@ -140,7 +140,7 @@ const officerIcon = new L.Icon({
 const incidentIcon = (priority) => new L.DivIcon({
   className: 'custom-div-icon',
   html: `<div class="w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-bold text-white shadow-xl ${
-    priority >= 4 ? 'bg-crimson animate-pulse' : priority >= 2 ? 'bg-saffron' : 'bg-emerald'
+    priority >= 4 ? 'bg-[#F87171]' : priority >= 2 ? 'bg-[#FACC15]' : 'bg-[#10B981]'
   }">${priority >= 4 ? '!' : priority}</div>`,
   iconSize: [32, 32],
   iconAnchor: [16, 16],
@@ -200,6 +200,11 @@ export default function AdminHeatmap() {
     setWardStats(stats);
   };
 
+  const maxCount = useMemo(() => {
+    const values = Object.values(wardStats);
+    return values.length > 0 ? Math.max(...values) : 0;
+  }, [wardStats]);
+
   const filteredTickets = useMemo(() => {
     if (categoryFilter === "all") return tickets;
     return tickets.filter(t => t.category === categoryFilter);
@@ -240,17 +245,19 @@ export default function AdminHeatmap() {
       };
     }
 
-    // Density mode: Green → Yellow → Red based on complaint count
+    // Density mode: Green → Yellow → Red based on relative intensity
     const count = wardStats[wardId] || 0;
+    const intensity = maxCount > 0 ? (count / maxCount) : 0;
+
     let fillColor, borderColor;
     if (count === 0) {
       fillColor = '#10B981'; borderColor = '#059669'; // Green — no complaints
-    } else if (count <= 3) {
-      fillColor = '#F59E0B'; borderColor = '#D97706'; // Yellow — low activity
-    } else if (count <= 8) {
-      fillColor = '#F97316'; borderColor = '#EA580C'; // Orange — moderate
+    } else if (intensity <= 0.33) {
+      fillColor = '#FDE047'; borderColor = '#EAB308'; // Light Yellow — low relative density
+    } else if (intensity <= 0.66) {
+      fillColor = '#FACC15'; borderColor = '#CA8A04'; // Bright Yellow — moderate density
     } else {
-      fillColor = '#EF4444'; borderColor = '#DC2626'; // Red — high density
+      fillColor = '#F87171'; borderColor = '#EF4444'; // Soft Red — high relative density
     }
 
     return {
@@ -445,7 +452,7 @@ export default function AdminHeatmap() {
           <LayersControl.Overlay checked name="Grid Boundaries">
             {geoData && (
               <GeoJSON 
-                key={`${activeCity}-${selectedWard}`} // Force re-render on selection
+                key={`${activeCity}-${maxCount}-${selectedWard}`} // Force re-render on data load
                 data={geoData} 
                 style={getWardStyle}
                 onEachFeature={onEachWard}

@@ -8,7 +8,7 @@ export const citiesConfig = {
     "nameProp": "name",
     "logoUrl": "https://upload.wikimedia.org/wikipedia/en/thumb/5/52/Brihanmumbai_Municipal_Corporation_logo.svg/220px-Brihanmumbai_Municipal_Corporation_logo.svg.png",
     "offices": {
-      "Ward A": { "lat": 18.9285, "lng": 72.8331, "address": "BMC Ward A Office, M.V. Road, Colaba", "phone": "022-22812222", "commissioner": "Shri. Rajesh Patil" },
+      "Ward A": { "lat": 18.9400, "lng": 72.8350, "address": "BMC Ward A Office, Fort/CST Area (Land Optimized)", "phone": "022-22812222", "commissioner": "Shri. Rajesh Patil" },
       "Ward B": { "lat": 18.9581, "lng": 72.8371, "address": "BMC Ward B Office, Dongri, Mumbai", "phone": "022-23736001", "commissioner": "Smt. Priya Desai" },
       "Ward C": { "lat": 18.9497, "lng": 72.8278, "address": "BMC Ward C Office, Kalbadevi Road", "phone": "022-22006161", "commissioner": "Shri. Anil Sharma" },
       "Ward D": { "lat": 18.9606, "lng": 72.8183, "address": "BMC Ward D Office, Grant Road West", "phone": "022-23806001", "commissioner": "Shri. Vijay Shetty" },

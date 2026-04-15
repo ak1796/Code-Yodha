@@ -148,7 +148,7 @@ export default function CitizenMap({ tickets = [] }) {
           {tickets.filter(t => t.city === selectedCity).map(ticket => (
             <Marker 
               key={ticket.id} 
-              position={[ticket.latitude, ticket.longitude]} 
+              position={[ticket.lat, ticket.lng]} 
               icon={ticket.status === 'resolved' ? resolvedIcon : activeIcon}
             >
               <Popup>
