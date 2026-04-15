@@ -60,7 +60,7 @@ export default function ResolutionModal({ ticketId, onClose, onSuccess }) {
 
   const finalizeTicket = async () => {
     try {
-      const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5176';
+      const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
       const token = localStorage.getItem('nv_token');
       
       const formData = new FormData();

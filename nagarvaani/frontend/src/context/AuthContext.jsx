@@ -3,7 +3,7 @@ import axios from 'axios';
 
 const AuthContext = createContext({});
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5176';
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);

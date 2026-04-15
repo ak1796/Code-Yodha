@@ -22,8 +22,8 @@ export function useRealtimeTickets(officerId) {
           // Officers see tickets in their department (Step 5)
           query = query.eq('category', profile.department);
         } else if (profile.role === 'citizen') {
-          // Citizens see tickets they created
-          query = query.eq('creator_id', profile.id);
+          // Transparency Grid: Citizens see city-wide public signals (filtered by city in Component)
+          // No specific eq() here so they can see all city nodes for transparency
         }
 
         const { data, error } = await query
@@ -42,8 +42,8 @@ export function useRealtimeTickets(officerId) {
     fetchTickets();
 
     // Real-time subscription
-    let channelName = `citizen-tickets-${profile.id}`;
-    let filterStr = `creator_id=eq.${profile.id}`;
+    let channelName = `city-signals-${profile.city}`;
+    let filterStr = `city=eq.${profile.city}`;
 
     if (isOfficer) {
       channelName = `dept-tickets-${profile.department}`;
@@ -63,7 +63,7 @@ export function useRealtimeTickets(officerId) {
         } else if (payload.eventType === 'UPDATE') {
           setTickets(prev => prev.map(t => t.id === payload.new.id ? payload.new : t));
         } else if (payload.eventType === 'DELETE') {
-          setTickets(prev => prev.filter(t => t.id === payload.old.id));
+          setTickets(prev => prev.filter(t => t.id !== payload.old.id));
         }
       })
       .subscribe();

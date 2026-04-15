@@ -43,7 +43,7 @@ export default function StrategicAnalytics() {
   React.useEffect(() => {
     const fetchStats = async () => {
       try {
-        const response = await fetch('http://localhost:5176/api/data/bmc/stats');
+        const response = await fetch('http://localhost:3001/api/data/bmc/stats');
         const data = await response.json();
         setBmcStats(data);
       } catch (error) {

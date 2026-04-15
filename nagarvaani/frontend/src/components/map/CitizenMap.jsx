@@ -151,7 +151,7 @@ export default function CitizenMap({ tickets = [] }) {
             />
           )}
 
-          {tickets.filter(t => t.city === selectedCity && t.lat && t.lng).map(ticket => (
+          {tickets.filter(t => t.city === selectedCity && t.lat && t.lng && !isNaN(t.lat) && !isNaN(t.lng)).map(ticket => (
             <Marker 
               key={ticket.id} 
               position={[ticket.lat, ticket.lng]} 

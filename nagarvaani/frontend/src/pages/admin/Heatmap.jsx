@@ -289,9 +289,9 @@ export default function AdminHeatmap() {
           z-index: 1000 !important;
         }
       `}</style>
-      {/* City & Dept Header */}
-      <div className="absolute top-8 left-1/2 -translate-x-1/2 z-[1000] w-full max-w-5xl px-4">
-         <div className="bg-white/90 backdrop-blur-2xl border border-border p-3 rounded-[2rem] shadow-2xl flex items-center justify-between gap-4">
+      {/* Top Right Command Header */}
+      <div className="absolute top-8 right-8 z-[1000] flex flex-col items-end gap-3 pointer-events-none">
+         <div className="bg-white/90 backdrop-blur-2xl border border-border p-3 rounded-[2rem] shadow-2xl flex items-center gap-4 pointer-events-auto">
             {/* City Selector */}
             <div className="relative group">
               <select 
@@ -324,15 +324,16 @@ export default function AdminHeatmap() {
               </select>
             </div>
 
-            {/* Live Status Indicator */}
-            <div className="hidden md:flex items-center gap-3 pr-4">
-               <div className="flex flex-col items-end">
-                  <span className="text-[7px] font-black text-navy/40 uppercase tracking-widest">{activeCity} Protocol</span>
-                  <span className="text-[10px] font-extrabold text-navy uppercase">{cityConfig.org} Command</span>
-               </div>
-               <div className="w-10 h-10 rounded-xl bg-emerald/10 text-emerald flex items-center justify-center shadow-inner">
-                  <Activity size={18} />
-               </div>
+         </div>
+
+         {/* Protocol Status Badge */}
+         <div className="flex items-center gap-3 bg-white/80 backdrop-blur-xl border border-border px-6 py-3 rounded-full shadow-lg pointer-events-auto">
+            <div className="flex flex-col items-end">
+               <span className="text-[7px] font-black text-navy/40 uppercase tracking-widest">{activeCity} Protocol</span>
+               <span className="text-[10px] font-extrabold text-navy uppercase">{cityConfig.org} Command</span>
+            </div>
+            <div className="w-8 h-8 rounded-xl bg-emerald/10 text-emerald flex items-center justify-center shadow-inner">
+               <Activity size={16} />
             </div>
          </div>
       </div>

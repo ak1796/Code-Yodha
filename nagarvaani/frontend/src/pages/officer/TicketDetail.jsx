@@ -64,7 +64,7 @@ export default function TicketDetail() {
 
   const updateStatus = async (newStatus) => {
     try {
-      const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5176';
+      const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
       const token = localStorage.getItem('nv_token');
       
       const res = await axios.patch(`${backendUrl}/api/tickets/${id}/status`, 

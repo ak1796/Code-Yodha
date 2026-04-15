@@ -5,7 +5,8 @@ import { useTranslation } from 'react-i18next';
 import { useRealtimeTickets } from '../../hooks/useRealtimeTickets';
 import ComplaintCard from '../../components/complaint/ComplaintCard';
 import ComplaintForm from '../../components/complaint/ComplaintForm';
-import { Plus, LogOut, Shield, MessageSquare, Activity, ChevronRight, X } from 'lucide-react';
+import CitizenMap from '../../components/map/CitizenMap';
+import { Plus, LogOut, Shield, MessageSquare, Activity, ChevronRight, X, Info } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 
@@ -25,7 +26,7 @@ export default function CitizenDashboard() {
   const handleFormSubmit = async (formData) => {
     setIsSubmitting(true);
     try {
-      const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5176';
+      const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
       const payload = { ...formData, user_id: profile?.id };
       const response = await axios.post(`${backendUrl}/api/complaints`, payload);
       if (response.status === 201) {
@@ -114,6 +115,17 @@ export default function CitizenDashboard() {
               </div>
            </div>
         </div>
+        
+        {/* Transparency Intelligence Grid */}
+        <section className="mb-12 space-y-6">
+           <div className="flex items-center justify-between px-2">
+              <h2 className="text-2xl font-sora font-extrabold text-navy tracking-tight flex items-center gap-3">
+                <Info size={24} className="text-navy/20" /> {t('TransparencyGrid')}
+              </h2>
+              <div className="text-[10px] font-bold text-text-secondary uppercase tracking-[0.2em]">{t('LiveMunicipalSignals')}</div>
+           </div>
+           <CitizenMap tickets={tickets} />
+        </section>
 
         <div className="space-y-6">
            <div className="flex items-center justify-between px-2">
@@ -151,7 +163,7 @@ export default function CitizenDashboard() {
       </main>
 
       {showForm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-6 sm:p-12 backdrop-blur-md bg-navy/20 animate-fade-in overflow-y-auto overflow-x-hidden">
+        <div className="fixed inset-0 z-[2000] flex items-center justify-center p-6 sm:p-12 backdrop-blur-md bg-navy/20 animate-fade-in overflow-y-auto overflow-x-hidden">
            <div className="bg-surface max-w-4xl w-full rounded-[2.5rem] shadow-2xl relative my-auto">
               <button
                 onClick={() => setShowForm(false)}
