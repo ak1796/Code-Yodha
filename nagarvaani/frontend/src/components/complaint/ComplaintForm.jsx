@@ -195,7 +195,7 @@ export default function HighFidelityComplaintForm({ onSubmit, isSubmitting: pare
   const aiExtract = async (transcript) => {
     const loadId = toast.loading("AI analyzing your voice...");
     try {
-      const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5176';
+      const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
       const res = await fetch(`${backendUrl}/api/voice/process`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

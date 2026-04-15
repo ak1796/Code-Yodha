@@ -21,29 +21,30 @@ const MOCK_VOL_DATA = [
   { day: 'May 16', volume: 92, water: 40, roads: 40, garbage: 12 },
 ];
 
-const RESOLUTION_DIST = [
-  { name: 'SLA Met', value: 68, color: '#0E8A5F' },
-  { name: 'Late 1-6h', value: 12, color: '#007AFF' },
-  { name: 'Late 6-24h', value: 11, color: '#E8720C' },
-  { name: 'Late 24h+', value: 9, color: '#C0392B' },
-];
-
-const SOURCE_DATA = [
-  { name: 'Web Form', value: 41, color: '#0D1B40' },
-  { name: 'Telegram', value: 18, color: '#0088CC' },
-  { name: 'Reddit', value: 14, color: '#FF4500' },
-  { name: 'Social Feed', value: 27, color: '#E8720C' },
-];
-
 export default function StrategicAnalytics() {
   const { t } = useTranslation();
+
+  const RESOLUTION_DIST = React.useMemo(() => [
+    { name: t('SLAMet'), value: 68, color: '#0E8A5F' },
+    { name: t('Late1_6h'), value: 12, color: '#007AFF' },
+    { name: t('Late6_24h'), value: 11, color: '#E8720C' },
+    { name: t('Late24hPlus'), value: 9, color: '#C0392B' },
+  ], [t]);
+
+  const SOURCE_DATA = React.useMemo(() => [
+    { name: t('WebForm'), value: 41, color: '#0D1B40' },
+    { name: t('Telegram'), value: 18, color: '#0088CC' },
+    { name: t('Reddit'), value: 14, color: '#FF4500' },
+    { name: t('SocialFeed'), value: 27, color: '#E8720C' },
+  ], [t]);
   const [bmcStats, setBmcStats] = React.useState(null);
   const [isLoading, setIsLoading] = React.useState(true);
 
   React.useEffect(() => {
     const fetchStats = async () => {
       try {
-        const response = await fetch('http://localhost:5176/api/data/bmc/stats');
+        const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
+        const response = await fetch(`${backendUrl}/api/data/bmc/stats`);
         const data = await response.json();
         setBmcStats(data);
       } catch (error) {
@@ -56,8 +57,8 @@ export default function StrategicAnalytics() {
   }, []);
 
   const exportReport = (title) => {
-    toast.success(`Synthesizing Specialist Node: ${title}...`);
-    setTimeout(() => toast.success(`Exporting ${title} Deployment Successful.`), 2000);
+    toast.success(t('ExportingReport', { title }));
+    setTimeout(() => toast.success(t('ExportSuccess', { title })), 2000);
   };
 
   const volumeData = bmcStats?.yearlyVolume 
@@ -85,9 +86,9 @@ export default function StrategicAnalytics() {
              <p className="text-text-secondary font-medium opacity-60 italic">{t('StrategicAnalyticsDesc')}</p>
           </div>
           <div className="flex gap-4">
-             <ReportButton icon={<FileText size={18}/>} label="Weekly PDF" onClick={() => exportReport('Weekly Summary PDF')} />
-             <ReportButton icon={<Download size={18}/>} label="Officer CSV" onClick={() => exportReport('Officer Performance CSV')} />
-             <ReportButton icon={<Activity size={18}/>} label="AATS Hist" onClick={() => exportReport('AATS History CSV')} />
+             <ReportButton icon={<FileText size={18}/>} label={t('WeeklyPDF')} onClick={() => exportReport(t('WeeklyPDF'))} />
+             <ReportButton icon={<Download size={18}/>} label={t('OfficerCSV')} onClick={() => exportReport(t('OfficerCSV'))} />
+             <ReportButton icon={<Activity size={18}/>} label={t('AATSHist')} onClick={() => exportReport(t('AATSHist'))} />
           </div>
        </header>
 
@@ -97,11 +98,11 @@ export default function StrategicAnalytics() {
              <div className="flex justify-between items-center mb-12">
                 <div>
                    <h3 className="text-xl font-sora font-extrabold text-navy uppercase tracking-tighter">{t('JurisdictionalThroughput')}</h3>
-                   <p className="text-[10px] font-black text-text-secondary opacity-40 uppercase tracking-widest mt-1">30-Day Volumetric Scan (Spike Detected: May 15)</p>
+                   <p className="text-[10px] font-black text-text-secondary opacity-40 uppercase tracking-widest mt-1">{t('VolumetricScan')}</p>
                 </div>
                 <div className="flex items-center gap-2 px-4 py-2 bg-emerald-light/20 text-emerald rounded-full border border-emerald/10">
                    <TrendingUp size={14} />
-                   <span className="text-[9px] font-black uppercase tracking-widest italic">+147% Pulse Spike</span>
+                   <span className="text-[9px] font-black uppercase tracking-widest italic">{t('PulseSpike')}</span>
                 </div>
              </div>
              
@@ -129,7 +130,7 @@ export default function StrategicAnalytics() {
           <div className="lg:col-span-4 bg-white rounded-[3.5rem] p-12 shadow-soft border border-border flex flex-col justify-between">
              <div className="space-y-2 mb-10">
                 <h3 className="text-xl font-sora font-extrabold text-navy uppercase tracking-tighter">{t('ChannelOrigin')}</h3>
-                <p className="text-[10px] font-black text-text-secondary opacity-40 uppercase tracking-widest mt-1">Source Frequency Distribution</p>
+                <p className="text-[10px] font-black text-text-secondary opacity-40 uppercase tracking-widest mt-1">{t('SourceFreq')}</p>
              </div>
              <div className="h-[250px] w-full relative">
                 <ResponsiveContainer width="100%" height="100%">
@@ -175,7 +176,7 @@ export default function StrategicAnalytics() {
                 ))}
              </div>
              <div className="mt-12 p-6 bg-white/5 rounded-2xl border border-white/5 relative z-10 italic text-[10px] font-medium opacity-40">
-                "9% of jurisdictional nodes are currently experiencing severe resolution lag exceeding the 24h delta window."
+                {t('SLALagAlert')}
              </div>
              <div className="absolute -left-20 -bottom-20 w-80 h-80 bg-saffron/10 rounded-full blur-[100px]" />
           </div>
@@ -183,7 +184,7 @@ export default function StrategicAnalytics() {
           <div className="lg:col-span-7 bg-white rounded-[3.5rem] p-12 shadow-soft border border-border">
              <div className="flex justify-between items-center mb-10">
                 <h3 className="text-xl font-sora font-extrabold text-navy uppercase tracking-tighter">{t('OfficerPerfRegression')}</h3>
-                <span className="text-[10px] font-black text-text-secondary opacity-40 uppercase tracking-widest italic">Normalized Ranking Matrix</span>
+                <span className="text-[10px] font-black text-text-secondary opacity-40 uppercase tracking-widest italic">{t('RankingMatrix')}</span>
              </div>
              <div className="space-y-6">
                 <RankingRow rank="01" name="Priya Sharma" score="98.2" dep="DRAINAGE" />

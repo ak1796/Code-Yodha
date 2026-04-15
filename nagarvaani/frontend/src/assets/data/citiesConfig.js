@@ -8,24 +8,30 @@ export const citiesConfig = {
     "nameProp": "name",
     "logoUrl": "https://upload.wikimedia.org/wikipedia/en/thumb/5/52/Brihanmumbai_Municipal_Corporation_logo.svg/220px-Brihanmumbai_Municipal_Corporation_logo.svg.png",
     "offices": {
-      "Zone-1": {
-        "lat": 19.0921, "lng": 72.846,
-        "address": "BMC HQ, Fort, Mumbai",
-        "phone": "022-22620251",
-        "commissioner": "Shri. Bhushan Gagrani"
-      },
-      "Zone-2": {
-        "lat": 19.0484, "lng": 72.9159,
-        "address": "BMC Office, Worli",
-        "phone": "022-24935701",
-        "commissioner": "Shri. Ashwini Bhide"
-      },
-      "Zone-3": {
-        "lat": 19.1254, "lng": 72.8183,
-        "address": "BMC Office, Andheri West",
-        "phone": "022-26239131",
-        "commissioner": "Shri. Abhijit Bangar"
-      }
+      "Ward A": { "lat": 18.9285, "lng": 72.8331, "address": "BMC Ward A Office, M.V. Road, Colaba", "phone": "022-22812222", "commissioner": "Shri. Rajesh Patil" },
+      "Ward B": { "lat": 18.9581, "lng": 72.8371, "address": "BMC Ward B Office, Dongri, Mumbai", "phone": "022-23736001", "commissioner": "Smt. Priya Desai" },
+      "Ward C": { "lat": 18.9497, "lng": 72.8278, "address": "BMC Ward C Office, Kalbadevi Road", "phone": "022-22006161", "commissioner": "Shri. Anil Sharma" },
+      "Ward D": { "lat": 18.9606, "lng": 72.8183, "address": "BMC Ward D Office, Grant Road West", "phone": "022-23806001", "commissioner": "Shri. Vijay Shetty" },
+      "Ward E": { "lat": 18.9760, "lng": 72.8355, "address": "BMC Ward E Office, Clare Road, Byculla", "phone": "022-23776001", "commissioner": "Smt. Kavita Nair" },
+      "Ward F/N": { "lat": 19.0220, "lng": 72.8620, "address": "BMC Ward F/N Office, Sion Road, Matunga", "phone": "022-24016001", "commissioner": "Shri. Suresh Kamble" },
+      "Ward F/S": { "lat": 18.9960, "lng": 72.8447, "address": "BMC Ward F/S Office, Dr. Babasaheb Ambedkar Road, Parel", "phone": "022-24135001", "commissioner": "Shri. Rahul Jadhav" },
+      "Ward G/N": { "lat": 19.0219, "lng": 72.8421, "address": "BMC Ward G/N Office, Dadar West", "phone": "022-24226001", "commissioner": "Smt. Sunita More" },
+      "Ward G/S": { "lat": 19.0073, "lng": 72.8183, "address": "BMC Ward G/S Office, Annie Besant Road, Worli", "phone": "022-24966001", "commissioner": "Shri. Dinesh Pawar" },
+      "Ward H/E": { "lat": 19.0631, "lng": 72.8428, "address": "BMC Ward H/E Office, Santacruz East", "phone": "022-26486001", "commissioner": "Shri. Manoj Gupta" },
+      "Ward H/W": { "lat": 19.0535, "lng": 72.8194, "address": "BMC Ward H/W Office, Hill Road, Bandra West", "phone": "022-26556001", "commissioner": "Smt. Anjali Bhosale" },
+      "Ward K/E": { "lat": 19.1136, "lng": 72.8697, "address": "BMC Ward K/E Office, Western Express Hwy, Andheri East", "phone": "022-26836001", "commissioner": "Shri. Santosh Rane" },
+      "Ward K/W": { "lat": 19.1197, "lng": 72.8271, "address": "BMC Ward K/W Office, Veera Desai Road, Andheri West", "phone": "022-26766001", "commissioner": "Shri. Prakash Salvi" },
+      "Ward L": { "lat": 19.0726, "lng": 72.8831, "address": "BMC Ward L Office, LBS Marg, Kurla West", "phone": "022-25016001", "commissioner": "Smt. Rekha Jadhav" },
+      "Ward M/E": { "lat": 19.0453, "lng": 72.9164, "address": "BMC Ward M/E Office, Govandi Station Road", "phone": "022-25566001", "commissioner": "Shri. Nilesh Sawant" },
+      "Ward M/W": { "lat": 19.0625, "lng": 72.8996, "address": "BMC Ward M/W Office, Chembur Colony", "phone": "022-25276001", "commissioner": "Shri. Hemant Kulkarni" },
+      "Ward N": { "lat": 19.0870, "lng": 72.9084, "address": "BMC Ward N Office, Ghatkopar West", "phone": "022-25016401", "commissioner": "Smt. Seema Tawde" },
+      "Ward P/N": { "lat": 19.1863, "lng": 72.8485, "address": "BMC Ward P/N Office, Malad West, Orlem", "phone": "022-28886001", "commissioner": "Shri. Ajay Kadam" },
+      "Ward P/S": { "lat": 19.1528, "lng": 72.8501, "address": "BMC Ward P/S Office, Goregaon West", "phone": "022-28766001", "commissioner": "Shri. Ramesh Patil" },
+      "Ward R/N": { "lat": 19.2477, "lng": 72.8505, "address": "BMC Ward R/N Office, Dahisar East", "phone": "022-28976001", "commissioner": "Smt. Vaishali Gawde" },
+      "Ward R/C": { "lat": 19.2321, "lng": 72.8566, "address": "BMC Ward R/C Office, Borivali West, IC Colony", "phone": "022-28966001", "commissioner": "Shri. Sunil Lokhande" },
+      "Ward R/S": { "lat": 19.2077, "lng": 72.8488, "address": "BMC Ward R/S Office, Kandivali West", "phone": "022-28606001", "commissioner": "Shri. Vikas Chavan" },
+      "Ward S": { "lat": 19.1440, "lng": 72.9226, "address": "BMC Ward S Office, Bhandup Complex, LBS Marg", "phone": "022-25966001", "commissioner": "Smt. Deepa Marathe" },
+      "Ward T": { "lat": 19.1726, "lng": 72.9580, "address": "BMC Ward T Office, Mulund West", "phone": "022-25696001", "commissioner": "Shri. Amol Desai" }
     },
     "filename": "mumbai_wards.json"
   },

@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { supabase } from "../../lib/supabaseClient";
 import { 
   MapContainer, TileLayer, Marker, Popup, 
   LayerGroup, LayersControl, GeoJSON, useMap, Pane
 } from "react-leaflet";
-import { useTranslation } from 'react-i18next';
 import { 
   Shield, History, MapPin, Zap, Filter, 
   AlertTriangle, Users2, Phone, Activity, ChevronDown
@@ -12,6 +12,7 @@ import {
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { citiesConfig } from "../../assets/data/citiesConfig";
+import { getEstimatedPopulation } from "../../assets/data/populationMapping";
 
 const normalizeWardValue = (value) => {
   if (value === null || value === undefined) return "";
@@ -97,29 +98,19 @@ const getWardLabel = (feature, cityConfig, activeCity) => {
   return { wardId, rawWardId, wardDisplayName };
 };
 
-const getWardOfficePoints = (geoData, cityConfig, activeCity) => {
-  if (!geoData?.features?.length) return [];
-
-  return geoData.features.reduce((acc, feature, index) => {
-    try {
-      const layer = L.geoJSON(feature);
-      const center = layer.getBounds().getCenter();
-      const { wardId, rawWardId, wardDisplayName } = getWardLabel(feature, cityConfig, activeCity);
-
-      if (!wardId && !rawWardId) return acc;
-
-      acc.push({
-        key: `${wardId || rawWardId || index}-${index}`,
-        wardCode: rawWardId || "N/A",
-        wardName: wardDisplayName,
-        lat: center.lat,
-        lng: center.lng,
-      });
-      return acc;
-    } catch (err) {
-      return acc;
-    }
-  }, []);
+// Use citiesConfig.offices (real verified coordinates) instead of GeoJSON centroids
+const getWardOfficePoints = (cityConfig) => {
+  if (!cityConfig?.offices) return [];
+  return Object.entries(cityConfig.offices).map(([zoneName, details]) => ({
+    key: zoneName,
+    wardCode: zoneName,
+    wardName: `${cityConfig.org} — ${zoneName}`,
+    lat: details.lat,
+    lng: details.lng,
+    address: details.address,
+    phone: details.phone,
+    commissioner: details.commissioner,
+  }));
 };
 
 // Component to handle map movement when city changes
@@ -157,6 +148,7 @@ export default function AdminHeatmap() {
   const [geoData, setGeoData] = useState(null);
   const [selectedWard, setSelectedWard] = useState(null);
   const [wardStats, setWardStats] = useState({});
+  const [viewMode, setViewMode] = useState("density"); // "density" or "silent-crisis"
 
   const cityConfig = citiesConfig[activeCity] || citiesConfig["Mumbai"];
 
@@ -209,17 +201,57 @@ export default function AdminHeatmap() {
   // UNIFIED HIGH FIDELITY STYLING
   const getWardStyle = (feature) => {
     const { wardId } = getWardIdentity(feature, cityConfig);
-                   
-    // CRITICAL FIX: Only match if wardId is truthy to avoid all turning blue if property is missing
+    const wardName = feature.properties[cityConfig.nameProp];
+
     const isSelected = !!(selectedWard && selectedWard === wardId);
-    const intensity = wardStats[wardId] || 0;
+
+    // Blue highlight for selected ward (takes priority)
+    if (isSelected) {
+      return {
+        fillColor: '#2563EB',
+        fillOpacity: 0.45,
+        color: '#1D4ED8',
+        weight: 4,
+        opacity: 1,
+        stroke: true
+      };
+    }
+
+    if (viewMode === 'silent-crisis') {
+      const population = getEstimatedPopulation(activeCity, wardName);
+      const count = wardStats[wardId] || 0;
+      const ratio = population / (count + 1);
+      const isAtRisk = ratio > 3000;
+      const riskOpacity = Math.min(0.75, ratio / 8000);
+      return {
+        fillColor: isAtRisk ? '#EF4444' : '#10B981',
+        fillOpacity: isAtRisk ? riskOpacity : 0.25,
+        color: isAtRisk ? '#DC2626' : '#059669',
+        weight: 2,
+        opacity: 0.8,
+        stroke: true
+      };
+    }
+
+    // Density mode: Green → Yellow → Red based on complaint count
+    const count = wardStats[wardId] || 0;
+    let fillColor, borderColor;
+    if (count === 0) {
+      fillColor = '#10B981'; borderColor = '#059669'; // Green — no complaints
+    } else if (count <= 3) {
+      fillColor = '#F59E0B'; borderColor = '#D97706'; // Yellow — low activity
+    } else if (count <= 8) {
+      fillColor = '#F97316'; borderColor = '#EA580C'; // Orange — moderate
+    } else {
+      fillColor = '#EF4444'; borderColor = '#DC2626'; // Red — high density
+    }
 
     return {
-      fillColor: isSelected ? '#B3E5FC' : (intensity > 0 ? '#FFEBEE' : 'transparent'),
-      fillOpacity: isSelected ? 0.8 : (intensity > 0 ? 0.3 : 0),
-      color: isSelected ? '#007AFF' : '#007AFF', // Solid Blue Border
-      weight: isSelected ? 4 : 2,        // Thick Line
-      opacity: 1,
+      fillColor,
+      fillOpacity: count === 0 ? 0.15 : 0.35,
+      color: borderColor,
+      weight: 2,
+      opacity: 0.8,
       stroke: true
     };
   };
@@ -241,39 +273,82 @@ export default function AdminHeatmap() {
     
     layer.on({
       click: (e) => {
-        if (wardId) setSelectedWard(wardId);
+        if (wardId) setSelectedWard(normalizeWardValue(wardId));
         L.DomEvent.stopPropagation(e);
       }
     });
 
-    const count = wardStats[wardId] || 0;
+    const count = wardStats[normalizeWardValue(wardId)] || wardStats[wardId] || 0;
+    const population = getEstimatedPopulation(activeCity, wardDisplayName);
+    const ratio = Math.round(population / (count + 1));
+
+    // Match office from citiesConfig — try "Ward X" key format first, then direct key
+    const officeKey = Object.keys(cityConfig.offices || {}).find(k =>
+      normalizeWardValue(k) === normalizeWardValue(`Ward ${wardId}`) ||
+      normalizeWardValue(k) === normalizeWardValue(wardId)
+    );
+    const office = officeKey ? cityConfig.offices[officeKey] : null;
+
+    const statusColor = count === 0 ? '#10B981' : count <= 3 ? '#F59E0B' : count <= 8 ? '#F97316' : '#EF4444';
+    const statusLabel = count === 0 ? 'All Clear' : count <= 3 ? 'Low Activity' : count <= 8 ? 'Moderate' : 'High Density';
+
     layer.bindPopup(`
-      <div class="p-0 font-sora overflow-hidden rounded-xl border border-navy/10 min-w-[200px]">
-        <div class="bg-navy p-3 text-white">
-          <p class="text-[8px] font-black uppercase tracking-widest opacity-60">${cityConfig.org} Sector</p>
-          <h4 class="font-black text-sm uppercase tracking-tighter">${wardDisplayName}</h4>
-          <p class="text-[9px] font-bold opacity-40">Code: ${wardId || 'N/A'}</p>
+      <div style="font-family: 'Sora', sans-serif; min-width: 280px; border-radius: 16px; overflow: hidden; border: 1px solid #e5e7eb; box-shadow: 0 20px 40px rgba(0,0,0,0.12);">
+        
+        <div style="background: ${cityConfig.color}; padding: 14px 16px; color: white;">
+          <p style="font-size: 8px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.15em; opacity: 0.6; margin: 0 0 4px 0;">${cityConfig.org} Ward Intelligence</p>
+          <h4 style="font-size: 15px; font-weight: 900; text-transform: uppercase; margin: 0; letter-spacing: -0.02em;">${officeKey || wardDisplayName}</h4>
+          ${office ? `<p style="font-size: 9px; font-weight: 600; opacity: 0.75; margin: 3px 0 0 0;">📍 ${office.address}</p>` : ''}
         </div>
-        <div class="p-3 bg-white">
-          <div class="flex justify-between items-center bg-gray-50 p-2 rounded-lg mb-2">
-            <span class="text-[9px] font-bold text-navy/40 uppercase">Active Signals</span>
-            <span class="text-xs font-black text-navy">${count}</span>
+
+        <div style="background: white; padding: 14px 16px;">
+
+          ${office ? `
+          <div style="display: flex; flex-direction: column; gap: 8px; padding-bottom: 12px; border-bottom: 1px solid #f3f4f6; margin-bottom: 12px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span style="font-size: 14px;">📞</span>
+              <div>
+                <div style="font-size: 7px; font-weight: 900; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.1em;">Phone</div>
+                <div style="font-size: 11px; font-weight: 800; color: ${cityConfig.color};">${office.phone}</div>
+              </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span style="font-size: 14px;">👤</span>
+              <div>
+                <div style="font-size: 7px; font-weight: 900; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.1em;">Asst. Commissioner</div>
+                <div style="font-size: 11px; font-weight: 800; color: #1e293b;">${office.commissioner}</div>
+              </div>
+            </div>
+          </div>` : ''}
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px;">
+            <div style="background: #f8fafc; padding: 10px; border-radius: 10px; text-align: center;">
+              <div style="font-size: 7px; font-weight: 900; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.1em;">Signals</div>
+              <div style="font-size: 18px; font-weight: 900; color: #0f172a;">${count}</div>
+            </div>
+            <div style="background: #f8fafc; padding: 10px; border-radius: 10px; text-align: center;">
+              <div style="font-size: 7px; font-weight: 900; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.1em;">Pop. Est.</div>
+              <div style="font-size: 18px; font-weight: 900; color: #0f172a;">${(population / 1000).toFixed(1)}k</div>
+            </div>
           </div>
-          <div class="space-y-1">
-             <p class="text-[8px] font-bold text-navy/30 uppercase tracking-widest">Status Protocol</p>
-             <div class="flex items-center gap-2">
-                <div class="w-1.5 h-1.5 rounded-full ${count > 5 ? 'bg-crimson animate-pulse' : 'bg-emerald'}" />
-                <span class="text-[10px] font-extrabold text-navy">${count > 5 ? 'CRITICAL LOAD' : 'GRID STABLE'}</span>
-             </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <span style="font-size: 8px; font-weight: 900; color: #9ca3af; text-transform: uppercase;">Status</span>
+            <span style="font-size: 9px; font-weight: 900; color: ${statusColor}; background: ${statusColor}18; padding: 3px 8px; border-radius: 999px;">● ${statusLabel}</span>
           </div>
+          <div style="width: 100%; height: 5px; background: #f1f5f9; border-radius: 999px; overflow: hidden;">
+            <div style="height: 100%; width: ${Math.min(100, count * 10)}%; background: ${statusColor}; border-radius: 999px; transition: width 0.4s ease;"></div>
+          </div>
+
         </div>
       </div>
-    `, { className: 'premium-ward-popup' });
+    `, { className: 'premium-ward-popup', maxWidth: 320 });
   };
 
+  // Use real office coordinates from citiesConfig.offices
   const wardOfficePoints = useMemo(
-    () => getWardOfficePoints(geoData, cityConfig, activeCity),
-    [geoData, cityConfig, activeCity]
+    () => getWardOfficePoints(cityConfig),
+    [cityConfig]
   );
 
   return (
@@ -290,6 +365,21 @@ export default function AdminHeatmap() {
       <div className="absolute top-8 left-1/2 -translate-x-1/2 z-[1000] w-full max-w-5xl px-4">
          <div className="bg-white/90 backdrop-blur-2xl border border-border p-3 rounded-[2rem] shadow-2xl flex items-center justify-between gap-4">
             {/* City Selector */}
+            <div className="flex bg-bg rounded-2xl p-1 gap-1 border border-border">
+               <button 
+                  onClick={() => setViewMode('density')}
+                  className={`px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all ${viewMode === 'density' ? 'bg-navy text-white shadow-lg' : 'text-navy/40 hover:bg-white'}`}
+               >
+                  {t('Density')}
+               </button>
+               <button 
+                  onClick={() => setViewMode('silent-crisis')}
+                  className={`px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all ${viewMode === 'silent-crisis' ? 'bg-crimson text-white shadow-lg shadow-crimson/20' : 'text-navy/40 hover:bg-white'}`}
+               >
+                  {t('SilentCrisis')}
+               </button>
+            </div>
+
             <div className="relative group">
               <select 
                 value={activeCity}
@@ -399,25 +489,28 @@ export default function AdminHeatmap() {
                     >
                        <Popup className="municipal-popup">
                         <div className="p-0 font-sora overflow-hidden rounded-xl bg-white shadow-2xl min-w-[280px]">
-                           <div className="bg-blue-600 p-4 text-white">
+                           <div style={{ background: cityConfig.color }} className="p-4 text-white">
                               <div className="flex justify-between items-center mb-1">
-                                 <span className="text-[7px] font-black uppercase tracking-[0.2em] opacity-60">{cityConfig.org} Ward Office</span>
-                                 <span className="text-[7px] font-black uppercase tracking-[0.2em] opacity-60">Local Command</span>
+                                 <span className="text-[7px] font-black uppercase tracking-[0.2em] opacity-60">{cityConfig.org} Zonal Office</span>
+                                 <Shield size={12} className="opacity-60" />
                               </div>
                               <h4 className="text-lg font-black tracking-tighter uppercase">{office.wardName}</h4>
                            </div>
-                           <div className="p-5 space-y-4">
-                              <div className="flex gap-4">
-                                 <div className="text-navy/40 font-black text-[9px] uppercase w-20 flex-shrink-0">Ward Code:</div>
-                                 <div className="text-navy font-extrabold text-[10px]">{office.wardCode}</div>
+                           <div className="p-5 space-y-3">
+                              <div className="flex gap-3 items-start">
+                                 <MapPin size={13} className="text-gray-400 flex-shrink-0 mt-0.5" />
+                                 <div className="text-navy font-semibold text-[10px] leading-relaxed">{office.address}</div>
                               </div>
-                              <div className="flex gap-4">
-                                 <div className="text-navy/40 font-black text-[9px] uppercase w-20 flex-shrink-0">Office:</div>
-                                 <div className="text-navy font-extrabold text-[10px]">{cityConfig.org} Ward Office</div>
+                              <div className="flex gap-3 items-center">
+                                 <Phone size={13} className="text-gray-400 flex-shrink-0" />
+                                 <div className="text-navy font-extrabold text-[10px]">{office.phone}</div>
                               </div>
-                              <div className="pt-2 border-t border-border flex justify-between items-center">
-                                 <span className="text-[8px] font-black text-navy/20 uppercase tracking-[0.2em]">Authentic Grid Node</span>
-                                 <Shield size={12} className="text-blue-600" />
+                              <div className="flex gap-3 items-center border-t border-gray-100 pt-3">
+                                 <Users2 size={13} className="text-gray-400 flex-shrink-0" />
+                                 <div>
+                                    <div className="text-[8px] font-black text-gray-400 uppercase tracking-widest">Asst. Commissioner</div>
+                                    <div className="text-navy font-extrabold text-[10px]">{office.commissioner}</div>
+                                 </div>
                               </div>
                            </div>
                         </div>

@@ -61,8 +61,8 @@ router.post('/', upload.single('photo'), complaintLimiter, async (req, res) => {
     }
 
     // 2. AI COGNITIVE SYNTHESIS
-    console.log('🧠 Triggering AI Synthesis for description:', finalDescription.substring(0, 30));
-    const embedding = await geminiEmbed(finalDescription);
+    console.log('🧠 Triggering AI Synthesis for description:', cleanedText.substring(0, 30));
+    const embedding = await geminiEmbed(cleanedText);
     const dedupResult = await deduplicateComplaint({ lat, lng }, embedding);
     console.log('🔍 Deduplication complete:', dedupResult.merged ? 'MERGED' : 'NEW SIGNAL');
 
@@ -76,8 +76,8 @@ router.post('/', upload.single('photo'), complaintLimiter, async (req, res) => {
       const { data: ticket, error: ticketError } = await supabase.from('master_tickets').insert({
         category,
         department,
-        description: finalDescription,
-        title: finalDescription.substring(0, 50) + '...',
+        description: cleanedText,
+        title: cleanedText.substring(0, 50) + '...',
         lat: parseFloat(lat) || null,
         lng: parseFloat(lng) || null,
         city: city || 'Mumbai',
@@ -99,7 +99,7 @@ router.post('/', upload.single('photo'), complaintLimiter, async (req, res) => {
     console.log('📡 Logging Forensic Complaint trace for Master Ticket:', masterTicketId);
     const { error: complaintError } = await supabase.from('complaints').insert({
       master_ticket_id: masterTicketId,
-      description: finalDescription,
+      description: cleanedText,
       raw_text: finalDescription,
       category,
       department,

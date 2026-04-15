@@ -28,7 +28,7 @@ export default function ComplaintDetail() {
         setTimeline(ticketRes.data.audit_log || []);
         setAssignment(assignRes.data);
       } catch (error) {
-        toast.error("Telemetry sync failed");
+        toast.error(t('TelemetrySyncFailed'));
       } finally {
         setLoading(false);
       }
@@ -40,7 +40,7 @@ export default function ComplaintDetail() {
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'master_tickets', filter: `id=eq.${id}` },
       (payload) => {
         setTicket(prev => ({ ...prev, ...payload.new }));
-        toast.success("Ticket status updated in real-time!");
+        toast.success(t('RealtimeUpdate'));
       }).subscribe();
 
     return () => supabase.removeChannel(sub);
@@ -76,7 +76,7 @@ export default function ComplaintDetail() {
                      <span 
                         onClick={() => {
                            navigator.clipboard.writeText(ticket.id);
-                           toast.success("Accountability Token Cached");
+                           toast.success(t('TokenCached'));
                         }}
                         className="text-xs font-bold text-text-secondary border border-border px-2.5 py-1 rounded-full uppercase tracking-widest cursor-pointer hover:bg-navy hover:text-white transition flex items-center gap-2"
                         title={t('CopyAuditID')}
@@ -116,7 +116,7 @@ export default function ComplaintDetail() {
                  <Info size={18} className="text-blue-600 mt-0.5" />
                  <div>
                     <h4 className="text-sm font-bold text-blue-900">{t('AIClusterDetected')}</h4>
-                    <p className="text-xs text-blue-700 mt-0.5">This issue has been reported by {ticket.cluster_size} residents. Your report is linked to a major {ticket.category?.toLowerCase()} cluster, increasing official priority.</p>
+                    <p className="text-xs text-blue-700 mt-0.5">{t('ClusterDesc', { count: ticket.cluster_size, category: ticket.category?.toLowerCase() })}</p>
                  </div>
               </div>
             )}
@@ -184,7 +184,7 @@ export default function ComplaintDetail() {
                 {assignment.distance_km > 0 && (
                   <div className="mt-4 pt-4 border-t border-border flex justify-between items-center">
                      <span className="text-[10px] font-bold text-text-secondary uppercase">{t('DispatchedFrom')}</span>
-                     <span className="text-xs font-bold text-navy">{assignment.distance_km.toFixed(1)} km away</span>
+                     <span className="text-xs font-bold text-navy">{t('DistAway', { dist: assignment.distance_km.toFixed(1) })}</span>
                   </div>
                 )}
              </div>
@@ -195,7 +195,7 @@ export default function ComplaintDetail() {
                  <Shield size={20} className="text-saffron" />
                  <h4 className="font-sora font-bold text-sm">{t('AccountabilityInfo')}</h4>
               </div>
-              <p className="text-xs text-white/70 leading-relaxed font-medium">Your complaint is tied to an immutable audit trail. Every action from assignment to resolution is logged against the official's ID for full transparency.</p>
+              <p className="text-xs text-white/70 leading-relaxed font-medium">{t('AccountabilityLogDesc')}</p>
            </div>
         </div>
       </main>
