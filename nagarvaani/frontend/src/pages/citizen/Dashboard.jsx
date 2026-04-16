@@ -122,7 +122,7 @@ export default function CitizenDashboard() {
                <h2 className="text-2xl font-sora font-extrabold text-navy tracking-tight">{t('TransparencyGrid')}</h2>
                <div className="text-[10px] font-bold text-text-secondary uppercase tracking-[0.2em]">{t('CivilSignals')}</div>
             </div>
-            <CitizenMap tickets={tickets} />
+            <CitizenMap tickets={tickets} currentUserId={profile?.id} />
             <div className="bg-white/50 p-6 rounded-[2rem] border border-border flex items-center gap-6">
                <div className="w-12 h-12 rounded-2xl bg-navy/5 flex items-center justify-center text-navy opacity-20">
                   <Info size={24} />
