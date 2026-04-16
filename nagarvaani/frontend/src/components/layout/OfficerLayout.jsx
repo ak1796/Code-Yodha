@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { 
   BarChart3, LayoutDashboard, Zap, Activity, History, 
   Bell, LogOut, ShieldAlert, Award, Menu, X
@@ -11,14 +12,15 @@ export default function OfficerLayout({ children }) {
   const { profile, signOut } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const { t, i18n } = useTranslation();
   const [showNotifications, setShowNotifications] = useState(false);
   const unreadCount = 3;
 
   const navItems = [
-    { icon: <LayoutDashboard size={20} />, label: "Dashboard", path: "/officer/dashboard" },
-    { icon: <Zap size={20} />, label: "Ingestion Feed", path: "/officer/ingestion" },
-    { icon: <Award size={20} />, label: "Performance", path: "/officer/performance" },
-    { icon: <History size={20} />, label: "Audit Log", path: "/officer/audit" },
+    { icon: <LayoutDashboard size={20} />, labelKey: "OperationalHub", path: "/officer/dashboard" },
+    { icon: <Zap size={20} />, labelKey: "LiveIngestion", path: "/officer/ingestion" },
+    { icon: <Award size={20} />, labelKey: "CivicPerformance", path: "/officer/performance" },
+    { icon: <History size={20} />, labelKey: "SovereignAudit", path: "/officer/audit" },
   ];
 
   return (
@@ -32,7 +34,7 @@ export default function OfficerLayout({ children }) {
                </div>
                <div className="hidden lg:block">
                   <h2 className="text-xl font-sora font-extrabold tracking-tighter leading-none">NagarVaani</h2>
-                  <span className="text-[10px] uppercase tracking-[0.3em] text-white/30 font-bold mt-1 block italic">Officer Field Suite</span>
+                  <span className="text-[10px] uppercase tracking-[0.3em] text-white/30 font-bold mt-1 block italic">{t('FieldCommandStation')}</span>
                </div>
             </div>
          </div>
@@ -50,15 +52,26 @@ export default function OfficerLayout({ children }) {
                  <div className={`${location.pathname === item.path ? 'scale-110' : 'group-hover:scale-110'} transition-transform shrink-0`}>
                     {item.icon}
                  </div>
-                 <span className="font-bold text-[11px] hidden lg:block uppercase tracking-widest">{item.label}</span>
+                 <span className="font-bold text-[11px] hidden lg:block uppercase tracking-widest">{t(item.labelKey)}</span>
               </div>
             ))}
          </nav>
 
+         <div className="px-6 pb-4 w-full hidden lg:block">
+           <select
+             className="w-full bg-white/10 text-white text-[10px] font-bold uppercase outline-none cursor-pointer tracking-widest rounded-lg px-3 py-2 border border-white/10"
+             onChange={(e) => i18n.changeLanguage(e.target.value)}
+             value={i18n.language}
+           >
+             <option value="en" className="bg-navy">English</option>
+             <option value="hi" className="bg-navy">हिंदी</option>
+             <option value="mr" className="bg-navy">मराठी</option>
+           </select>
+         </div>
          <div className="p-8 border-t border-white/5 space-y-6">
             <button onClick={signOut} className="flex items-center gap-4 px-5 py-4 rounded-2xl text-white/20 hover:bg-crimson hover:text-white transition w-full group">
                <LogOut size={20} className="group-hover:-translate-x-1 transition-transform" />
-               <span className="font-bold text-[11px] hidden lg:block uppercase tracking-widest">Sign Out</span>
+               <span className="font-bold text-[11px] hidden lg:block uppercase tracking-widest">{t('DeactivateTerminal')}</span>
             </button>
          </div>
       </aside>
@@ -69,11 +82,11 @@ export default function OfficerLayout({ children }) {
          <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-border px-8 lg:px-12 py-6 flex justify-between items-center shadow-sm">
             <div className="flex items-center gap-6">
                <div className="px-4 py-2 bg-navy text-white text-[10px] font-black rounded-xl shadow-lg uppercase tracking-widest">
-                  {profile?.department} SPECIALIST
+                  {profile?.department} {t('Specialist')}
                </div>
                <div className="flex items-center gap-3 px-4 py-2 bg-emerald-light/10 border border-emerald/10 rounded-xl">
                   <div className="w-2 h-2 bg-emerald rounded-full animate-pulse" />
-                  <span className="text-[9px] font-black text-emerald uppercase tracking-widest leading-none mt-0.5">Tactical Pulse: Online</span>
+                  <span className="text-[9px] font-black text-emerald uppercase tracking-widest leading-none mt-0.5">{t('TacticalPulseOnline')}</span>
                </div>
             </div>
 
@@ -93,7 +106,7 @@ export default function OfficerLayout({ children }) {
                <div className="flex items-center gap-4 pl-6 border-l border-border hidden sm:flex">
                   <div className="text-right">
                      <p className="text-[11px] font-black text-navy uppercase tracking-tighter leading-none">{profile?.full_name}</p>
-                     <p className="text-[9px] font-black text-text-secondary opacity-40 uppercase tracking-widest mt-1">Status: Active Field</p>
+                     <p className="text-[9px] font-black text-text-secondary opacity-40 uppercase tracking-widest mt-1">{t('AuthenticatedSession')}</p>
                   </div>
                   <div className="w-10 h-10 rounded-xl bg-navy text-white flex items-center justify-center font-black text-sm border border-navy/10">
                      {profile?.full_name?.charAt(0)}
