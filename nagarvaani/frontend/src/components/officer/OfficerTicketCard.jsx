@@ -1,11 +1,9 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import { MapPin, Users, Zap, Clock, ChevronRight, AlertTriangle } from 'lucide-react';
 import SLATimer from './SLATimer';
 
 export default function OfficerTicketCard({ ticket, isNew }) {
-  const { t } = useTranslation();
   const navigate = useNavigate();
 
   const getPriorityBadge = (p) => {
@@ -39,10 +37,14 @@ export default function OfficerTicketCard({ ticket, isNew }) {
          <div className="flex justify-between items-start">
             <div className="space-y-1">
                <div className="flex items-center gap-3">
-                  <span className="text-[10px] font-black uppercase tracking-tighter text-text-secondary opacity-40">UGIRP-{new Date(ticket.created_at).getFullYear()}-{ticket.id.substring(0, 5).toUpperCase()}</span>
                   <span className={`px-3 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest ${getPriorityBadge(ticket.priority_score)}`}>
-                    P{ticket.priority_score} {ticket.priority_score >= 4 ? t('CRITICAL') : ''}
+                    P{ticket.priority_score} {ticket.priority_score >= 4 ? 'CRITICAL' : ''}
                   </span>
+                  {ticket.source === 'EMAIL' && (
+                    <span className="bg-blue-100 text-blue-800 px-3 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-widest flex items-center gap-1">
+                      <Zap size={10} fill="currentColor" /> EMAIL
+                    </span>
+                  )}
                </div>
                <h3 className="text-xl font-sora font-extrabold text-navy tracking-tight line-clamp-1">{ticket.title}</h3>
             </div>
@@ -51,10 +53,10 @@ export default function OfficerTicketCard({ ticket, isNew }) {
          </div>
 
          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 pt-4">
-            <MetricItem icon={<MapPin size={14} />} label={t('Location')} val={ticket.address || 'Andheri West, Mumbai'} />
-            <MetricItem icon={<Users size={14} />} label={t('Impact')} val={t('CitizensAffect', { count: ticket.cluster_size || 1 })} />
-            <MetricItem icon={<Zap size={14} />} label={t('Category')} val={t(ticket.category)} badge />
-            <MetricItem icon={<MapPin size={14} className="text-emerald" />} label={t('Distance')} val={`${(2.1).toFixed(1)}km ${t('FromYou')}`} />
+            <MetricItem icon={<MapPin size={14} />} label="Location" val={ticket.address || 'Andheri West, Mumbai'} />
+            <MetricItem icon={<Users size={14} />} label="Impact" val={`${ticket.cluster_size || 1} Citizens Affect`} />
+            <MetricItem icon={<Zap size={14} />} label="Category" val={ticket.category} badge />
+            <MetricItem icon={<MapPin size={14} className="text-emerald" />} label="Distance" val="2.1km from you" />
          </div>
       </div>
 

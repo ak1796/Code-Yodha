@@ -5,6 +5,17 @@ const { sendEmail } = require('../services/notificationService');
 
 const { reassignOfficer } = require('../services/autoAssignService');
 const { scrapeApifySignals } = require('../services/socialScraper');
+const { processIncomingEmails } = require('../services/emailIngestionService');
+
+// Every 5 minutes: Ingest signals from Gmail inbox (hackathon USP)
+cron.schedule('*/5 * * * *', async () => {
+  console.log('ðŸ“¡ Scanning NagarVaani inbox for new signals...');
+  try {
+    await processIncomingEmails();
+  } catch (error) {
+    console.error('âŒ Email Ingestion Engine Failure:', error.message);
+  }
+});
 
 // Every hour: detect SLA breaches and escalations (Gap 1)
 cron.schedule('0 * * * *', async () => {
@@ -22,7 +33,7 @@ cron.schedule('0 * * * *', async () => {
   if (critical) {
     const { escalateToDeptHead } = require('../services/autoAssignService');
     for (const ticket of critical) {
-      console.log(`📡 CRITICAL SLA ESCALATION: Ticket ${ticket.id} passed 6h threshold.`);
+      console.log(`ðŸ“¡ CRITICAL SLA ESCALATION: Ticket ${ticket.id} passed 6h threshold.`);
       await escalateToDeptHead(ticket.id);
       await auditService.log({ ticket_id: ticket.id, action: 'SLA_CRITICAL_ESCALATION', new_value: 'DEPARTMENT_HEAD' });
     }
@@ -39,7 +50,7 @@ cron.schedule('0 * * * *', async () => {
 
   if (soft) {
     for (const ticket of soft) {
-      console.log(`🔔 SLA SOFT BREACH: Alerting officer for Ticket ${ticket.id}`);
+      console.log(`ðŸ”” SLA SOFT BREACH: Alerting officer for Ticket ${ticket.id}`);
       // Notify logic (Email already sent on assignment, this is a follow-up)
       await supabase.from('master_tickets').update({ status: 'assigned_alerted' }).eq('id', ticket.id);
       await auditService.log({ ticket_id: ticket.id, action: 'SLA_SOFT_BREACH_ALERT' });

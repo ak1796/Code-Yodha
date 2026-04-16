@@ -6,11 +6,26 @@ import SLATimer from "../../components/officer/SLATimer";
 import MapComponent from "../../components/map/MapComponent";
 import ResolutionModal from "../../components/officer/ResolutionModal";
 import { useAuth } from "../../context/AuthContext";
+import { useTranslation } from 'react-i18next';
 import { 
-  MapPin, Info, Users, ArrowLeft, CheckCircle, MessageSquare, 
-  AlertTriangle, ShieldAlert, Clock, Globe, ShieldCheck, Mail, History
+  MapPin, Clock, Calendar, Shield, Users, AlertTriangle, 
+  ChevronLeft, Trash2, CheckCircle, Info, Mail, Zap, 
+  Globe, MessageSquare, ArrowLeft, ShieldAlert, ShieldCheck, History
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+
+function MetaStrip({ label, val, icon, mono }) {
+  return (
+    <div className="bg-white p-4 flex flex-col gap-1 hover:bg-gray-50 transition-colors">
+      <p className="text-[8px] font-black uppercase tracking-[0.2em] text-text-secondary opacity-40 flex items-center gap-1.5">
+        {icon} {label}
+      </p>
+      <p className={`text-[10px] font-bold text-navy truncate ${mono ? 'font-mono' : ''}`}>
+        {val}
+      </p>
+    </div>
+  );
+}
 
 export default function TicketDetail() {
   const { id } = useParams();
@@ -20,6 +35,7 @@ export default function TicketDetail() {
   const [auditLog, setAuditLog] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isResolving, setIsResolving] = useState(false);
+  const { t } = useTranslation();
 
   useEffect(() => {
     fetchTicketData();
@@ -90,14 +106,7 @@ export default function TicketDetail() {
   );
 
   return (
-    <div className="min-h-screen bg-[#F8F9FC] p-8 lg:p-16 animate-fade-in pb-32">
-       <button onClick={() => navigate(-1)} className="mb-10 flex items-center gap-3 text-text-secondary hover:text-navy transition font-bold group">
-          <div className="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center group-hover:-translate-x-1 transition-transform">
-             <ArrowLeft size={18} />
-          </div>
-          <span className="text-xs uppercase tracking-[0.2em]">{t('ExitHQ')}</span>
-       </button>
-
+    <div className="p-10 space-y-10">
        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
           {/* Main Info Columns */}
           <div className="lg:col-span-8 space-y-12">
@@ -120,6 +129,77 @@ export default function TicketDetail() {
                    <SLATimer deadline={ticket.sla_deadline} isResolved={ticket.status === 'resolved'} />
                 </div>
                 <div className="absolute -right-20 -bottom-20 w-80 h-80 bg-navy/5 rounded-full blur-[100px]" />
+             </div>
+
+             {/* Forensic Evidence Dossier */}
+             <div className="bg-white rounded-[3.5rem] p-10 shadow-soft border border-border space-y-8 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-gray-50 -mr-16 -mt-16 rounded-full opacity-50" />
+                
+                <div className="flex items-center justify-between relative z-10">
+                   <h3 className="text-sm font-black text-navy uppercase tracking-widest flex items-center gap-3">
+                      <Mail size={18} className="text-saffron" /> Forensic Evidence Capture
+                   </h3>
+                   <div className="flex items-center gap-2">
+                      <span className="px-3 py-1 bg-saffron/10 text-saffron text-[8px] font-black rounded-full uppercase tracking-widest">
+                         Original Fragment
+                      </span>
+                      <span className="px-3 py-1 bg-navy text-white text-[8px] font-black rounded-full uppercase tracking-widest">
+                         {ticket.source || 'WEB'}
+                      </span>
+                   </div>
+                </div>
+
+                {/* Photo Preview Terminal */}
+                <div className="space-y-4">
+                   {ticket.photo_url ? (
+                      <div className="relative rounded-[2.5rem] overflow-hidden border-2 border-border bg-gray-50 group" style={{ aspectRatio: '21/9' }}>
+                         <img
+                           src={ticket.photo_url}
+                           alt="Citizen submitted evidence"
+                           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                         />
+                         <div className="absolute inset-0 bg-gradient-to-t from-navy/90 via-transparent to-transparent flex flex-col justify-end p-8">
+                            <div className="flex justify-between items-end">
+                               <div className="space-y-1">
+                                  <p className="text-white text-[10px] font-black uppercase tracking-[0.3em]">ðŸ“¸ Optical Evidence Capture</p>
+                                  <p className="text-white/60 text-[9px] font-bold">{ticket.city} Intelligence Node</p>
+                               </div>
+                               <button className="px-4 py-2 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-xl text-white text-[9px] font-black uppercase tracking-widest transition">
+                                  Inspect Full Frame
+                               </button>
+                            </div>
+                         </div>
+                      </div>
+                   ) : (
+                      <div className="h-48 rounded-[2.5rem] border-2 border-dashed border-border bg-gray-50/50 flex flex-col items-center justify-center gap-4 text-text-secondary opacity-40">
+                         <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center">
+                            <Mail size={32} className="opacity-30" />
+                         </div>
+                         <div className="text-center">
+                            <p className="text-[10px] font-black uppercase tracking-[0.3em] mb-1">No Visual Signal Attached</p>
+                            <p className="text-[9px] font-bold">Audit reveals no image data in original packet</p>
+                         </div>
+                      </div>
+                   )}
+
+                   {/* Forensic Metadata Terminal */}
+                   <div className="grid grid-cols-1 md:grid-cols-3 gap-0.5 rounded-3xl overflow-hidden border border-border bg-border">
+                      <MetaStrip label="Source Protocol" val={ticket.source || 'Standard Web Ingestion'} icon={<Globe size={12} />} />
+                      <MetaStrip label="Citizen Signal ID" val={ticket.citizen_email || ticket.id.substring(0, 16)} icon={<Shield size={12} />} mono />
+                      <MetaStrip label="Telemetric Sync" val={new Date(ticket.created_at).toLocaleString()} icon={<Clock size={12} />} />
+                   </div>
+                </div>
+
+                {/* Original Content Fragment */}
+                {ticket.raw_text && ticket.raw_text !== ticket.description && (
+                   <div className="bg-gray-50 rounded-[2rem] p-8 border border-border relative">
+                      <div className="absolute top-4 right-6 text-[8px] font-black text-text-secondary opacity-20 tracking-widest uppercase">Raw Packet</div>
+                      <p className="text-[10px] font-black uppercase tracking-[0.2em] text-text-secondary opacity-60 mb-3 flex items-center gap-2">
+                         <MessageSquare size={12} /> Unprocessed Native Signal
+                      </p>
+                      <p className="text-sm font-bold text-navy/80 leading-relaxed italic pr-12">"{ticket.raw_text}"</p>
+                   </div>
+                )}
              </div>
 
              {/* Intelligence Block: Translation & Description */}
@@ -147,11 +227,76 @@ export default function TicketDetail() {
                       <Metric label={t('PublicSignals')} val={Math.floor((ticket.cluster_size || 1) * 0.6)} />
                    </div>
                 </div>
+
+                {/* LOCATION DETECTED header */}
+                <div className="flex items-center gap-4 px-6 py-4 rounded-2xl bg-emerald/5 border border-emerald/20">
+                   <div className="w-8 h-8 rounded-xl bg-emerald flex items-center justify-center flex-shrink-0">
+                      <MapPin size={16} className="text-white" />
+                   </div>
+                   <div className="flex-1 min-w-0">
+                      <p className="text-[9px] font-black uppercase tracking-[0.2em] text-emerald mb-0.5">
+                         ðŸ“¡ LOCATION DETECTED â€” GPS VERIFIED
+                      </p>
+                      {ticket.lat && ticket.lng ? (
+                         <p className="text-[11px] font-bold text-navy font-mono truncate">
+                            {Number(ticket.lat).toFixed(5)}Â°N, {Number(ticket.lng).toFixed(5)}Â°E
+                            {ticket.address && <span className="ml-3 text-text-secondary font-sans">â€” {ticket.address}</span>}
+                         </p>
+                      ) : (
+                         <p className="text-[11px] font-bold text-text-secondary opacity-60">
+                            Manual Ward Selection â€” No precise GPS fix
+                         </p>
+                      )}
+                   </div>
+                   <span className="px-3 py-1 bg-emerald text-white text-[8px] font-black rounded-full uppercase tracking-widest flex-shrink-0">
+                      {ticket.ward ? `Ward ${ticket.ward}` : 'Unspecified'}
+                   </span>
+                </div>
+
                 <div className="h-[400px] rounded-[2.5rem] overflow-hidden border-4 border-gray-50 bg-gray-100 flex items-center justify-center text-navy font-bold">
-                   <MapComponent lat={ticket.lat} lng={ticket.lng} />
+                   <MapComponent
+                     center={ticket.lat && ticket.lng ? [Number(ticket.lat), Number(ticket.lng)] : [19.0760, 72.8777]}
+                   />
                 </div>
                 <p className="text-xs font-bold text-text-secondary uppercase tracking-[0.2em] opacity-40 italic text-center">{t('VisualizingTelemetry')}</p>
              </div>
+
+             {/* Resolution Evidence Gallery */}
+             {ticket.status === 'resolved' && (
+               <div className="bg-white rounded-[3.5rem] p-12 shadow-soft border border-emerald/20 bg-emerald/5">
+                  <div className="flex items-center gap-4 mb-10">
+                     <div className="w-12 h-12 rounded-2xl bg-emerald text-white flex items-center justify-center">
+                        <CheckCircle size={24} />
+                     </div>
+                     <div>
+                        <h3 className="text-xl font-sora font-extrabold text-navy uppercase tracking-tighter">{t('ResolutionProof')}</h3>
+                        <p className="text-[10px] font-bold text-emerald uppercase tracking-widest">{t('VerifiedBySpecialist')}</p>
+                     </div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                     <div className="space-y-4">
+                        <p className="text-[10px] font-black uppercase tracking-widest text-text-secondary opacity-40">{t('BeforeIntervention')}</p>
+                        <div className="aspect-video rounded-[2.5rem] overflow-hidden border-2 border-border bg-gray-50 flex items-center justify-center">
+                           {ticket.before_image_url ? (
+                              <img src={ticket.before_image_url} alt="Before" className="w-full h-full object-cover" />
+                           ) : (
+                              <span className="text-xs font-bold text-text-secondary opacity-30">{t('NoImageAvailable')}</span>
+                           )}
+                        </div>
+                     </div>
+                     <div className="space-y-4">
+                        <p className="text-[10px] font-black uppercase tracking-widest text-text-secondary opacity-40">{t('AfterFulfillment')}</p>
+                        <div className="aspect-video rounded-[2.5rem] overflow-hidden border-2 border-emerald/20 bg-emerald/5 flex items-center justify-center">
+                           {ticket.after_image_url ? (
+                              <img src={ticket.after_image_url} alt="After" className="w-full h-full object-cover" />
+                           ) : (
+                              <span className="text-xs font-bold text-emerald/30">{t('NoImageAvailable')}</span>
+                           )}
+                        </div>
+                     </div>
+                  </div>
+               </div>
+             )}
 
              {/* Accountability Section: USP 9 SLA */}
              <div className="bg-white rounded-[3.5rem] p-12 shadow-soft border border-border grid grid-cols-1 md:grid-cols-2 gap-12">
@@ -188,12 +333,12 @@ export default function TicketDetail() {
                 <h3 className="text-lg font-sora font-extrabold uppercase tracking-tight text-saffron">{t('ActionTerminal')}</h3>
                 
                 <div className="space-y-4">
-                   {['filed', 'assigned', 'in_progress'].includes(ticket.status) && (
+                   {['filed', 'assigned'].includes(ticket.status) && (
                       <button 
-                        onClick={() => updateStatus(ticket.status === 'in_progress' ? 'resolved' : 'in_progress')}
+                        onClick={() => updateStatus('in_progress')}
                         className="w-full bg-saffron text-white py-6 rounded-2xl font-bold uppercase tracking-widest hover:scale-105 transition shadow-xl"
                       >
-                         {ticket.status === 'in_progress' ? t('FinalizeResolution') : t('InitializeResolution')}
+                         {t('InitializeResolution')}
                       </button>
                    )}
                    {ticket.status === 'in_progress' && (

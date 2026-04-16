@@ -115,7 +115,7 @@ export default function App() {
               } />
               <Route path="/officer/tickets/:id" element={
                 <ProtectedRoute allowedRoles={['officer', 'admin']}>
-                  <TicketDetail />
+                  <OfficerLayout><TicketDetail /></OfficerLayout>
                 </ProtectedRoute>
               } />
 

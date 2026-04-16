@@ -74,13 +74,6 @@ const COUNCILS = [
   "Other"
 ];
 
-const STATES = [
-  "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh", "Goa", "Gujarat", "Haryana", 
-  "Himachal Pradesh", "Jharkhand", "Karnataka", "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur", 
-  "Meghalaya", "Mizoram", "Nagaland", "Odisha", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu", 
-  "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal"
-];
-
 const LANGUAGES = [
   { code: 'en', name: 'English' },
   { code: 'hi', name: 'Hindi' },
@@ -92,13 +85,10 @@ const LANGUAGES = [
 export default function HighFidelityComplaintForm({ onSubmit, isSubmitting: parentSubmitting }) {
   const { t, i18n } = useTranslation();
   const [formData, setFormData] = useState({
-    // Section 1
     complaint_type: '',
     complaint_subtype: '',
     ppo_no: '',
     description: '',
-    
-    // Section 2
     house_no: '',
     street: '',
     area: '',
@@ -109,27 +99,13 @@ export default function HighFidelityComplaintForm({ onSubmit, isSubmitting: pare
     lng: null,
     connection_code: '',
     council: '',
-    
-    // Section 3
     first_name: '',
     last_name: '',
-    
-    // Section 4
-    c_house_no: '',
-    c_street: '',
-    c_area: '',
-    c_city: 'Mumbai',
-    c_state: 'Maharashtra',
-    c_country: 'India',
-    c_std: '',
-    c_phone: '',
     mobile: '',
     email: '',
-    folio_code: '',
-    
-    // Section 5
     is_anonymous: false,
     media: null,
+    mediaPreview: null,
     language: 'en'
   });
 
@@ -139,16 +115,14 @@ export default function HighFidelityComplaintForm({ onSubmit, isSubmitting: pare
   const [successData, setSuccessData] = useState(null);
   const [isListening, setIsListening] = useState(false);
   const [recognition, setRecognition] = useState(null);
-  const scrollRef = useRef(null);
 
-  // Initialize Speech Recognition
   useEffect(() => {
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       const rec = new SpeechRecognition();
       rec.continuous = true;
       rec.interimResults = true;
-      rec.lang = 'en-IN'; // Default
+      rec.lang = 'en-IN';
       
       rec.onresult = (event) => {
         let finalTrans = '';
@@ -164,7 +138,6 @@ export default function HighFidelityComplaintForm({ onSubmit, isSubmitting: pare
       setRecognition(rec);
     }
 
-    // Load Draft
     const draft = localStorage.getItem('ugirp_complaint_draft');
     if (draft) {
       try {
@@ -174,7 +147,6 @@ export default function HighFidelityComplaintForm({ onSubmit, isSubmitting: pare
     }
   }, []);
 
-  // Save Draft
   const saveDraft = () => {
     localStorage.setItem('ugirp_complaint_draft', JSON.stringify(formData));
     toast.success(t("DraftSaved"), { duration: 1000 });
@@ -219,11 +191,7 @@ export default function HighFidelityComplaintForm({ onSubmit, isSubmitting: pare
       recognition?.start();
       setIsListening(true);
       
-      // Stop and process after 5 seconds of silence or manual stop
-      recognition.onend = () => {
-        setIsListening(false);
-        // We trigger extraction when it ends
-      };
+      recognition.onend = () => setIsListening(false);
       
       recognition.onresult = (event) => {
         const transcript = Array.from(event.results)
@@ -270,7 +238,7 @@ export default function HighFidelityComplaintForm({ onSubmit, isSubmitting: pare
     const newErrors = {};
     if (!formData.complaint_type) newErrors.complaint_type = t("ErrComplaintType");
     if (!formData.complaint_subtype) newErrors.complaint_subtype = t("ErrSubtype");
-    if (formData.description.trim().split(/\s+/).length < 10) newErrors.description = t("ErrDescriptionMinWords");
+    if (formData.description.trim().split(/\s+/).length < 1) newErrors.description = t("ErrDescriptionMinWords");
     if (!formData.street) newErrors.street = t("ErrStreet");
     if (!formData.area) newErrors.area = t("ErrArea");
     if (!formData.ward) newErrors.ward = t("ErrWard");
@@ -291,14 +259,13 @@ export default function HighFidelityComplaintForm({ onSubmit, isSubmitting: pare
     }
 
     setIsProcessing(true);
-    setProcessStep(1);
-
-    // Instant Cognitive Sequence
-    setProcessStep(4); // Skip immediately to final stage
+    setProcessStep(4);
 
     try {
-      const typeObj = COMPLAINT_TYPES.find(t => t.name === formData.complaint_type);
-      const payload = {
+      const typeObj = COMPLAINT_TYPES.find(tOption => tOption.name === formData.complaint_type);
+
+      const fd = new FormData();
+      const fields = {
         ...formData,
         ward: formData.ward_code || formData.ward,
         category: typeObj?.internal || 'OTHER',
@@ -306,28 +273,18 @@ export default function HighFidelityComplaintForm({ onSubmit, isSubmitting: pare
         source: 'web',
         filed_at: new Date().toISOString()
       };
-      console.log('🚀 Sending Dispatch Signal:', {
-        description: payload.description,
-        category: payload.category,
-        full_payload: payload
+
+      Object.entries(fields).forEach(([key, val]) => {
+        if (key !== 'media' && key !== 'mediaPreview' && val !== null && val !== undefined) {
+          fd.append(key, String(val));
+        }
       });
 
-      // Call parent submit
-      await onSubmit(payload);
-      
-      // Dynamic Success Data Response (Based on Jurisdictional Category)
-      const deptName = payload.category.charAt(0) + payload.category.slice(1).toLowerCase();
-      
-      setSuccessData({
-        id: `UGIRP-2024-${Math.floor(10000 + Math.random() * 90000)}`,
-        category: payload.category,
-        priority: 'P3',
-        officer: `Specialist assigned to ${deptName} Department`,
-        distance: `${(Math.random() * 3 + 0.5).toFixed(1)}km`,
-        sla: 'Action within 24-48 hours',
-        deadline: new Date(Date.now() + 48 * 60 * 60 * 1000).toLocaleString()
-      });
+      if (formData.media) {
+        fd.append('photo', formData.media);
+      }
 
+      await onSubmit(fd);
       clearDraft();
     } catch (err) {
       toast.error(t("SignalIngestionFailed"));
@@ -377,7 +334,6 @@ export default function HighFidelityComplaintForm({ onSubmit, isSubmitting: pare
 
   return (
     <div className="bg-surface rounded-[2.5rem] card-shadow overflow-hidden relative">
-      {/* Processing Overlay */}
       {isProcessing && (
         <div className="absolute inset-0 z-[100] bg-white/80 backdrop-blur-md flex flex-col items-center justify-center p-12 text-center space-y-10 animate-fade-in">
            <div className="relative">
@@ -402,7 +358,6 @@ export default function HighFidelityComplaintForm({ onSubmit, isSubmitting: pare
         </div>
       )}
 
-      {/* Form Header */}
       <div className="p-10 border-b border-border bg-bg/50 flex justify-between items-center">
          <div>
             <h2 className="text-2xl font-sora font-extrabold text-navy tracking-tight uppercase flex items-center gap-3">
@@ -426,7 +381,6 @@ export default function HighFidelityComplaintForm({ onSubmit, isSubmitting: pare
       </div>
 
       <form onSubmit={handleSubmit} className="p-10 space-y-12">
-        {/* SECTION 1: NATURE */}
         <Section title={t("DefineNatureOfComplaint")} icon={<Sparkles size={18}/>}>
            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div className="space-y-2">
@@ -496,7 +450,6 @@ export default function HighFidelityComplaintForm({ onSubmit, isSubmitting: pare
            </div>
         </Section>
 
-        {/* SECTION 2: LOCATION */}
         <Section title={t("SpecifyLocation")} icon={<Map size={18}/>}>
            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <Input label={t("HouseNo")} placeholder={t("BuildingUnit")} val={formData.house_no} onChange={v => setFormData({ ...formData, house_no: v })} />
@@ -554,7 +507,6 @@ export default function HighFidelityComplaintForm({ onSubmit, isSubmitting: pare
            </div>
         </Section>
 
-        {/* SECTION 3 & 4: COMPLAINANT */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
             <Section title={t("SpecialistIDName")} icon={<User size={18}/>}>
                <div className="space-y-8">
@@ -570,21 +522,60 @@ export default function HighFidelityComplaintForm({ onSubmit, isSubmitting: pare
             </Section>
         </div>
 
-        {/* SECTION 5: ADDITIONAL */}
         <Section title={t("ForensicEvidencePrivacy")} icon={<Filter size={18}/>}>
            <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-              <div className="space-y-6">
+              <div className="space-y-4">
                  <Label label={t("AttachEvidence")} />
-                 <label className="w-full flex items-center gap-6 p-8 bg-bg border-2 border-dashed border-border rounded-[2rem] cursor-pointer group hover:border-navy transition duration-500">
-                    <div className="w-16 h-16 bg-white rounded-3xl flex items-center justify-center text-navy shadow-soft group-hover:scale-110 transition duration-500">
-                       <Camera size={28} />
+                 <label className={`w-full flex items-center gap-6 p-6 bg-bg border-2 border-dashed rounded-[2rem] cursor-pointer group transition duration-500 ${
+                   formData.media ? 'border-navy bg-navy/5' : 'border-border hover:border-navy'
+                 }`}>
+                    <div className="w-20 h-20 min-w-[80px] rounded-2xl overflow-hidden border border-border bg-white flex items-center justify-center shadow-sm group-hover:scale-105 transition duration-500">
+                       {formData.mediaPreview
+                         ? <img src={formData.mediaPreview} alt="preview" className="w-full h-full object-cover" />
+                         : <Camera size={28} className="text-navy" />}
                     </div>
-                    <div>
-                       <span className="text-xs font-black text-navy uppercase tracking-widest block">{t("UploadMediaNode")}</span>
-                       <span className="text-[9px] font-bold text-text-secondary opacity-40 uppercase tracking-widest italic">{t("MediaSupported")}</span>
+                    <div className="flex-1 min-w-0">
+                       <span className="text-xs font-black text-navy uppercase tracking-widest block truncate">
+                         {formData.media ? formData.media.name : t("UploadMediaNode")}
+                       </span>
+                       <span className="text-[9px] font-bold text-text-secondary opacity-60 uppercase tracking-widest italic">
+                         {formData.media
+                           ? `${(formData.media.size / 1024).toFixed(0)} KB Â· ${formData.media.type}`
+                           : t("MediaSupported")}
+                       </span>
+                       {formData.mediaPreview && (
+                         <span className="mt-1 inline-flex items-center gap-1 text-[8px] font-black text-emerald uppercase tracking-widest">
+                           <CheckCircle size={10} /> {t("PreviewReadyLabel")}
+                         </span>
+                       )}
                     </div>
-                    <input type="file" className="hidden" accept="image/*,video/*" />
+                    <input
+                       type="file"
+                       className="hidden"
+                       accept="image/*,video/*"
+                       onChange={e => {
+                         const file = e.target.files?.[0] || null;
+                         if (!file) return;
+                         const preview = file.type.startsWith('image/')
+                           ? URL.createObjectURL(file)
+                           : null;
+                         setFormData(prev => ({ ...prev, media: file, mediaPreview: preview }));
+                       }}
+                    />
                  </label>
+                 {formData.media && (
+                   <button
+                     type="button"
+                     onClick={() => setFormData(prev => ({
+                       ...prev,
+                       media: null,
+                       mediaPreview: prev.mediaPreview ? (URL.revokeObjectURL(prev.mediaPreview), null) : null
+                     }))}
+                     className="flex items-center gap-1.5 text-[9px] font-black text-crimson uppercase tracking-widest hover:opacity-70 transition ml-1"
+                   >
+                     <X size={10} /> {t("RemoveFileLabel")}
+                   </button>
+                 )}
               </div>
 
               <div className="space-y-6">
@@ -610,7 +601,6 @@ export default function HighFidelityComplaintForm({ onSubmit, isSubmitting: pare
            </div>
         </Section>
 
-        {/* SUBMISSION FOOTER */}
         <div className="pt-12 border-t border-border flex flex-col md:flex-row gap-6">
            <button 
              type="button" 
@@ -633,8 +623,6 @@ export default function HighFidelityComplaintForm({ onSubmit, isSubmitting: pare
     </div>
   );
 }
-
-// --- SUB-COMPONENTS ---
 
 function Section({ title, icon, children }) {
   return (

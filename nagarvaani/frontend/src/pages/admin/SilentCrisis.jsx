@@ -1,22 +1,66 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   EyeOff, MapPin, Users, Phone, Users2,
   HelpCircle, ChevronRight, AlertTriangle,
-  ShieldAlert, Activity, CheckCircle, MessageSquare
+  ShieldAlert, Activity, CheckCircle, MessageSquare,
+  RefreshCw
 } from 'lucide-react';
-
-const WARDS = [
-  { name: "Dharavi", population: 600000, complaints: 6, ratio: 100000, risk: "CRITICAL", color: "bg-crimson" },
-  { name: "Govandi", population: 400000, complaints: 4, ratio: 100000, risk: "CRITICAL", color: "bg-crimson" },
-  { name: "Mankhurd", population: 180000, complaints: 22, ratio: 8181, risk: "HIGH", color: "bg-saffron" },
-  { name: "Bandra West", population: 120000, complaints: 180, ratio: 667, risk: "MEDIUM", color: "bg-yellow-400" },
-  { name: "Colaba", population: 80000, complaints: 240, ratio: 333, risk: "LOW", color: "bg-emerald" },
-];
+import { supabase } from '../../lib/supabaseClient';
+import { citiesConfig } from '../../assets/data/citiesConfig';
+import { getEstimatedPopulation } from '../../assets/data/populationMapping';
 
 export default function SilentCrisis() {
+  const [wards, setWards] = useState([]);
   const [selectedWard, setSelectedWard] = useState(null);
+  const [loading, setLoading] = useState(true);
   const { t } = useTranslation();
+  const [selectedCity, setSelectedCity] = useState("Mumbai");
+
+  useEffect(() => {
+    fetchSilenceData();
+  }, [selectedCity]);
+
+  const fetchSilenceData = async () => {
+    setLoading(true);
+    try {
+      const { data: tickets } = await supabase
+        .from('master_tickets')
+        .select('ward, city');
+      
+      const cityConfig = citiesConfig[selectedCity];
+      const wardComplaints = {};
+      tickets?.filter(t => t.city === selectedCity).forEach(t => {
+        const w = t.ward || "Unknown";
+        wardComplaints[w] = (wardComplaints[w] || 0) + 1;
+      });
+
+      const commonWards = Object.keys(cityConfig.offices || {}).map(k => k.replace(/^Ward\s*/, ''));
+      if (commonWards.length === 0) {
+        Object.keys(wardComplaints).forEach(w => { if(!commonWards.includes(w)) commonWards.push(w); });
+      }
+
+      const calculatedWards = commonWards.map(wName => {
+        const count = wardComplaints[wName] || 0;
+        const pop = getEstimatedPopulation(selectedCity, wName);
+        const ratio = Math.round(pop / (count + 1));
+        
+        let risk = "LOW";
+        let color = "bg-emerald";
+        if (ratio > 3000) { risk = "CRITICAL"; color = "bg-crimson"; }
+        else if (ratio > 1500) { risk = "HIGH"; color = "bg-saffron"; }
+        else if (ratio > 800) { risk = "MEDIUM"; color = "bg-yellow-400"; }
+
+        return { name: wName, population: pop, complaints: count, ratio, risk, color };
+      }).sort((a, b) => b.ratio - a.ratio);
+
+      setWards(calculatedWards);
+    } catch (err) {
+      console.error("Silence fetch failed:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="p-10 lg:p-16 space-y-12 animate-fade-in max-w-7xl mx-auto pb-32">
@@ -33,31 +77,66 @@ export default function SilentCrisis() {
              </div>
              <div>
                 <span className="text-[10px] font-black uppercase tracking-widest text-text-secondary opacity-40">{t('GlobalBlindSpots')}</span>
-                <p className="text-sm font-extrabold text-navy uppercase tracking-tighter">{t('CriticalNodes', { count: '02' })}</p>
+                <p className="text-sm font-extrabold text-navy uppercase tracking-tighter">
+                   {t('CriticalNodes', { count: wards.filter(w => w.risk === 'CRITICAL').length.toString().padStart(2, '0') })}
+                </p>
              </div>
           </div>
        </header>
 
        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
           {/* Ward Table */}
-          <div className="lg:col-span-8 bg-white rounded-[3.5rem] shadow-soft border border-[#162F6A]/30 overflow-hidden">
-             <table className="w-full text-left">
-                <thead>
-                   <tr className="border-b border-border bg-bg/30">
-                      <Th label={t('WardJurisdictions')} />
-                      <Th label={t('Population')} />
-                      <Th label={t('Complaints')} />
-                      <Th label={t('SilenceRatio')} />
-                      <Th label={t('RiskLevel')} />
-                   </tr>
-                </thead>
-                <tbody className="divide-y divide-border">
-                   {WARDS.map((ward, idx) => (
-                      <tr 
-                        key={idx} 
-                        onClick={() => setSelectedWard(ward)}
-                        className={`hover:bg-bg/50 transition-all cursor-pointer group ${selectedWard?.name === ward.name ? 'bg-bg' : ''}`}
-                      >
+          <div className="lg:col-span-8 bg-white rounded-[3.5rem] shadow-soft border border-[#162F6A]/30 overflow-hidden min-h-[400px]">
+             {loading ? (
+                <div className="flex flex-col items-center justify-center h-full py-20 opacity-20">
+                   <RefreshCw className="animate-spin mb-4" />
+                   <span className="text-[10px] font-black uppercase tracking-widest">Scanning Signal Ratios...</span>
+                </div>
+             ) : (
+                <table className="w-full text-left">
+                   <thead>
+                      <tr className="border-b border-border bg-bg/30">
+                         <Th label={t('WardJurisdictions')} />
+                         <Th label={t('Population')} />
+                         <Th label={t('Complaints')} />
+                         <Th label={t('SilenceRatio')} />
+                         <Th label={t('RiskLevel')} />
+                      </tr>
+                   </thead>
+                   <tbody className="divide-y divide-border">
+                      {wards.map((ward, idx) => (
+                         <tr 
+                           key={idx} 
+                           onClick={() => setSelectedWard(ward)}
+                           className={`hover:bg-bg/50 transition-all cursor-pointer group ${selectedWard?.name === ward.name ? 'bg-bg' : ''}`}
+                         >
+                            <td className="py-8 px-10">
+                               <div className="flex items-center gap-4">
+                                  <MapPin size={18} className="text-navy opacity-30" />
+                                  <span className="text-sm font-extrabold text-navy uppercase tracking-tighter">{ward.name}</span>
+                               </div>
+                            </td>
+                            <td className="py-8 font-bold text-navy opacity-60 text-xs">{ward.population.toLocaleString()}</td>
+                            <td className="py-8 font-bold text-navy opacity-60 text-xs">{ward.complaints} {t('Filed')}</td>
+                            <td className="py-8">
+                               <div className="flex flex-col">
+                                  <span className="text-xs font-black text-navy opacity-80">1:{ward.ratio.toLocaleString()}</span>
+                                  <div className="w-24 h-1 bg-gray-100 rounded-full mt-2 overflow-hidden">
+                                     <div className={`h-full ${ward.color}`} style={{ width: `${Math.min(100, (ward.ratio/5000) * 100)}%` }} />
+                                  </div>
+                               </div>
+                            </td>
+                            <td className="py-8">
+                               <div className={`px-3 py-1 rounded-full text-[8px] font-black text-white uppercase tracking-widest inline-block ${ward.color}`}>
+                                  {t(ward.risk)}
+                               </div>
+                            </td>
+                         </tr>
+                      ))}
+                   </tbody>
+                </table>
+             )}
+          </div>
                          <td className="py-8 px-10">
                             <div className="flex items-center gap-4">
                                <MapPin size={18} className="text-navy opacity-30" />

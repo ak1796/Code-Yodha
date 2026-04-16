@@ -4,7 +4,6 @@ import {
   Bell, X, ShieldAlert, Award, AlertTriangle, 
   MessageSquare, Zap, Clock, ChevronRight, Activity, Star
 } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 
 const MOCK_NOTIFS = [
   {
@@ -46,7 +45,6 @@ const MOCK_NOTIFS = [
 ];
 
 export default function NotificationPanel({ onClose }) {
-  const { t } = useTranslation();
   return (
     <div className="fixed inset-0 z-[110] flex justify-end">
        {/* Backdrop */}
@@ -62,8 +60,8 @@ export default function NotificationPanel({ onClose }) {
                    <div className="absolute -top-1 -right-1 w-4 h-4 bg-crimson rounded-full border-2 border-white" />
                 </div>
                 <div>
-                   <h3 className="text-xl font-sora font-extrabold text-navy tracking-tighter uppercase">Tactical Signals</h3>
-                   <p className="text-[10px] font-bold text-text-secondary uppercase tracking-widest opacity-40">Zero-Latency Ingestion Feed</p>
+                   <h3 className="text-xl font-sora font-extrabold text-navy tracking-tighter uppercase">Recent Notifications</h3>
+                   <p className="text-[10px] font-bold text-text-secondary uppercase tracking-widest opacity-40">Real-time alert list</p>
                 </div>
              </div>
              <button onClick={onClose} className="p-3 hover:bg-gray-100 rounded-xl transition">
@@ -92,7 +90,7 @@ export default function NotificationPanel({ onClose }) {
                       <div className="space-y-1">
                          <div className="flex items-center gap-3">
                             <span className="text-[9px] font-black uppercase tracking-widest opacity-40 text-text-secondary">{notif.time}</span>
-                            {notif.urgent && <span className="text-[8px] font-black uppercase tracking-widest text-crimson animate-pulse">{t('NT_Critical')}</span>}
+                            {notif.urgent && <span className="text-[8px] font-black uppercase tracking-widest text-crimson animate-pulse">Critical</span>}
                          </div>
                          <h4 className="text-sm font-extrabold text-navy tracking-tight">{notif.title}</h4>
                          <p className="text-xs text-text-secondary font-medium leading-relaxed italic">{notif.desc}</p>

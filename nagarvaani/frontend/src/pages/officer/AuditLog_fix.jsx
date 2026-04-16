@@ -3,25 +3,10 @@ import { supabase } from '../../lib/supabaseClient';
 import { useAuth } from '../../context/AuthContext';
 import { useTranslation } from 'react-i18next';
 import { 
-  ChevronLeft, Search, Calendar, User, 
-  History, Shield, Zap, FileText, 
-  Activity, CheckCircle, ShieldCheck,
-  Terminal, Cpu, AlertTriangle
+  Shield, Clock, FileText, CheckCircle, Search, 
+  ArrowRight, ShieldCheck, User, Cpu, AlertTriangle, 
+  Filter, History, Zap
 } from 'lucide-react';
-
-// Forensic Hash Utility for Accountability
-const getForensicHash = (id, length = 6) => {
-   if (!id) return "0x" + "0".repeat(length);
-   // Simple deterministic hash
-   let hash = 0;
-   const str = id.toString();
-   for (let i = 0; i < str.length; i++) {
-     hash = ((hash << 5) - hash) + str.charCodeAt(i);
-     hash |= 0;
-   }
-   return "0x" + Math.abs(hash).toString(16).substring(0, length).toUpperCase();
-};
-
 import { formatDate } from '../../lib/utils';
 import toast from 'react-hot-toast';
 
@@ -47,7 +32,7 @@ export default function OfficerAudit() {
         table: 'audit_log' 
       }, (payload) => {
         setLogs(prev => [payload.new, ...prev]);
-        toast.success(t('LedgerUpdatedRealtime'));
+        toast.success("Ledger updated in real-time");
       })
       .subscribe();
 
@@ -79,7 +64,7 @@ export default function OfficerAudit() {
       setLogs(data || []);
     } catch (err) {
       console.error(err);
-      toast.error(t('AuditRegistryOffline'));
+      toast.error("Audit registry offline");
     } finally {
       setLoading(false);
     }
@@ -109,17 +94,10 @@ export default function OfficerAudit() {
       groups[log.ticket_id].push(log);
     });
     // Sort logs within each group by date ascending for timeline flow
-    // Sort groups by the most recent activity in that group
-    return Object.keys(groups)
-      .sort((a, b) => {
-        const lastA = new Date(groups[a][groups[a].length - 1].created_at);
-        const lastB = new Date(groups[b][groups[b].length - 1].created_at);
-        return lastB - lastA;
-      })
-      .reduce((obj, key) => {
-        obj[key] = groups[key];
-        return obj;
-      }, {});
+    Object.keys(groups).forEach(id => {
+      groups[id].sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+    });
+    return groups;
   }, [filteredLogs]);
 
   const calculateDay = (currentDate, startDate) => {
@@ -130,7 +108,7 @@ export default function OfficerAudit() {
     const c = new Date(current.getFullYear(), current.getMonth(), current.getDate());
     const diffTime = Math.abs(c - s);
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
-    return t('DayCount', { count: diffDays });
+    return `Day ${diffDays}`;
   };
 
   const getActionIcon = (action, isSystem) => {
@@ -142,13 +120,37 @@ export default function OfficerAudit() {
   };
 
   return (
-    <div className="p-10 space-y-10">
+    <div className="min-h-screen bg-[#F0F2F5] p-6 lg:p-12 font-sans animate-fade-in relative">
+      <div className="max-w-4xl mx-auto space-y-12 pb-32">
+        
+        {/* Modern Glass Header */}
+        <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+          <div className="space-y-1">
+            <h1 className="text-4xl font-sora font-extrabold text-navy tracking-tighter uppercase">
+              {t('SovereignAuditTitle')}
+            </h1>
+            <p className="text-[11px] font-bold text-text-secondary opacity-40 uppercase tracking-[0.2em] ml-1">{t('ImmutableLedger')}</p>
+          </div>
+          <div className="bg-white px-6 py-3 rounded-2xl shadow-sm border border-border flex items-center gap-4">
+             <div className="w-8 h-8 rounded-lg bg-emerald text-white flex items-center justify-center shadow-lg shadow-emerald/20 translate-y-[-1px]">
+                <Shield size={18} />
+             </div>
+             <div>
+                <p className="text-[10px] font-extrabold text-emerald uppercase tracking-tighter leading-none">Integrity Verified</p>
+                <div className="flex items-center gap-1">
+                   <div className="w-1.5 h-1.5 bg-emerald rounded-full animate-pulse" />
+                   <span className="text-[8px] font-black uppercase tracking-widest text-text-secondary opacity-40">Sync Active</span>
+                </div>
+             </div>
+          </div>
+        </header>
+
         {/* Tactical Search */}
         <div className="relative group">
            <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-text-secondary opacity-30 group-focus-within:text-navy transition-colors transition-transform group-focus-within:scale-110" size={20} />
            <input 
              type="text"
-             placeholder={t('SearchPlaceholderAudit')}
+             placeholder="Search case ID or action history..."
              value={searchTerm}
              onChange={(e) => setSearchTerm(e.target.value)}
              className="w-full pl-16 pr-6 py-6 bg-white border-2 border-transparent rounded-[2rem] outline-none focus:border-navy focus:bg-white text-navy font-bold transition-all shadow-xl shadow-navy/5"
@@ -176,16 +178,16 @@ export default function OfficerAudit() {
                      <div className="flex items-center justify-between border-b border-border pb-8 mb-10 relative z-10">
                         <div>
                            <div className="flex items-center gap-3">
-                              <span className="px-3 py-1 bg-navy text-white text-[9px] font-black rounded-full uppercase tracking-tighter">{t('Node')} #{ticketId.substring(0, 8)}</span>
-                              <span className="text-[10px] font-bold text-text-secondary opacity-40 uppercase tracking-widest">{ticketLogs.length} {t('ChainEvents')}</span>
+                              <span className="px-3 py-1 bg-navy text-white text-[9px] font-black rounded-full uppercase tracking-tighter">NODE #{ticketId.substring(0, 8)}</span>
+                              <span className="text-[10px] font-bold text-text-secondary opacity-40 uppercase tracking-widest">{ticketLogs.length} Chain Events</span>
                            </div>
-                           <h3 className="text-2xl font-sora font-extrabold text-navy mt-2 underline decoration-navy/10 underline-offset-8">{t('AccountabilityTimeline')}</h3>
+                           <h3 className="text-2xl font-sora font-extrabold text-navy mt-2 underline decoration-navy/10 underline-offset-8">Accountability Timeline</h3>
                         </div>
                         <div className="flex flex-col items-end">
                            <div className="flex items-center gap-2 px-3 py-1 bg-emerald-light/10 text-emerald text-[9px] font-black rounded-full border border-emerald/10 shadow-sm">
-                              <ShieldCheck size={12} /> {t('TamperProof')}
+                              <ShieldCheck size={12} /> TAMPER-PROOF
                            </div>
-                           <p className="text-[10px] font-bold text-text-secondary opacity-40 mt-2 uppercase tracking-widest">{t('IntegrityVerified')}</p>
+                           <p className="text-[10px] font-bold text-text-secondary opacity-40 mt-2 uppercase tracking-widest">Integrity Verified</p>
                         </div>
                      </div>
 
@@ -221,22 +223,6 @@ export default function OfficerAudit() {
                                       <span className="text-[10px] font-bold text-text-secondary opacity-60 flex items-center gap-1">
                                          &mdash; {log.actor || (isSystem ? 'System Intelligence' : 'Authorized Official')}
                                       </span>
-                                   </div>
-
-                                   {/* Forensic Meta Terminal */}
-                                   <div className="flex items-center gap-3 mt-1.5 opacity-40">
-                                      <div className="flex items-center gap-1 text-[8px] font-black uppercase tracking-widest text-navy bg-navy/5 px-2 py-0.5 rounded-md border border-navy/10 font-mono">
-                                         <Terminal size={10} className="opacity-40" />
-                                         {t('NodeID_Label')} <span className="opacity-100">{getForensicHash(log.id, 8)}</span>
-                                      </div>
-                                      <div className="flex items-center gap-1 text-[8px] font-black uppercase tracking-widest text-navy bg-navy/5 px-2 py-0.5 rounded-md border border-navy/10 font-mono">
-                                         <Cpu size={10} className="opacity-40" />
-                                         {t('ProtocolCode')} <span className="opacity-100">0x{getForensicHash(log.action, 4)}</span>
-                                      </div>
-                                      <div className="flex items-center gap-1 text-[8px] font-black uppercase tracking-widest text-emerald bg-emerald/5 px-2 py-0.5 rounded-md border border-emerald/10 font-mono">
-                                         <ShieldCheck size={10} className="opacity-40" />
-                                         {t('AuthStatus')} <span className="opacity-100">VERIFIED</span>
-                                      </div>
                                    </div>
                                    
                                    {log.note && (

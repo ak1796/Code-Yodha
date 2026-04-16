@@ -23,6 +23,7 @@ const MOCK_BAR_DATA = [
 export default function Performance() {
   const { profile } = useAuth();
   const [history, setHistory] = useState([]);
+  const { t } = useTranslation();
 
   useEffect(() => {
     fetchHistory();
@@ -46,22 +47,6 @@ export default function Performance() {
     <div className="min-h-screen bg-[#F0F2F5] p-8 lg:p-16 animate-fade-in pb-32">
        <div className="max-w-7xl mx-auto space-y-12">
           
-          <header className="flex justify-between items-end">
-             <div className="space-y-2">
-                <h1 className="text-4xl font-sora font-extrabold text-navy tracking-tight">{t('PerformanceCockpit')}</h1>
-                <p className="text-text-secondary font-medium opacity-60 italic">{t('PerformanceCockpitDesc')}</p>
-             </div>
-             <div className="bg-white px-8 py-4 rounded-3xl shadow-soft border border-border flex items-center gap-4">
-                <div className="w-10 h-10 rounded-xl bg-saffron text-white flex items-center justify-center shadow-lg shadow-saffron/20">
-                   <Award size={20} />
-                </div>
-                <div>
-                   <span className="text-[10px] font-black uppercase tracking-widest text-text-secondary opacity-40">{t('OperationalRank')}</span>
-                   <p className="text-sm font-extrabold text-navy uppercase tracking-tighter">{t('GoldSpecialistTier')}</p>
-                </div>
-             </div>
-          </header>
-
           {/* KPI Matrix (4 cards) */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
              <KPICard label={t('JurisdictionsClosed')} val="14" sub={t('ThisWeek')} icon={<CheckCircle size={24}/>} color="emerald" />
@@ -73,17 +58,21 @@ export default function Performance() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
              {/* Weekly Velocity Chart */}
              <div className="lg:col-span-8 bg-white rounded-[3.5rem] p-12 shadow-soft border border-border relative overflow-hidden group">
-                <div className="flex justify-between items-center mb-12">
-                   <div>
-                      <h3 className="text-xl font-sora font-extrabold text-navy uppercase tracking-tighter">{t('ResolutionVelocity')}</h3>
-                      <p className="text-[10px] font-bold text-text-secondary opacity-40 uppercase tracking-widest mt-1">{t('RollingRollingLoad')}</p>
+                <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
+                   <div className="space-y-1">
+                      <h1 className="text-4xl font-sora font-extrabold text-navy tracking-tighter uppercase">{t('PerformanceCockpit')}</h1>
+                      <p className="text-[11px] font-bold text-text-secondary opacity-40 uppercase tracking-[0.2em] ml-1">{t('PerformanceCockpitDesc')}</p>
                    </div>
-                   <div className="flex gap-4">
-                      <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-emerald">
-                         <div className="w-2 h-2 rounded-full bg-emerald" /> {t('Volume')}
+                   <div className="bg-white px-6 py-3 rounded-2xl shadow-sm border border-border flex items-center gap-4">
+                      <div className="w-8 h-8 rounded-lg bg-saffron text-white flex items-center justify-center shadow-lg shadow-saffron/20 group hover:rotate-12 transition-transform">
+                         <Award size={18} />
+                      </div>
+                      <div>
+                         <p className="text-[10px] font-extrabold text-navy uppercase tracking-tighter leading-none">GOLD TIER</p>
+                         <span className="text-[8px] font-black uppercase tracking-widest text-text-secondary opacity-40">{t('OperationalRank')}</span>
                       </div>
                    </div>
-                </div>
+                </header>
                 <div className="h-[350px] relative z-10">
                    <ResponsiveContainer width="100%" height="100%">
                       <BarChart data={MOCK_BAR_DATA}>

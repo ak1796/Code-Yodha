@@ -1,4 +1,6 @@
 const { supabase } = require('../lib/supabase');
+const { sendAssignmentEmail } = require('./notificationService');
+const auditService = require('./auditService');
 
 /**
  * Haversine distance function (km)
@@ -19,7 +21,7 @@ function haversineKm(lat1, lon1, lat2, lon2) {
  */
 exports.autoAssignOfficer = async (ticketId, category, lat, lng, city, ward) => {
   try {
-    console.log(`🤖 Universal Dispatcher: Solving optimal routing for Ticket ${ticketId} in Ward ${ward}...`);
+    console.log(`ðŸ¤– Universal Dispatcher: Solving optimal routing for Ticket ${ticketId} in Ward ${ward}...`);
 
     // 1. Fetch ALL capable officers in city (Step 4)
     const { data: officers, error } = await supabase
@@ -31,7 +33,7 @@ exports.autoAssignOfficer = async (ticketId, category, lat, lng, city, ward) => 
       .eq('is_available', true);
 
     if (error || !officers || officers.length === 0) {
-      console.log(`⚠️ No local specialist found for ${category}. Triggering Fallback...`);
+      console.log(`âš ï¸ No local specialist found for ${category}. Triggering Fallback...`);
       return await assignFallback(ticketId, category, city);
     }
 
@@ -71,7 +73,7 @@ exports.autoAssignOfficer = async (ticketId, category, lat, lng, city, ward) => 
     return { success: true, officer_name: best.full_name, distance: best.dist };
 
   } catch (err) {
-    console.error("❌ Auto-Assign Fatal:", err.message);
+    console.error("âŒ Auto-Assign Fatal:", err.message);
     return { success: false };
   }
 };
@@ -80,7 +82,7 @@ exports.autoAssignOfficer = async (ticketId, category, lat, lng, city, ward) => 
  * Fallback to Dept Head or Cross-Department
  */
 async function assignFallback(ticketId, category, city) {
-  console.log(`⚠️ No local specialist available for ${category}. Triggering Fallback...`);
+  console.log(`âš ï¸ No local specialist available for ${category}. Triggering Fallback...`);
 
   // 1. Try Dept Head in that city
   const { data: head } = await supabase
@@ -155,13 +157,12 @@ exports.escalateToDeptHead = async (ticketId) => {
   await supabase.from('master_tickets').update({ status: 'escalated' }).eq('id', ticketId);
 
   // 4. CC notification (Simplified logic)
-  const { sendAssignmentEmail } = require('./notificationService');
-  await sendAssignmentEmail(head.email, { ...ticket, title: `🚨 ESCALATED BREACH: ${ticket.title}` });
+  await sendAssignmentEmail(head.email, { ...ticket, title: `ðŸš¨ ESCALATED BREACH: ${ticket.title}` });
   
   return { success: true, head_name: head.full_name };
 };
 
-const auditService = require('./auditService');
+
 
 /**
  * atomic updates for assignments
@@ -185,6 +186,6 @@ async function finalizeAssignment(ticketId, officer, reason, dist) {
     ticket_id: ticketId,
     action: 'OFFICER_ASSIGNED',
     new_value: officer.full_name,
-    ip_address: '0.0.0.0' // Service-to-service
+    ip_address: 'SYSTEM_PROTOCOL_DISPATCH'
   });
 }

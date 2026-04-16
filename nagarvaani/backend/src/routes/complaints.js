@@ -2,13 +2,14 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const { supabase } = require('../lib/supabase');
-const { geminiEmbed, geminiUrgencyScore, geminiSentimentScore } = require('../lib/gemini');
+const { geminiEmbed, geminiUrgencyScore, geminiSentimentScore, geminiTranslateToEnglish } = require('../lib/gemini');
 const { filterSpam } = require('../services/spamFilter');
 const { categorizeComplaint } = require('../services/categorizer');
 const { deduplicateComplaint } = require('../services/deduplicator');
 const { computePriorityScore } = require('../services/urgencyScorer');
 const { computeSlaDeadline } = require('../services/slaService');
 const { autoAssignOfficer } = require('../services/autoAssignService');
+const { getWeeklyTrustMatrix } = require('../services/analyticsService');
 const { encryptComplaint, generateToken } = require('../services/whistleblowerService');
 const { sendEmail, sendPushNotification } = require('../services/notificationService');
 const auditService = require('../services/auditService');
@@ -16,12 +17,13 @@ const { sendCitizenConfirmation } = require('../services/emailService');
 const { authenticate } = require('../middleware/auth');
 const { complaintLimiter } = require('../middleware/rateLimiter');
 const { cleanComplaintText } = require('../utils/cleaner');
+const { resolveJurisdiction } = require('../utils/geoResolver');
 
 const upload = multer({ storage: multer.memoryStorage() });
 
 // POST /api/complaints
 router.post('/', upload.single('photo'), complaintLimiter, async (req, res) => {
-  console.log('📡 Signal Received at Command HQ:', req.body);
+  console.log('ðŸ“¡ Signal Received at Command HQ:', req.body);
   
   const { 
     description, raw_text, lat, lng, is_anonymous, location_text, user_id,
@@ -34,9 +36,13 @@ router.post('/', upload.single('photo'), complaintLimiter, async (req, res) => {
   try {
     // 1. VALIDATE & MAP JURISDICTION
     const cleanedText = cleanComplaintText(finalDescription || '');
-    if (!cleanedText || cleanedText.split(/\s+/).length < 3) {
-      return res.status(400).json({ error: 'Text must be at least 3 words after cleaning' });
+    if (!cleanedText || cleanedText.trim().length === 0) {
+      return res.status(400).json({ error: 'Text cannot be empty' });
     }
+
+    // Resolve Jurisdiction based on Telemetry
+    const jurisdiction = resolveJurisdiction(lat, lng, city, ward);
+    console.log(`ðŸ—ºï¸ Jurisdiction Resolved: ${jurisdiction.city} | ${jurisdiction.ward}`);
 
     const category = (req.body.category || req.body.complaint_type || 'OTHER').toUpperCase();
     const departmentMap = {
@@ -56,34 +62,61 @@ router.post('/', upload.single('photo'), complaintLimiter, async (req, res) => {
 
     // 2. SPAM FILTER
     const spamResult = await filterSpam(cleanedText);
-    if (spamResult.status === 'rejected') {
-      await auditService.log({ action: 'SPAM_REJECTED', ip_address, new_value: { text: raw_text || finalDescription } });
-      return res.status(403).json({ error: 'Spam detected' });
+    if (spamResult.status === 'rejected' || spamResult.status === 'flagged') {
+      await auditService.log({ action: 'SPAM_REJECTED', ip_address, new_value: { text: raw_text || finalDescription, reason: spamResult.reason } });
+      return res.status(403).json({ error: 'Signal rejected: does not meet civic complaint criteria.', reason: spamResult.reason });
     }
 
     // 2. AI COGNITIVE SYNTHESIS
-    console.log('🧠 Triggering AI Synthesis for description:', cleanedText.substring(0, 30));
-    const embedding = await geminiEmbed(cleanedText);
+    console.log('ðŸ§  Triggering AI Synthesis for description:', cleanedText.substring(0, 30));
+    
+    // Translation Pipeline
+    let englishText = cleanedText;
+    try {
+       englishText = await geminiTranslateToEnglish(cleanedText);
+       console.log('ðŸŒ Translated to English:', englishText.substring(0, 30) + '...');
+    } catch(e) {
+       console.error("Translation error:", e);
+    }
+
+    const embedding = await geminiEmbed(englishText);
     const dedupResult = await deduplicateComplaint({ lat, lng }, embedding);
-    console.log('🔍 Deduplication complete:', dedupResult.merged ? 'MERGED' : 'NEW SIGNAL');
+    console.log('ðŸ” Deduplication complete:', dedupResult.merged ? 'MERGED' : 'NEW SIGNAL');
 
     let masterTicketId = dedupResult.master_ticket_id;
 
     if (!dedupResult.merged) {
       // 3. MASTER TICKET INGESTION
-      console.log('🏛️ Inserting NEW Master Ticket...');
+      console.log('ðŸ›ï¸ Inserting NEW Master Ticket...');
       const slaDeadline = computeSlaDeadline(new Date(), category);
       
+      // Calculate Priority Score for New Signal
+      const [keywordResult, sentimentResult] = await Promise.all([
+        geminiUrgencyScore(englishText),
+        geminiSentimentScore(englishText)
+      ]);
+      const kScore = keywordResult?.keyword_score || 0.1;
+      const sScore = sentimentResult?.sentiment_score || 0.1;
+      
+      const priority = await computePriorityScore({
+        keywordScore: kScore,
+        sentimentScore: sScore,
+        clusterSize: 1,
+        lat: parseFloat(lat) || null,
+        lng: parseFloat(lng) || null
+      });
+
       const { data: ticket, error: ticketError } = await supabase.from('master_tickets').insert({
         category,
         department,
-        description: cleanedText,
-        title: cleanedText.substring(0, 50) + '...',
+        description: englishText,
+        title: englishText.substring(0, 50) + '...',
         lat: parseFloat(lat) || null,
         lng: parseFloat(lng) || null,
-        city: city || 'Mumbai',
-        ward: ward,
+        city: jurisdiction.city,
+        ward: jurisdiction.ward,
         status: 'filed',
+        priority_score: priority,
         sla_deadline: slaDeadline.toISOString(),
         embedding: embedding,
         creator_id: user_id || null,
@@ -91,17 +124,17 @@ router.post('/', upload.single('photo'), complaintLimiter, async (req, res) => {
       }).select().single();
 
       if (ticketError) {
-        console.error('❌ Master Ticket Insertion Failure:', ticketError);
+        console.error('âŒ Master Ticket Insertion Failure:', ticketError);
         throw ticketError;
       }
       masterTicketId = ticket.id;
     }
 
     // 4. COMPLAINT RECORD INGESTION
-    console.log('📡 Logging Forensic Complaint trace for Master Ticket:', masterTicketId);
+    console.log('ðŸ“¡ Logging Forensic Complaint trace for Master Ticket:', masterTicketId);
     const { error: complaintError } = await supabase.from('complaints').insert({
       master_ticket_id: masterTicketId,
-      description: cleanedText,
+      description: englishText,
       raw_text: finalDescription,
       category,
       department,
@@ -115,13 +148,13 @@ router.post('/', upload.single('photo'), complaintLimiter, async (req, res) => {
     });
 
     if (complaintError) {
-      console.error('❌ Complaint Insertion Failure:', complaintError);
+      console.error('âŒ Complaint Insertion Failure:', complaintError);
       throw complaintError;
     }
 
     // 4.5 SEND CONFIRMATION EMAIL TO CITIZEN
     if (email) {
-      console.log('📧 Dispatching Confirmation Pulse to Citizen:', email);
+      console.log('ðŸ“§ Dispatching Confirmation Pulse to Citizen:', email);
       sendCitizenConfirmation(email, masterTicketId, category).catch(e => console.error('Email error:', e.message));
     }
 
@@ -140,12 +173,12 @@ router.post('/', upload.single('photo'), complaintLimiter, async (req, res) => {
     });
 
     if (masterTicketId && !dedupResult.merged) {
-      console.log('🏎️ Triggering Specialist Dispatch Engine...');
+      console.log('ðŸŽï¸ Triggering Specialist Dispatch Engine...');
       await supabase.from('master_tickets').update({ status: 'assigned' }).eq('id', masterTicketId);
       autoAssignOfficer(masterTicketId, category, lat, lng, city || 'Mumbai', ward);
 
       // JURISDICTIONAL PULSE: Notify nearby citizens (Gap 5)
-      console.log('📡 Broadcasting Neural Pulse to nearby citizens...');
+      console.log('ðŸ“¡ Broadcasting Neural Pulse to nearby citizens...');
       const { data: nearbyUsers } = await supabase.rpc('find_nearby_citizens', {
         comp_lat: parseFloat(lat),
         comp_lng: parseFloat(lng),
@@ -226,6 +259,16 @@ router.get('/officer/queue', authenticate, async (req, res) => {
   } catch (error) {
     console.error("Jurisdictional Fetch Error:", error);
     res.status(500).json({ error: error.message });
+  }
+});
+
+// GET /api/complaints/analytics/weekly-matrix
+router.get('/analytics/weekly-matrix', async (req, res) => {
+  try {
+    const matrix = await getWeeklyTrustMatrix();
+    res.json(matrix);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 });
 

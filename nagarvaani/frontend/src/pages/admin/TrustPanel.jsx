@@ -30,18 +30,96 @@ const DEPARTMENTS = [
   { id: 'school', name: 'School', score: 88, color: '#D35400', trend: 'up', icon: <School />, res: '91%', sla: '87%', rating: '4.7/5' },
 ];
 
-const MOCK_HISTORY = [
-  { day: 'MON', drainage: 30, water: 65, roads: 42, garbage: 60, storm: 50, health: 80, garden: 55, buildings: 40, pest: 70, encroach: 32, elec: 62, licence: 45, factories: 50, school: 85 },
-  { day: 'TUE', drainage: 32, water: 68, roads: 45, garbage: 62, storm: 52, health: 82, garden: 58, buildings: 42, pest: 72, encroach: 35, elec: 65, licence: 48, factories: 52, school: 88 },
-  { day: 'WED', drainage: 35, water: 72, roads: 44, garbage: 65, storm: 55, health: 85, garden: 60, buildings: 44, pest: 75, encroach: 38, elec: 68, licence: 52, factories: 55, school: 91 },
-  { day: 'THU', drainage: 34, water: 75, roads: 44, garbage: 68, storm: 52, health: 88, garden: 62, buildings: 44, pest: 78, encroach: 37, elec: 68, licence: 52, factories: 55, school: 85 },
-  { day: 'FRI', drainage: 33, water: 73, roads: 45, garbage: 70, storm: 50, health: 80, garden: 63, buildings: 45, pest: 80, encroach: 33, elec: 70, licence: 55, factories: 58, school: 82 },
-  { day: 'SAT', drainage: 31, water: 71, roads: 44, garbage: 72, storm: 48, health: 82, garden: 65, buildings: 40, pest: 82, encroach: 31, elec: 72, licence: 52, factories: 52, school: 80 },
-  { day: 'SUN', drainage: 29, water: 71, roads: 44, garbage: 75, storm: 45, health: 84, garden: 68, buildings: 44, pest: 85, encroach: 29, elec: 71, licence: 50, factories: 50, school: 78 },
+const MOCK_FALLBACK = [
+  { day: 'SUN', drainage: 1, water: 1, roads: 1, garbage: 1, storm: 1, health: 1, garden: 1, buildings: 1, pest: 1, encroach: 1, elec: 1, licence: 1, factories: 1, school: 1 },
+  { day: 'MON', drainage: 2, water: 2, roads: 2, garbage: 2, storm: 2, health: 2, garden: 2, buildings: 2, pest: 2, encroach: 2, elec: 2, licence: 2, factories: 2, school: 2 },
+  { day: 'TUE', drainage: 3, water: 3, roads: 3, garbage: 3, storm: 3, health: 3, garden: 3, buildings: 3, pest: 3, encroach: 3, elec: 3, licence: 3, factories: 3, school: 3 },
+  { day: 'WED', drainage: 4, water: 4, roads: 4, garbage: 4, storm: 4, health: 4, garden: 4, buildings: 4, pest: 4, encroach: 4, elec: 4, licence: 4, factories: 4, school: 4 },
+  { day: 'THU', drainage: 5, water: 5, roads: 5, garbage: 5, storm: 5, health: 5, garden: 5, buildings: 5, pest: 5, encroach: 5, elec: 5, licence: 5, factories: 5, school: 5 },
+  { day: 'FRI', drainage: 6, water: 6, roads: 6, garbage: 6, storm: 6, health: 6, garden: 6, buildings: 6, pest: 6, encroach: 6, elec: 6, licence: 6, factories: 6, school: 6 },
+  { day: 'SAT', drainage: 7, water: 7, roads: 7, garbage: 7, storm: 7, health: 7, garden: 7, buildings: 7, pest: 7, encroach: 7, elec: 7, licence: 7, factories: 7, school: 7 },
 ];
 
 export default function TrustPanel() {
   const { t } = useTranslation();
+  const [departments, setDepartments] = useState([]);
+  const [history, setHistory] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [globalTrust, setGlobalTrust] = useState(0);
+
+  useEffect(() => {
+    fetchTrustData();
+  }, []);
+
+  const fetchTrustData = async () => {
+    setLoading(true);
+    try {
+      const { data: tickets } = await supabase.from('master_tickets').select('category, status, sla_deadline, updated_at');
+      
+      const deptStats = {};
+      const CATEGORIES = [
+        { id: 'drainage', name: 'DRAINAGE', icon: <Droplets />, color: '#FF3B30' },
+        { id: 'water', name: 'WATER SUPPLY', icon: <Droplets />, color: '#34C759' },
+        { id: 'roads', name: 'ROADS AND TRAFFIC', icon: <Construction />, color: '#FF9500' },
+        { id: 'garbage', name: 'SOLID WASTE MANAGEMENT', icon: <Trash2 />, color: '#007AFF' },
+        { id: 'health', name: 'HEALTH', icon: <Heart />, color: '#AF52DE' },
+        { id: 'garden', name: 'GARDEN', icon: <Leaf />, color: '#2ECC71' },
+        { id: 'buildings', name: 'BUILDINGS', icon: <Building2 />, color: '#8E8E93' },
+        { id: 'pest', name: 'PEST CONTROL', icon: <Bug />, color: '#FFCC00' },
+        { id: 'encroach', name: 'ENCHROACHMENT', icon: <ShieldAlert />, color: '#FF3B30' },
+        { id: 'elec', name: 'ELECTRICITY', icon: <Electricity />, color: '#FF9522' },
+        { id: 'licence', name: 'LICENCE', icon: <FileCheck />, color: '#5AC8FA' },
+        { id: 'factories', name: 'FACTORIES', icon: <Factory />, color: '#34495E' },
+        { id: 'school', name: 'SCHOOL', icon: <School />, color: '#D35400' },
+        { id: 'storm', name: 'STORM DRAINAGE', icon: <Droplets />, color: '#5856D6' }
+      ];
+
+      CATEGORIES.forEach(c => {
+         const dTickets = tickets?.filter(t => t.category === c.name) || [];
+         const total = dTickets.length;
+         const resolved = dTickets.filter(t => t.status === 'resolved').length;
+         const slaOk = dTickets.filter(t => t.status === 'resolved' && new Date(t.updated_at) < new Date(t.sla_deadline)).length;
+         
+         const resRate = total > 0 ? (resolved / total) : 0;
+         const slaRate = resolved > 0 ? (slaOk / resolved) : 0;
+         const score = total > 0 ? Math.round(resRate * 40 + slaRate * 30 + 30) : 0;
+
+         deptStats[c.id] = {
+           ...c,
+           score,
+           res: `${Math.round(resRate * 100)}%`,
+           sla: `${Math.round(slaRate * 100)}%`,
+           trend: score > 50 ? 'up' : 'down'
+         };
+      });
+
+      const avgTrust = Object.values(deptStats).length > 0 
+        ? Math.round(Object.values(deptStats).reduce((acc, curr) => acc + curr.score, 0) / Object.values(deptStats).length)
+        : 0;
+
+      setDepartments(Object.values(deptStats));
+      setGlobalTrust(avgTrust);
+
+      // Fetch Real History from Analytics API
+      try {
+        const response = await fetch('/api/complaints/analytics/weekly-matrix');
+        const hData = await response.json();
+        if (hData && Array.isArray(hData) && hData.length > 0) {
+            setHistory(hData);
+        } else {
+            setHistory(MOCK_FALLBACK);
+        }
+      } catch (e) {
+        console.error("Historical fetch failed, using fallback:", e);
+        setHistory(MOCK_FALLBACK);
+      }
+    } catch (err) {
+      console.error("Trust fetch failed:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="p-10 lg:p-16 space-y-12 animate-fade-in relative max-w-[1600px] mx-auto pb-40">
       <header className="flex justify-between items-end">
@@ -51,23 +129,28 @@ export default function TrustPanel() {
                  <Pulse size={24} />
               </div>
               <div>
-                 <h1 className="text-4xl font-sora font-black text-navy tracking-tighter uppercase leading-none">Bureaucratic Trust HQ</h1>
-                 <p className="text-[10px] font-black text-text-secondary opacity-40 uppercase tracking-[0.3em] mt-1 italic">Algorithmic Accountability & Trust Scoring (AATS) Meta-Grid.</p>
+                 <h1 className="text-4xl font-sora font-black text-navy tracking-tighter uppercase leading-none">{t('TrustHQ')}</h1>
+                 <p className="text-[10px] font-black text-text-secondary opacity-40 uppercase tracking-[0.3em] mt-1 italic">{t('TrustSubHeader')}</p>
               </div>
            </div>
         </div>
         <div className="flex items-center gap-4 bg-white px-8 py-5 rounded-3xl shadow-soft border border-[#162F6A]/30">
            <Award size={24} className="text-saffron" />
            <div>
-              <span className="text-[10px] font-black uppercase tracking-widest text-text-secondary opacity-40 leading-none">Global Accuracy Index</span>
-              <p className="text-lg font-black text-navy leading-none mt-1 uppercase tracking-tighter">94.2% TRUSTED</p>
+              <span className="text-[10px] font-black uppercase tracking-widest text-text-secondary opacity-40">{t('AccuracyIndex')}</span>
+              <p className="text-lg font-black text-navy leading-none mt-1 uppercase tracking-tighter">{globalTrust}% {t('TRUSTED')}</p>
            </div>
         </div>
       </header>
 
       {/* Trust Score Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-4">
-         {DEPARTMENTS.map(dept => (
+      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-4 min-h-[400px]">
+         {loading ? (
+           <div className="col-span-full flex flex-col items-center justify-center p-20 opacity-20">
+              <RefreshCw className="animate-spin mb-4" />
+              <span className="text-[10px] font-black uppercase tracking-widest">Aggregating Global Performance Matrix...</span>
+           </div>
+         ) : departments.map(dept => (
            <DepartmentCard key={dept.id} dept={dept} />
          ))}
       </div>
@@ -80,7 +163,7 @@ export default function TrustPanel() {
                   <h3 className="text-2xl font-sora font-black text-navy uppercase tracking-tighter flex items-center gap-3">
                      <BarChart3 className="text-navy opacity-20" /> Jurisdictional Trust Matrix
                   </h3>
-                  <p className="text-[10px] font-bold text-text-secondary opacity-40 uppercase tracking-widest mt-1 italic">Normalized Stacked Regression • All 14 Municipal Signals</p>
+                  <p className="text-[10px] font-bold text-text-secondary opacity-40 uppercase tracking-widest mt-1 italic">Normalized Stacked Regression â€¢ All 14 Municipal Signals</p>
                </div>
                <div className="flex flex-wrap gap-x-4 gap-y-1 justify-end max-w-xl">
                   {DEPARTMENTS.slice(0, 7).map(d => (
@@ -93,7 +176,7 @@ export default function TrustPanel() {
             
             <div className="h-[500px] relative z-0 w-full">
                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={MOCK_HISTORY} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                  <BarChart data={history.length > 0 ? history : MOCK_FALLBACK} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
                      <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{fontSize: 10, fontWeight: 900, fill: '#0D1B40', opacity: 0.3}} />
                      <YAxis axisLine={false} tickLine={false} tick={{fontSize: 10, fontWeight: 900, fill: '#0D1B40', opacity: 0.3}} />

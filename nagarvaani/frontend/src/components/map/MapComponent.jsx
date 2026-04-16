@@ -6,16 +6,20 @@ import 'leaflet/dist/leaflet.css';
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 
-let DefaultIcon = L.icon({
-    iconUrl: icon,
-    shadowUrl: iconShadow,
-    iconSize: [25, 41],
-    iconAnchor: [12, 41]
+// Define a Tactical Node Icon (Pulsating Red Dot)
+const TacticalNode = L.divIcon({
+  className: 'tactical-marker',
+  html: `
+    <div class="relative flex items-center justify-center">
+      <div class="absolute w-8 h-8 bg-crimson rounded-full animate-ping opacity-20"></div>
+      <div class="relative w-4 h-4 bg-crimson border-2 border-white rounded-full shadow-lg"></div>
+    </div>
+  `,
+  iconSize: [32, 32],
+  iconAnchor: [16, 16]
 });
 
-L.Marker.prototype.options.icon = DefaultIcon;
-
-export default function MapComponent({ center, complaints = [], zoom = 13 }) {
+export default function MapComponent({ center, complaints = [], zoom = 14 }) {
   const mapRef = useRef(null);
   const mapInstanceRef = useRef(null);
   const markersRef = useRef([]);
@@ -50,8 +54,8 @@ export default function MapComponent({ center, complaints = [], zoom = 13 }) {
 
     // Add main center marker
     if (center) {
-       const mainMarker = L.marker(center).addTo(map);
-       mainMarker.bindPopup("<b>Primary Incident Site</b>").openPopup();
+       const mainMarker = L.marker(center, { icon: TacticalNode }).addTo(map);
+       mainMarker.bindPopup("<b class='text-navy uppercase tracking-widest text-[10px]'>Target Incident Node</b>").openPopup();
        markersRef.current.push(mainMarker);
     }
 

@@ -36,6 +36,7 @@ export default function ComplaintDetail() {
 
     fetchTicket();
 
+    // Real-time sync for ticket updates
     const sub = supabase.channel(`ticket-${id}`)
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'master_tickets', filter: `id=eq.${id}` },
       (payload) => {
@@ -43,7 +44,26 @@ export default function ComplaintDetail() {
         toast.success(t('RealtimeUpdate'));
       }).subscribe();
 
-    return () => supabase.removeChannel(sub);
+    // Real-time sync for reassignments
+    const assignSub = supabase.channel(`assign-${id}`)
+      .on('postgres_changes', { 
+        event: 'INSERT', 
+        schema: 'public', 
+        table: 'officer_assignments', 
+        filter: `ticket_id=eq.${id}` 
+      }, async (payload) => {
+        const { data } = await supabase.from('officer_assignments')
+          .select('*, profiles(full_name, department, city)')
+          .eq('id', payload.new.id)
+          .single();
+        if (data) setAssignment(data);
+        toast.success(t('OfficerDispatched'));
+      }).subscribe();
+
+    return () => {
+      if (sub) supabase.removeChannel(sub);
+      if (assignSub) supabase.removeChannel(assignSub);
+    };
   }, [id]);
 
   if (loading) return <div className="p-12 text-center text-text-secondary">{t('SyncingNagarVaani')}</div>;
@@ -158,6 +178,25 @@ export default function ComplaintDetail() {
                 </div>
             </div>
           )}
+
+          {/* Citizen Feedback Terminal */}
+          {ticket.status === 'resolved' && (
+            <div className="bg-white rounded-[2.5rem] p-10 shadow-2xl border border-navy/5 relative overflow-hidden group">
+               <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                  <Shield size={120} className="text-navy" />
+               </div>
+               <div className="relative z-10 space-y-8">
+                  <div>
+                     <h3 className="text-2xl font-sora font-extrabold text-navy uppercase tracking-tighter">{t('RateDepartmentExperience')}</h3>
+                     <p className="text-[10px] font-black text-text-secondary uppercase tracking-widest opacity-40">
+                        {t('FeedbackFor')} <span className="text-navy">{ticket.department || ticket.category}</span>
+                     </p>
+                  </div>
+                  
+                  <ReviewForm ticketId={id} department={ticket.department || ticket.category} />
+               </div>
+            </div>
+          )}
         </div>
 
         <div className="space-y-6">
@@ -176,7 +215,7 @@ export default function ComplaintDetail() {
                    <div>
                       <p className="text-sm font-extrabold text-navy tracking-tight">{assignment.profiles.full_name}</p>
                       <div className="flex gap-1.5 mt-1">
-                         <span className="text-[9px] font-bold bg-gray-100 px-2 py-0.5 rounded text-text-secondary uppercase">{assignment.profiles.department}</span>
+                         <span className="text-[9px] font-bold bg-gray-100 px-2 py-0.5 rounded text-text-secondary uppercase">{ticket.category}</span>
                          <span className="text-[9px] font-bold bg-navy text-white px-2 py-0.5 rounded uppercase">{assignment.profiles.city}</span>
                       </div>
                    </div>
@@ -201,4 +240,90 @@ export default function ComplaintDetail() {
       </main>
     </div>
   );
+}
+
+function ReviewForm({ ticketId, department }) {
+   const [rating, setRating] = useState(0);
+   const [hover, setHover] = useState(0);
+   const [comment, setComment] = useState('');
+   const [isSubmitted, setIsSubmitted] = useState(false);
+   const [loading, setLoading] = useState(false);
+   const { t } = useTranslation();
+
+   const handleSubmit = async (e) => {
+      e.preventDefault();
+      if (rating === 0) return toast.error(t('PleaseSelectRating'));
+
+      setLoading(true);
+      try {
+         const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5176';
+         const res = await fetch(`${backendUrl}/api/tickets/${ticketId}/review`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ rating, comment, department })
+         });
+         
+         if (res.ok) {
+            setIsSubmitted(true);
+            toast.success(t('FeedbackSynchronized'));
+         } else {
+            throw new Error('Sync Failed');
+         }
+      } catch (err) {
+         toast.error(t('ReviewSubmissionFailed'));
+      } finally {
+         setLoading(false);
+      }
+   };
+
+   if (isSubmitted) {
+      return (
+         <div className="bg-emerald/5 border border-emerald/10 p-8 rounded-2xl text-center animate-fade-in">
+            <div className="w-16 h-16 bg-emerald/10 text-emerald rounded-full flex items-center justify-center mx-auto mb-4">
+               <CheckCircle size={32} />
+            </div>
+            <h4 className="text-lg font-extrabold text-navy uppercase tracking-tight">{t('ReviewCommited')}</h4>
+            <p className="text-xs font-bold text-text-secondary opacity-60 mt-1">{t('FeedbackAuditTrailDesc')}</p>
+         </div>
+      );
+   }
+
+   return (
+      <form onSubmit={handleSubmit} className="space-y-6">
+         <div className="flex items-center gap-2">
+            {[1, 2, 3, 4, 5].map((star) => (
+               <button
+                  key={star}
+                  type="button"
+                  className={`p-2 transition-all duration-300 transform hover:scale-125 ${
+                     star <= (hover || rating) ? 'text-saffron' : 'text-gray-200'
+                  }`}
+                  onClick={() => setRating(star)}
+                  onMouseEnter={() => setHover(star)}
+                  onMouseLeave={() => setHover(0)}
+               >
+                  <Tag size={32} fill={star <= (hover || rating) ? 'currentColor' : 'none'} />
+               </button>
+            ))}
+         </div>
+
+         <div className="space-y-4">
+            <textarea
+               className="w-full h-32 bg-gray-50 border border-border rounded-2xl p-6 text-sm font-bold text-navy outline-none focus:ring-2 ring-navy/10 resize-none transition-all"
+               placeholder={t('ShareQualitativeInsights')}
+               value={comment}
+               onChange={(e) => setComment(e.target.value)}
+            />
+            
+            <button
+               type="submit"
+               disabled={loading || rating === 0}
+               className="w-full bg-navy text-white py-5 rounded-2xl font-black uppercase tracking-widest text-[11px] shadow-2xl hover:scale-[1.02] transition active:scale-95 disabled:opacity-20 flex items-center justify-center gap-3"
+            >
+               {loading ? <CheckCircle className="animate-spin" size={20} /> : <Shield size={18} />}
+               {loading ? t('SyncingFeedback') : t('SubmitTacticalReview')}
+            </button>
+         </div>
+      </form>
+   );
 }

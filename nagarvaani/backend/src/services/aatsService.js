@@ -21,11 +21,12 @@ exports.computeAatsForDepartment = async function(category) {
     const resolutionRate = resolved / total;
     const slaCompliance = slaCompliant / (resolved || 1);
 
-    const aats = Math.round(
-      (resolutionRate * 0.4 * 100) +
-      (slaCompliance * 0.3 * 100) +
-      (avgRating / 5 * 0.3 * 100)
-    );
+    // Synchronized Formula (Matches CitizenMap.jsx): Base 30 + 40 (Res) + 30 (SLA)
+    const aats = Math.min(100, Math.round(
+      (resolutionRate * 40) +
+      (slaCompliance * 30) +
+      30
+    ));
 
     // Save stats
     await supabase.from('department_scores').insert({

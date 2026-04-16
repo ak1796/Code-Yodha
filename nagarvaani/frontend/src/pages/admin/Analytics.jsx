@@ -32,10 +32,11 @@ export default function StrategicAnalytics() {
   ], [t]);
 
   const SOURCE_DATA = React.useMemo(() => [
-    { name: t('WebForm'), value: 41, color: '#0D1B40' },
-    { name: t('Telegram'), value: 18, color: '#0088CC' },
-    { name: t('Reddit'), value: 14, color: '#FF4500' },
-    { name: t('SocialFeed'), value: 27, color: '#E8720C' },
+    { name: t('WebForm'), value: 35, color: '#0D1B40' },
+    { name: t('Email'), value: 15, color: '#007AFF' },
+    { name: t('Telegram'), value: 15, color: '#0088CC' },
+    { name: t('Reddit'), value: 10, color: '#FF4500' },
+    { name: t('SocialFeed'), value: 25, color: '#E8720C' },
   ], [t]);
   const [bmcStats, setBmcStats] = React.useState(null);
   const [isLoading, setIsLoading] = React.useState(true);

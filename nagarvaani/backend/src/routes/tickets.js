@@ -46,7 +46,7 @@ router.patch('/:id/status', authenticate, isOfficer, async (req, res) => {
     const { data: oldTicket, error: fetchError } = await supabase.from('master_tickets').select('status').eq('id', id).maybeSingle();
     
     if (fetchError || !oldTicket) {
-      console.error("❌ Node Retrieval Failure:", fetchError || 'Ticket missing from grid');
+      console.error("âŒ Node Retrieval Failure:", fetchError || 'Ticket missing from grid');
       return res.status(404).json({ error: 'Signal node not found in jurisdictional ledger' });
     }
 
@@ -57,7 +57,7 @@ router.patch('/:id/status', authenticate, isOfficer, async (req, res) => {
       .single();
 
     if (error) {
-       console.error("❌ Node Update Failure:", error);
+       console.error("âŒ Node Update Failure:", error);
        throw error;
     }
 
@@ -78,9 +78,9 @@ router.patch('/:id/status', authenticate, isOfficer, async (req, res) => {
       } else {
         try {
           await sendCitizenUpdateEmail(complaint.email, status, ticket);
-          console.log('📬 Citizen notified of state transition');
+          console.log('ðŸ“¬ Citizen notified of state transition');
         } catch (e) {
-          console.warn('⚠️ Notification hub unavailable');
+          console.warn('âš ï¸ Notification hub unavailable');
         }
       }
     }
@@ -95,7 +95,7 @@ router.patch('/:id/status', authenticate, isOfficer, async (req, res) => {
 
     res.json(ticket);
   } catch (error) {
-    console.error("❌ Fatal Transition Error:", error);
+    console.error("âŒ Fatal Transition Error:", error);
     res.status(500).json({ 
       error: 'Jurisdictional State Failure', 
       message: error.message,
@@ -105,79 +105,127 @@ router.patch('/:id/status', authenticate, isOfficer, async (req, res) => {
 });
 
 // PATCH /api/tickets/:id/resolve (Step 8)
-router.patch('/:id/resolve', authenticate, isOfficer, upload.fields([{ name: 'before' }, { name: 'after' }]), async (req, res) => {
+router.patch('/:id/resolve', authenticate, isOfficer, upload.any(), async (req, res) => {
   const { id } = req.params;
-  console.log(`📸 Initiating Cloud Forensic Sync for Ticket ${id}...`);
+  console.log(`ðŸ“¸ Initiating Cloud Forensic Sync for Ticket ${id}...`);
 
   try {
-    const { data: ticket } = await supabase.from('master_tickets').select('*').eq('id', id).single();
+    const files = req.files || [];
+    console.log(`ðŸ“¸ Resolution Payload for Ticket ${id}:`, {
+      count: files.length,
+      fields: files.map(f => f.fieldname)
+    });
+
+    const { data: ticket, error: fetchErr } = await supabase.from('master_tickets').select('*').eq('id', id).single();
+    
+    if (fetchErr || !ticket) {
+      console.error("âŒ Node Retrieval Failure:", fetchErr);
+      return res.status(404).json({ error: 'Signal node not found in jurisdictional ledger' });
+    }
 
     let beforeUrl = ticket.before_image_url;
     let afterUrl = ticket.after_image_url;
 
+    // Use flat naming to avoid folder collisions
+    const beforeFile = files.find(f => f.fieldname === 'before');
+    const afterFile = files.find(f => f.fieldname === 'after');
+
     // 1. Upload "Before" to Supabase Storage
-    if (req.files['before']) {
-      const file = req.files['before'][0];
-      const { data, error } = await supabase.storage
-        .from('evidence')
-        .upload(`${id}/before_${Date.now()}.jpg`, file.buffer, { contentType: file.mimetype, upsert: true });
-      if (!error) {
-        const { data: publicUrl } = supabase.storage.from('evidence').getPublicUrl(data.path);
-        beforeUrl = publicUrl.publicUrl;
+    if (beforeFile) {
+      const fileName = `res_${id}_before_${Date.now()}.jpg`;
+      try {
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('evidence')
+          .upload(fileName, beforeFile.buffer, { contentType: beforeFile.mimetype, upsert: true });
+        
+        if (uploadError) throw uploadError;
+        
+        if (uploadData) {
+          const { data: publicUrlData } = supabase.storage.from('evidence').getPublicUrl(uploadData.path);
+          beforeUrl = publicUrlData.publicUrl;
+          console.log("âœ… Before Image Sync Complete:", beforeUrl);
+        }
+      } catch (e) {
+        console.error("âŒ Before Image Upload Exception:", e.message);
       }
     }
 
     // 2. Upload "After" to Supabase Storage & GPS Validate
-    if (req.files['after']) {
-      const file = req.files['after'][0];
-      
+    if (afterFile) {
       // GPS Validation
-      const isValid = await validateResolutionGPS(ticket.lat, ticket.lng, file.buffer);
-      if (!isValid) {
-        console.warn("⚠️ Resolution GPS Integrity Check FAILED");
-        await auditService.log({ ticket_id: id, actor_id: req.user.profile_id, action: 'RESOLUTION_GPS_FAILED' });
+      try {
+        const isValid = await validateResolutionGPS(ticket.lat, ticket.lng, afterFile.buffer);
+        if (!isValid) {
+          console.warn("âš ï¸ Resolution GPS Integrity Check FAILED");
+          await auditService.log({ ticket_id: id, actor_id: req.user.profile_id, action: 'RESOLUTION_GPS_FAILED' });
+        }
+      } catch (e) {
+        console.warn("GPS Validation Skip or Error:", e.message);
       }
 
       // Upload to Cloud
-      const { data, error } = await supabase.storage
-        .from('evidence')
-        .upload(`${id}/after_${Date.now()}.jpg`, file.buffer, { contentType: file.mimetype, upsert: true });
-      if (!error) {
-        const { data: publicUrl } = supabase.storage.from('evidence').getPublicUrl(data.path);
-        afterUrl = publicUrl.publicUrl;
+      const fileName = `res_${id}_after_${Date.now()}.jpg`;
+      try {
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('evidence')
+          .upload(fileName, afterFile.buffer, { contentType: afterFile.mimetype, upsert: true });
+        
+        if (uploadError) throw uploadError;
+
+        if (uploadData) {
+          const { data: publicUrlData } = supabase.storage.from('evidence').getPublicUrl(uploadData.path);
+          afterUrl = publicUrlData.publicUrl;
+          console.log("âœ… After Image Sync Complete:", afterUrl);
+        }
+      } catch (e) {
+        console.error("âŒ After Image Upload Exception:", e.message);
       }
     }
 
-    const { data: updated, error } = await supabase.from('master_tickets')
+    console.log("ðŸ›ï¸ Finalizing Ledger Update...");
+    const { data: updated, error: updateError } = await supabase.from('master_tickets')
       .update({ 
         status: 'resolved', 
         resolution_verified: true, 
         before_image_url: beforeUrl,
         after_image_url: afterUrl,
-        resolved_at: new Date().toISOString(),
         updated_at: new Date().toISOString() 
       })
       .eq('id', id)
       .select()
       .single();
 
-    if (error) throw error;
+    if (updateError) {
+      console.error("âŒ Database Update Failure:", updateError);
+      throw updateError;
+    }
 
-    // Final Resolve Handshake (Step 8) - Using limit(1) to avoid 500
+    // Final Resolve Handshake (Step 8)
     const { data: complaint } = await supabase.from('complaints').select('email').eq('master_ticket_id', id).limit(1).maybeSingle();
+    
     if (complaint && complaint.email) {
       try {
-        await sendCitizenUpdateEmail(complaint.email, 'resolved', updated);
+        const { sendCitizenUpdateEmail } = require('./notificationService'); // Correct relative path if needed? No, check current file. 
+        // Wait, current file is routes/tickets.js. notificationService is in services/
+        const ns = require('../services/notificationService');
+        if (ns.sendCitizenUpdateEmail) {
+            await ns.sendCitizenUpdateEmail(complaint.email, 'resolved', updated);
+        }
       } catch (e) {
-        console.warn("Notification Hub unavailable");
+        console.warn("Notification Hub unavailable:", e.message);
       }
     }
 
     await auditService.log({ ticket_id: id, actor_id: req.user.profile_id, action: 'RESOLUTION_SUBMITTED' });
     res.json(updated);
   } catch (error) {
-    console.error("❌ Fatal Resolve Error:", error);
-    res.status(500).json({ error: 'Jurisdictional State failure', message: error.message });
+    console.error("âŒ Fatal Resolve Error Handler:", error);
+    res.status(500).json({ 
+      error: 'Jurisdictional State failure', 
+      message: error.message,
+      stack: error.stack,
+      details: error.details || error
+    });
   }
 });
 
@@ -218,6 +266,47 @@ router.patch('/:id/reassign', authenticate, isAdmin, async (req, res) => {
     });
 
     res.json(updated);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/**
+ * POST /api/tickets/:id/review
+ * Strategic Citizen Review Node
+ */
+router.post('/:id/review', async (req, res) => {
+  const { id } = req.params;
+  const { rating, comment, department } = req.body;
+
+  try {
+    const { data: review, error } = await supabase.from('reviews').insert({
+      ticket_id: id,
+      rating: parseInt(rating),
+      comment,
+      department,
+      created_at: new Date().toISOString()
+    }).select().single();
+
+    if (error) {
+      console.error("âŒ Review Persistence Failure:", error.message);
+      if (error.code === '42P01') { // PostgreSQL table not found code
+          return res.status(404).json({ 
+            error: 'Feedback Ledger Missing', 
+            message: 'Target table [reviews] not found. Please run the provided SQL in Supabase Dashboard.' 
+          });
+      }
+      return res.status(500).json({ error: 'Feedback synchronization failed', details: error.message });
+    }
+
+    await auditService.log({
+      ticket_id: id,
+      action: 'CITIZEN_REVIEW_FILED',
+      new_value: `Rating: ${rating} | Dept: ${department}`,
+      ip_address: req.ip
+    });
+
+    res.status(201).json(review);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

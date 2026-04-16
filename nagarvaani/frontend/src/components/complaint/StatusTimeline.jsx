@@ -1,17 +1,15 @@
 import React from 'react';
 import { CheckCircle, Clock, MapPin, User, ChevronRight } from 'lucide-react';
 import { formatDate } from '../../lib/utils';
-import { useTranslation } from 'react-i18next';
 
 const STEPS = [
-  { id: 'filed', tKey: 'TL_ComplaintFiled', icon: Clock },
-  { id: 'assigned', tKey: 'TL_OfficerAssigned', icon: User },
-  { id: 'in_progress', tKey: 'TL_WorkInProgress', icon: MapPin },
-  { id: 'resolved', tKey: 'TL_IssueResolved', icon: CheckCircle }
+  { id: 'filed', label: 'Complaint Filed', icon: Clock },
+  { id: 'assigned', label: 'Officer Assigned', icon: User },
+  { id: 'in_progress', label: 'Work In Progress', icon: MapPin },
+  { id: 'resolved', label: 'Issue Resolved', icon: CheckCircle }
 ];
 
 export default function StatusTimeline({ currentStatus, timeline = [] }) {
-  const { t } = useTranslation();
   const currentIndex = STEPS.findIndex(s => s.id === currentStatus);
 
   return (
@@ -40,20 +38,20 @@ export default function StatusTimeline({ currentStatus, timeline = [] }) {
             <div className="flex-1 pt-1">
               <div className="flex items-center gap-2">
                 <h4 className={`font-sora font-bold ${isCompleted ? 'text-navy' : 'text-text-secondary'}`}>
-                  {t(step.tKey)}
+                  {step.label}
                 </h4>
-                {isCurrent && <span className="bg-saffron text-white text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">{t('TL_CurrentStatus')}</span>}
+                {isCurrent && <span className="bg-saffron text-white text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">Current</span>}
               </div>
               
               {log ? (
                 <div className="mt-1">
-                   <p className="text-sm text-text-secondary">{log.note || t('TL_StatusUpdated')}</p>
+                   <p className="text-sm text-text-secondary">{log.note || 'Status updated by official'}</p>
                    <p className="text-[11px] text-text-secondary font-medium mt-1">{formatDate(log.created_at)}</p>
                 </div>
               ) : isCompleted ? (
-                <p className="text-xs text-text-secondary mt-1">{t('TL_Processed')}</p>
+                <p className="text-xs text-text-secondary mt-1">Processed</p>
               ) : (
-                <p className="text-xs text-text-secondary italic mt-1">{t('TL_Pending')}</p>
+                <p className="text-xs text-text-secondary italic mt-1">Pending...</p>
               )}
             </div>
           </div>

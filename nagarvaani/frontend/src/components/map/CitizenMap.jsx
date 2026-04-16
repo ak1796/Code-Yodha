@@ -47,19 +47,44 @@ const getClusterIcon = (count, status) => {
   const isResolved = status === 'resolved';
   const bg = isResolved ? '#10B981' : count >= 3 ? '#EF4444' : '#F59E0B';
   const glow = isResolved ? 'rgba(16,185,129,0.4)' : count >= 3 ? 'rgba(239,68,68,0.4)' : 'rgba(245,158,11,0.4)';
-  const size = count > 1 ? 22 : 14;
+  const size = count > 1 ? 24 : 16;
+  
+  // Tactical Pulsating Animation for Active Nodes
+  const animation = !isResolved ? 'animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;' : '';
+  const innerPulse = !isResolved ? `
+    <div style="
+      position:absolute; inset:-4px; border-radius:50%; background:${bg}; opacity:0.3;
+      animation: pulse-ring 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
+    "></div>
+  ` : '';
 
   return new L.DivIcon({
     className: 'custom-cluster-icon',
-    html: `<div style="
-      background:${bg};
-      width:${size}px; height:${size}px;
-      border-radius:50%;
-      border:2.5px solid white;
-      box-shadow:0 0 12px ${glow};
-      display:flex; align-items:center; justify-content:center;
-      color:white; font-size:9px; font-weight:900;
-    ">${count > 1 ? count : ''}</div>`,
+    html: `
+      <div style="position:relative; display:flex; align-items:center; justify-content:center;">
+        ${innerPulse}
+        <div style="
+          background:${bg};
+          width:${size}px; height:${size}px;
+          border-radius:50%;
+          border:2px solid white;
+          box-shadow:0 0 15px ${glow};
+          display:flex; align-items:center; justify-content:center;
+          color:white; font-size:10px; font-weight:900;
+          position:relative; z-index:10;
+          ${animation}
+        ">
+          ${count > 1 ? count : ''}
+        </div>
+      </div>
+      <style>
+        @keyframes pulse-ring {
+          0% { transform: scale(0.95); opacity: 0.7; }
+          50% { transform: scale(1.2); opacity: 0.3; }
+          100% { transform: scale(0.95); opacity: 0.7; }
+        }
+      </style>
+    `,
     iconSize: [size, size],
     iconAnchor: [size / 2, size / 2],
   });
@@ -71,6 +96,7 @@ export default function CitizenMap({ tickets = [], currentUserId }) {
   const [geoData, setGeoData] = useState(null);
   const [silenceZones, setSilenceZones] = useState([]);
   const [officerNames, setOfficerNames] = useState({}); // { officer_id: full_name }
+  const [wardAatsScores, setWardAatsScores] = useState({}); // { normWard: 0-100 }
   const config = citiesConfig[selectedCity];
 
   // Load GeoJSON boundaries
@@ -106,7 +132,31 @@ export default function CitizenMap({ tickets = [], currentUserId }) {
     return s.split(/[ \((]/)[0];
   };
 
-  // Silent crisis zones
+  // â”€â”€ Compute per-ward AATS trust scores from already-loaded tickets â”€â”€â”€â”€â”€â”€
+  useEffect(() => {
+    if (!geoData || tickets.length === 0) return;
+    const scores = {};
+    geoData.features.forEach(feature => {
+      const wardName = feature.properties[config.nameProp];
+      const normWard = normalizeWard(wardName);
+      const wardTickets = tickets.filter(t => normalizeWard(t.ward) === normWard);
+      if (wardTickets.length === 0) return;
+      const resolved = wardTickets.filter(t => t.status === 'resolved').length;
+      const slaOk = wardTickets.filter(t =>
+        t.status === 'resolved' &&
+        t.sla_deadline &&
+        new Date(t.updated_at) < new Date(t.sla_deadline)
+      ).length;
+      // AATS formula (mirrors aatsService.js): resolution 40% + sla 30% + base 30%
+      const resRate = resolved / wardTickets.length;
+      const slaRate = resolved > 0 ? slaOk / resolved : 0;
+      const aats = Math.round(resRate * 40 + slaRate * 30 + 30); // base 30 when data present
+      scores[normWard] = Math.min(100, aats);
+    });
+    setWardAatsScores(scores);
+  }, [geoData, tickets, selectedCity, config.nameProp]);
+
+  // â”€â”€ Silent crisis zones â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   useEffect(() => {
     if (!geoData) return;
     const zones = geoData.features.map(feature => {
@@ -120,16 +170,29 @@ export default function CitizenMap({ tickets = [], currentUserId }) {
     setSilenceZones(zones);
   }, [geoData, tickets, selectedCity, config.nameProp]);
 
+  // â”€â”€ Ward choropleth: priority = AATS score, fallback = silence detection â”€
+  const getAatsColor = (score) => {
+    if (score >= 70) return '#10B981'; // green  â€” high trust
+    if (score >= 40) return '#F59E0B'; // amber  â€” medium trust
+    return '#EF4444';                  // red    â€” low trust
+  };
+
   const getWardStyle = (feature) => {
     const wardName = feature.properties[config.nameProp];
+    const normWard = normalizeWard(wardName);
     const zone = silenceZones.find(z => z.name === wardName);
-    return {
-      fillColor: zone?.isSilent ? '#4B5563' : 'transparent',
-      fillOpacity: zone?.isSilent ? 0.4 : 0,
-      color: '#007AFF',
-      weight: 2,
-      opacity: 0.6
-    };
+    const aats = wardAatsScores[normWard];
+
+    // Silent crisis takes visual precedence (grey override)
+    if (zone?.isSilent) {
+      return { fillColor: '#4B5563', fillOpacity: 0.45, color: '#374151', weight: 2, opacity: 0.7 };
+    }
+    // AATS-driven colour if we have ward data
+    if (aats !== undefined) {
+      return { fillColor: getAatsColor(aats), fillOpacity: 0.28, color: '#007AFF', weight: 1.5, opacity: 0.6 };
+    }
+    // No data yet â€” neutral outline
+    return { fillColor: 'transparent', fillOpacity: 0, color: '#007AFF', weight: 2, opacity: 0.6 };
   };
 
   // Cluster tickets by proximity
@@ -158,6 +221,7 @@ export default function CitizenMap({ tickets = [], currentUserId }) {
       {/* Legend */}
       <div className="absolute bottom-10 left-10 z-[400] bg-white/90 backdrop-blur-md p-6 rounded-3xl border border-border shadow-soft space-y-4">
         <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-navy opacity-30 italic mb-2">{t('TransparencyLegend')}</h4>
+        {/* Complaint pin legend */}
         <div className="flex items-center gap-3">
           <div className="w-3 h-3 rounded-full bg-crimson" />
           <span className="text-[10px] font-extrabold uppercase text-navy">{t('ActiveIssues')}</span>
@@ -166,9 +230,25 @@ export default function CitizenMap({ tickets = [], currentUserId }) {
           <div className="w-3 h-3 rounded-full bg-emerald" />
           <span className="text-[10px] font-extrabold uppercase text-navy">{t('Resolved')}</span>
         </div>
-        <div className="flex items-center gap-3">
-          <div className="w-3 h-3 rounded-md bg-gray-500 opacity-40" />
-          <span className="text-[10px] font-extrabold uppercase text-navy">{t('SilentCrises')}</span>
+        {/* AATS ward-level trust legend */}
+        <div className="border-t border-border pt-3 mt-1 space-y-2">
+          <p className="text-[9px] font-black uppercase tracking-[0.15em] text-navy opacity-40">AATS Ward Trust</p>
+          <div className="flex items-center gap-3">
+            <div className="w-3 h-3 rounded-sm" style={{ background: '#10B981', opacity: 0.7 }} />
+            <span className="text-[10px] font-extrabold uppercase text-navy">High â‰¥70</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="w-3 h-3 rounded-sm" style={{ background: '#F59E0B', opacity: 0.7 }} />
+            <span className="text-[10px] font-extrabold uppercase text-navy">Medium 40â€“69</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="w-3 h-3 rounded-sm" style={{ background: '#EF4444', opacity: 0.7 }} />
+            <span className="text-[10px] font-extrabold uppercase text-navy">Low &lt;40</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="w-3 h-3 rounded-md bg-gray-500 opacity-40" />
+            <span className="text-[10px] font-extrabold uppercase text-navy">{t('SilentCrises')}</span>
+          </div>
         </div>
       </div>
 
@@ -191,13 +271,22 @@ export default function CitizenMap({ tickets = [], currentUserId }) {
             style={getWardStyle}
             onEachFeature={(feature, layer) => {
               const wardName = feature.properties[config.nameProp];
+              const normWard = normalizeWard(wardName);
               const zone = silenceZones.find(z => z.name === wardName);
               const pop = getEstimatedPopulation(selectedCity, wardName);
+              const aats = wardAatsScores[normWard];
+              const aatsColor = aats !== undefined
+                ? aats >= 70 ? '#10B981' : aats >= 40 ? '#F59E0B' : '#EF4444'
+                : '#9CA3AF';
+              const aatsLabel = aats !== undefined
+                ? `<span style="color:${aatsColor};font-weight:900">${aats} / 100</span>`
+                : '<span style="color:#9CA3AF">No data</span>';
               layer.bindPopup(`
                 <div class="p-2">
                   <h3 class="font-black uppercase text-xs text-navy tracking-tight">${t('Ward')} ${wardName}</h3>
                   <div class="mt-2 space-y-1">
                     <p class="text-[9px] font-bold text-text-secondary uppercase">${t('PopEst')}: <b>${pop.toLocaleString()}</b></p>
+                    <p class="text-[9px] font-bold text-text-secondary uppercase">AATS Trust Score: ${aatsLabel}</p>
                     ${zone?.isSilent ? `<p class="text-[9px] font-black text-crimson uppercase italic mt-2 animate-pulse">${t('UnderReported')}</p>` : ''}
                   </div>
                 </div>
@@ -250,7 +339,7 @@ export default function CitizenMap({ tickets = [], currentUserId }) {
 
                     {/* People reported */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: '#f8fafc', borderRadius: '10px', padding: '8px 10px' }}>
-                      <span style={{ fontSize: '18px' }}>👥</span>
+                      <span style={{ fontSize: '18px' }}>ðŸ‘¥</span>
                       <div>
                         <p style={{ fontSize: '11px', fontWeight: 800, color: '#0f172a', margin: 0 }}>
                           <span style={{ color: isUserIncluded ? '#2563EB' : '#0f172a' }}>{youText}</span> reported this
@@ -261,7 +350,7 @@ export default function CitizenMap({ tickets = [], currentUserId }) {
 
                     {/* Officer assigned */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: '#f8fafc', borderRadius: '10px', padding: '8px 10px' }}>
-                      <span style={{ fontSize: '18px' }}>🛡️</span>
+                      <span style={{ fontSize: '18px' }}>ðŸ›¡ï¸</span>
                       <div>
                         <p style={{ fontSize: '9px', fontWeight: 900, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.08em', margin: 0 }}>Escalated To</p>
                         <p style={{ fontSize: '11px', fontWeight: 800, color: '#0f172a', margin: 0 }}>
@@ -276,13 +365,13 @@ export default function CitizenMap({ tickets = [], currentUserId }) {
                       <span style={{
                         fontSize: '9px', fontWeight: 900, color: statusColor,
                         background: `${statusColor}18`, padding: '2px 8px', borderRadius: '999px'
-                      }}>● {statusLabel}</span>
+                      }}>â— {statusLabel}</span>
                     </div>
 
                     {/* Ward */}
                     {representative.ward && (
                       <p style={{ fontSize: '9px', color: '#9ca3af', margin: 0, textAlign: 'center', borderTop: '1px solid #f1f5f9', paddingTop: '8px' }}>
-                        📍 Ward {representative.ward}
+                        ðŸ“ Ward {representative.ward}
                       </p>
                     )}
                   </div>
