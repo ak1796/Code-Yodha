@@ -28,11 +28,12 @@ exports.authenticate = async (req, res, next) => {
     req.user = { 
         id: profile.id, 
         email: profile.email, 
-        role: profile.role, 
+        role: String(profile.role || '').toLowerCase().trim(), 
         ward_id: profile.ward_id, 
         profile_id: profile.id 
     };
     
+    console.log('[AUTH_DEBUG] Authenticated User:', req.user.email, 'with role:', req.user.role);
     next();
   } catch (error) {
     console.error('Authentication Error:', error);

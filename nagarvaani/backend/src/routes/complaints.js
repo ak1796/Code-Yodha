@@ -34,8 +34,8 @@ router.post('/', upload.single('photo'), complaintLimiter, async (req, res) => {
   try {
     // 1. VALIDATE & MAP JURISDICTION
     const cleanedText = cleanComplaintText(finalDescription || '');
-    if (!cleanedText || cleanedText.split(/\s+/).length < 3) {
-      return res.status(400).json({ error: 'Text must be at least 3 words after cleaning' });
+    if (!cleanedText || cleanedText.trim().length === 0) {
+      return res.status(400).json({ error: 'Text cannot be empty' });
     }
 
     const category = (req.body.category || req.body.complaint_type || 'OTHER').toUpperCase();

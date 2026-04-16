@@ -189,7 +189,6 @@ router.patch('/:id/resolve', authenticate, isOfficer, upload.any(), async (req, 
         resolution_verified: true, 
         before_image_url: beforeUrl,
         after_image_url: afterUrl,
-        resolved_at: new Date().toISOString(),
         updated_at: new Date().toISOString() 
       })
       .eq('id', id)

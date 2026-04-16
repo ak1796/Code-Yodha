@@ -227,12 +227,12 @@ export default function TicketDetail() {
                 <h3 className="text-lg font-sora font-extrabold uppercase tracking-tight text-saffron">{t('ActionTerminal')}</h3>
                 
                 <div className="space-y-4">
-                   {['filed', 'assigned', 'in_progress'].includes(ticket.status) && (
+                   {['filed', 'assigned'].includes(ticket.status) && (
                       <button 
-                        onClick={() => updateStatus(ticket.status === 'in_progress' ? 'resolved' : 'in_progress')}
+                        onClick={() => updateStatus('in_progress')}
                         className="w-full bg-saffron text-white py-6 rounded-2xl font-bold uppercase tracking-widest hover:scale-105 transition shadow-xl"
                       >
-                         {ticket.status === 'in_progress' ? t('FinalizeResolution') : t('InitializeResolution')}
+                         {t('InitializeResolution')}
                       </button>
                    )}
                    {ticket.status === 'in_progress' && (

@@ -27,8 +27,8 @@ export default function CitizenDashboard() {
     setIsSubmitting(true);
     try {
       const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
-      const payload = { ...formData, user_id: profile?.id };
-      const response = await axios.post(`${backendUrl}/api/complaints`, payload);
+      formData.append('user_id', profile?.id || '');
+      const response = await axios.post(`${backendUrl}/api/complaints`, formData);
       if (response.status === 201) {
         toast.success("Signal ingestion successful!");
         if (formData.is_anonymous) {

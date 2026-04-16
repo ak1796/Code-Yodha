@@ -137,6 +137,7 @@ export default function HighFidelityComplaintForm({ onSubmit, isSubmitting: pare
     // Section 5
     is_anonymous: false,
     media: null,
+    mediaPreview: null,
     language: 'en'
   });
 
@@ -277,7 +278,7 @@ export default function HighFidelityComplaintForm({ onSubmit, isSubmitting: pare
     const newErrors = {};
     if (!formData.complaint_type) newErrors.complaint_type = "Complaint type is required";
     if (!formData.complaint_subtype) newErrors.complaint_subtype = "Subtype is required";
-    if (formData.description.trim().split(/\s+/).length < 10) newErrors.description = "Minimum 10 words required";
+    if (formData.description.trim().split(/\s+/).length < 1) newErrors.description = "Description cannot be empty";
     if (!formData.street) newErrors.street = "Street name required";
     if (!formData.area) newErrors.area = "Area name required";
     if (!formData.ward) newErrors.ward = "Select a ward for jurisdictional routing";
@@ -293,19 +294,19 @@ export default function HighFidelityComplaintForm({ onSubmit, isSubmitting: pare
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validate()) {
-       toast.error("Please correct errors in the grid");
-       return;
+      toast.error("Please correct errors in the grid");
+      return;
     }
 
     setIsProcessing(true);
-    setProcessStep(1);
-
-    // Instant Cognitive Sequence
-    setProcessStep(4); // Skip immediately to final stage
+    setProcessStep(4);
 
     try {
       const typeObj = COMPLAINT_TYPES.find(t => t.name === formData.complaint_type);
-      const payload = {
+
+      // Build multipart/form-data so the image binary reaches the backend
+      const fd = new FormData();
+      const fields = {
         ...formData,
         ward: formData.ward_code || formData.ward,
         category: typeObj?.internal || 'OTHER',
@@ -313,28 +314,20 @@ export default function HighFidelityComplaintForm({ onSubmit, isSubmitting: pare
         source: 'web',
         filed_at: new Date().toISOString()
       };
-      console.log('🚀 Sending Dispatch Signal:', {
-        description: payload.description,
-        category: payload.category,
-        full_payload: payload
+
+      Object.entries(fields).forEach(([key, val]) => {
+        if (key !== 'media' && key !== 'mediaPreview' && val !== null && val !== undefined) {
+          fd.append(key, String(val));
+        }
       });
 
-      // Call parent submit
-      await onSubmit(payload);
-      
-      // Dynamic Success Data Response (Based on Jurisdictional Category)
-      const deptName = payload.category.charAt(0) + payload.category.slice(1).toLowerCase();
-      
-      setSuccessData({
-        id: `UGIRP-2024-${Math.floor(10000 + Math.random() * 90000)}`,
-        category: payload.category,
-        priority: 'P3',
-        officer: `Specialist assigned to ${deptName} Department`,
-        distance: `${(Math.random() * 3 + 0.5).toFixed(1)}km`,
-        sla: 'Action within 24-48 hours',
-        deadline: new Date(Date.now() + 48 * 60 * 60 * 1000).toLocaleString()
-      });
+      if (formData.media) {
+        fd.append('photo', formData.media);
+        console.log('📸 Attaching photo:', formData.media.name, `(${(formData.media.size/1024).toFixed(0)} KB)`);
+      }
 
+      console.log('🚀 Dispatching signal:', fields.category);
+      await onSubmit(fd);
       clearDraft();
     } catch (err) {
       toast.error("Signal ingestion failed");
@@ -580,18 +573,59 @@ export default function HighFidelityComplaintForm({ onSubmit, isSubmitting: pare
         {/* SECTION 5: ADDITIONAL */}
         <Section title="Forensic Evidence & Privacy" icon={<Filter size={18}/>}>
            <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-              <div className="space-y-6">
+              <div className="space-y-4">
                  <Label label="Attach Evidence (Photo/Video)" />
-                 <label className="w-full flex items-center gap-6 p-8 bg-bg border-2 border-dashed border-border rounded-[2rem] cursor-pointer group hover:border-navy transition duration-500">
-                    <div className="w-16 h-16 bg-white rounded-3xl flex items-center justify-center text-navy shadow-soft group-hover:scale-110 transition duration-500">
-                       <Camera size={28} />
+                 <label className={`w-full flex items-center gap-6 p-6 bg-bg border-2 border-dashed rounded-[2rem] cursor-pointer group transition duration-500 ${
+                   formData.media ? 'border-navy bg-navy/5' : 'border-border hover:border-navy'
+                 }`}>
+                    {/* Thumbnail preview or camera icon */}
+                    <div className="w-20 h-20 min-w-[80px] rounded-2xl overflow-hidden border border-border bg-white flex items-center justify-center shadow-sm group-hover:scale-105 transition duration-500">
+                       {formData.mediaPreview
+                         ? <img src={formData.mediaPreview} alt="preview" className="w-full h-full object-cover" />
+                         : <Camera size={28} className="text-navy" />}
                     </div>
-                    <div>
-                       <span className="text-xs font-black text-navy uppercase tracking-widest block">Upload Media Node</span>
-                       <span className="text-[9px] font-bold text-text-secondary opacity-40 uppercase tracking-widest italic">JPG, PNG, MP4 Supported</span>
+                    <div className="flex-1 min-w-0">
+                       <span className="text-xs font-black text-navy uppercase tracking-widest block truncate">
+                         {formData.media ? formData.media.name : 'Upload Media Node'}
+                       </span>
+                       <span className="text-[9px] font-bold text-text-secondary opacity-60 uppercase tracking-widest italic">
+                         {formData.media
+                           ? `${(formData.media.size / 1024).toFixed(0)} KB · ${formData.media.type}`
+                           : 'JPG, PNG, MP4 — Max 20MB'}
+                       </span>
+                       {formData.mediaPreview && (
+                         <span className="mt-1 inline-flex items-center gap-1 text-[8px] font-black text-emerald uppercase tracking-widest">
+                           <CheckCircle size={10} /> Preview Ready
+                         </span>
+                       )}
                     </div>
-                    <input type="file" className="hidden" accept="image/*,video/*" />
+                    <input
+                       type="file"
+                       className="hidden"
+                       accept="image/*,video/*"
+                       onChange={e => {
+                         const file = e.target.files?.[0] || null;
+                         if (!file) return;
+                         const preview = file.type.startsWith('image/')
+                           ? URL.createObjectURL(file)
+                           : null;
+                         setFormData(prev => ({ ...prev, media: file, mediaPreview: preview }));
+                       }}
+                    />
                  </label>
+                 {formData.media && (
+                   <button
+                     type="button"
+                     onClick={() => setFormData(prev => ({
+                       ...prev,
+                       media: null,
+                       mediaPreview: prev.mediaPreview ? (URL.revokeObjectURL(prev.mediaPreview), null) : null
+                     }))}
+                     className="flex items-center gap-1.5 text-[9px] font-black text-crimson uppercase tracking-widest hover:opacity-70 transition ml-1"
+                   >
+                     <X size={10} /> Remove file
+                   </button>
+                 )}
               </div>
 
               <div className="space-y-6">
