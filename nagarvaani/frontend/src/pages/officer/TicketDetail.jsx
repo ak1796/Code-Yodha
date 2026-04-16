@@ -9,7 +9,8 @@ import { useAuth } from "../../context/AuthContext";
 import { useTranslation } from 'react-i18next';
 import { 
   MapPin, Info, Users, ArrowLeft, CheckCircle, MessageSquare, 
-  AlertTriangle, ShieldAlert, Clock, Globe, ShieldCheck, Mail, History
+  AlertTriangle, ShieldAlert, Clock, Globe, ShieldCheck, Mail, History,
+  Camera
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -139,6 +140,30 @@ export default function TicketDetail() {
                    <p className="text-lg font-sora font-extrabold leading-relaxed text-saffron-light/90">"{ticket.description}"</p>
                 </div>
              </div>
+
+             {/* Citizen Intelligence: Proof & AI Labeling */}
+             {ticket.before_image_url && (
+                <div className="bg-white rounded-[3.5rem] p-10 shadow-soft border border-border space-y-8 animate-fade-in mb-12">
+                   <div className="flex items-center gap-4 mb-6">
+                      <div className="w-12 h-12 rounded-2xl bg-navy text-white flex items-center justify-center shadow-lg">
+                         <Camera size={24} />
+                      </div>
+                      <div>
+                         <h3 className="text-xl font-sora font-extrabold text-navy uppercase tracking-tighter">{t('CitizenProofEvidence')}</h3>
+                         <p className="text-[10px] font-black text-text-secondary uppercase tracking-widest opacity-40">{t('OriginalTelemetryCapture')}</p>
+                      </div>
+                   </div>
+                   
+                   <div className="relative group">
+                      <div className="aspect-video w-full rounded-[2.5rem] overflow-hidden border-2 border-border bg-gray-50 flex items-center justify-center shadow-inner">
+                         <img src={ticket.before_image_url} alt="Citizen Proof" className="w-full h-full object-cover" />
+                      </div>
+                      <div className="absolute -top-8 -right-4 px-6 py-3 bg-navy text-white text-[10px] font-black uppercase tracking-widest rounded-xl shadow-xl border border-white/10 z-10 animate-pulse">
+                         Image detected = <span className="text-saffron">{ticket.category}</span>
+                      </div>
+                   </div>
+                </div>
+              )}
 
              {/* Strategic Map & Clustering */}
              <div className="bg-white rounded-[3.5rem] p-10 shadow-soft border border-border space-y-8">

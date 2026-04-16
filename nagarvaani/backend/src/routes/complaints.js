@@ -68,6 +68,27 @@ router.post('/', upload.single('photo'), complaintLimiter, async (req, res) => {
     console.log('🔍 Deduplication complete:', dedupResult.merged ? 'MERGED' : 'NEW SIGNAL');
 
     let masterTicketId = dedupResult.master_ticket_id;
+    let proofImageUrl = null;
+
+    // 2.5 HANDLE PHOTO UPLOAD (Gap Fix)
+    if (req.file) {
+      console.log('📸 Processing Proof Image Node...');
+      const fileName = `proof_${Date.now()}_${Math.random().toString(36).substring(7)}.jpg`;
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('evidence')
+        .upload(fileName, req.file.buffer, {
+          contentType: req.file.mimetype,
+          upsert: true
+        });
+
+      if (!uploadError && uploadData) {
+        const { data: publicUrlData } = supabase.storage.from('evidence').getPublicUrl(uploadData.path);
+        proofImageUrl = publicUrlData.publicUrl;
+        console.log('✅ Proof Image synchronized with cloud:', proofImageUrl);
+      } else {
+        console.error('❌ Proof image synchronization failed:', uploadError);
+      }
+    }
 
     if (!dedupResult.merged) {
       // 3. MASTER TICKET INGESTION
@@ -87,7 +108,8 @@ router.post('/', upload.single('photo'), complaintLimiter, async (req, res) => {
         sla_deadline: slaDeadline.toISOString(),
         embedding: embedding,
         creator_id: user_id || null,
-        email: email
+        email: email,
+        before_image_url: proofImageUrl
       }).select().single();
 
       if (ticketError) {
