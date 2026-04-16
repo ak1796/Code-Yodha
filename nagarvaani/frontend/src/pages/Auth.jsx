@@ -5,6 +5,8 @@ import { Shield, Key, Mail, Lock, User, ArrowRight, Activity } from 'lucide-reac
 import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
 
+import bgImage from '../assets/image.png';
+
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
   const [activeRole, setActiveRole] = useState('citizen');
@@ -47,8 +49,18 @@ export default function Auth() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-bg px-6 relative overflow-hidden">
-      <div className="absolute top-0 left-0 w-full h-full opacity-20 pointer-events-none">
+    <div className="min-h-screen flex items-center justify-center px-6 relative overflow-hidden bg-[#F0F8FF]">
+      {/* Background Image Layer */}
+      <div className="absolute inset-0 w-full h-full">
+        <img 
+          src={bgImage} 
+          alt="Background" 
+          className="w-full h-full object-cover opacity-80"
+        />
+        <div className="absolute inset-0 bg-[#F0F8FF]/40 backdrop-blur-sm" />
+      </div>
+
+      <div className="absolute top-0 left-0 w-full h-full opacity-20 pointer-events-none z-0">
          <div className={`absolute top-[-10%] right-[-10%] w-[40%] h-[40%] ${ROLE_CONFIG[activeRole].color} rounded-full blur-[120px] transition-colors duration-500`} />
          <div className="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] bg-saffron rounded-full blur-[120px]" />
       </div>
@@ -78,7 +90,7 @@ export default function Auth() {
            <p className="text-text-secondary font-medium mt-1 uppercase tracking-widest text-[10px] opacity-60">{t('CivicPlatform')}</p>
         </div>
 
-        <div className="bg-surface rounded-[40px] p-8 card-shadow border border-[#162F6A]/20">
+        <div className="bg-white/30 backdrop-blur-2xl rounded-[40px] p-8 card-shadow border border-[#162F6A]/20 shadow-2xl">
             <div className="grid grid-cols-3 gap-3 mb-8">
               {Object.keys(ROLE_CONFIG).filter(r => isLogin || r !== 'admin').map((role) => (
                 <button
@@ -100,7 +112,7 @@ export default function Auth() {
               ))}
             </div>
 
-          <div className="flex p-1 bg-gray-100 rounded-2xl mb-8">
+          <div className="flex p-1 bg-navy/5 rounded-2xl mb-8">
              <button
                onClick={() => setIsLogin(true)}
                className={`flex-1 py-3 rounded-xl font-bold text-xs uppercase tracking-widest transition-all ${isLogin ? 'bg-[#162F6A] text-white shadow-lg' : 'text-text-secondary hover:text-[#162F6A]'}`}
@@ -133,7 +145,7 @@ export default function Auth() {
                     type="text"
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
-                    className="w-full px-5 py-3 border border-border rounded-2xl outline-none focus:border-[#162F6A] focus:ring-4 focus:ring-[#162F6A]/5 text-sm font-bold transition"
+                    className="w-full px-5 py-3 bg-white/20 border border-border rounded-2xl outline-none focus:border-[#162F6A] focus:ring-4 focus:ring-[#162F6A]/5 text-sm font-bold transition backdrop-blur-md"
                     placeholder="e.g. Rohini Patil"
                     required={!isLogin}
                   />
@@ -149,7 +161,7 @@ export default function Auth() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-5 py-4 border border-border rounded-2xl outline-none focus:border-[#162F6A] focus:ring-4 focus:ring-[#162F6A]/5 text-sm font-bold transition"
+                className="w-full px-5 py-4 bg-white/20 border border-border rounded-2xl outline-none focus:border-[#162F6A] focus:ring-4 focus:ring-[#162F6A]/5 text-sm font-bold transition backdrop-blur-md"
                 placeholder={activeRole === 'citizen' ? 'citizen@mumbai.gov' : activeRole === 'admin' ? 'admin@mcgm.gov' : 'officer01@mcgm.gov'}
                 required
               />
@@ -163,7 +175,7 @@ export default function Auth() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-5 py-4 border border-border rounded-2xl outline-none focus:border-[#162F6A] focus:ring-4 focus:ring-[#162F6A]/5 text-sm font-bold transition"
+                className="w-full px-5 py-4 bg-white/20 border border-border rounded-2xl outline-none focus:border-[#162F6A] focus:ring-4 focus:ring-[#162F6A]/5 text-sm font-bold transition backdrop-blur-md"
                 placeholder="••••••••"
                 required
               />

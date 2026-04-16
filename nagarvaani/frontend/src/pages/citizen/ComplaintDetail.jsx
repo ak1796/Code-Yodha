@@ -36,6 +36,7 @@ export default function ComplaintDetail() {
 
     fetchTicket();
 
+    // Real-time sync for ticket updates
     const sub = supabase.channel(`ticket-${id}`)
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'master_tickets', filter: `id=eq.${id}` },
       (payload) => {
@@ -43,7 +44,26 @@ export default function ComplaintDetail() {
         toast.success(t('RealtimeUpdate'));
       }).subscribe();
 
-    return () => supabase.removeChannel(sub);
+    // Real-time sync for reassignments
+    const assignSub = supabase.channel(`assign-${id}`)
+      .on('postgres_changes', { 
+        event: 'INSERT', 
+        schema: 'public', 
+        table: 'officer_assignments', 
+        filter: `ticket_id=eq.${id}` 
+      }, async (payload) => {
+        const { data } = await supabase.from('officer_assignments')
+          .select('*, profiles(full_name, department, city)')
+          .eq('id', payload.new.id)
+          .single();
+        if (data) setAssignment(data);
+        toast.success(t('OfficerDispatched'));
+      }).subscribe();
+
+    return () => {
+      if (sub) supabase.removeChannel(sub);
+      if (assignSub) supabase.removeChannel(assignSub);
+    };
   }, [id]);
 
   if (loading) return <div className="p-12 text-center text-text-secondary">{t('SyncingNagarVaani')}</div>;
@@ -176,7 +196,7 @@ export default function ComplaintDetail() {
                    <div>
                       <p className="text-sm font-extrabold text-navy tracking-tight">{assignment.profiles.full_name}</p>
                       <div className="flex gap-1.5 mt-1">
-                         <span className="text-[9px] font-bold bg-gray-100 px-2 py-0.5 rounded text-text-secondary uppercase">{assignment.profiles.department}</span>
+                         <span className="text-[9px] font-bold bg-gray-100 px-2 py-0.5 rounded text-text-secondary uppercase">{ticket.category}</span>
                          <span className="text-[9px] font-bold bg-navy text-white px-2 py-0.5 rounded uppercase">{assignment.profiles.city}</span>
                       </div>
                    </div>

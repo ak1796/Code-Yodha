@@ -38,56 +38,8 @@ export default function OfficerDashboard() {
   }, [tickets, filter]);
 
   return (
-    <div className="min-h-screen bg-[#F0F8FF] p-8 lg:p-12 animate-fade-in relative">
-      <div className="max-w-7xl mx-auto space-y-12">
-        {/* Top Header */}
-        <header className="flex justify-between items-center bg-white p-8 rounded-[3rem] shadow-soft border border-border">
-           <div className="flex items-center gap-6">
-              <div className="w-16 h-16 rounded-3xl bg-navy text-white flex items-center justify-center font-sora font-extrabold text-2xl shadow-xl shadow-navy/20 uppercase tracking-tighter">
-                 {profile?.department?.charAt(0)}
-              </div>
-              <div>
-                 <h1 className="text-3xl font-sora font-extrabold text-navy tracking-tight">{profile?.full_name}</h1>
-                 <div className="flex items-center gap-3 mt-1.5">
-                    <span className="px-3 py-1 bg-blue-100 text-blue-600 text-[9px] font-extrabold rounded-full uppercase tracking-widest border border-blue-200">
-                       {profile?.department} {t('Specialist')}
-                    </span>
-                    <span className="text-[10px] font-bold text-text-secondary opacity-40 uppercase tracking-widest">
-                       {t('Ward')}: {profile?.ward_name || t('MumbaiHQ')}
-                    </span>
-                 </div>
-              </div>
-           </div>
-
-           <div className="flex items-center gap-4">
-              <div className="flex flex-col items-end mr-6">
-                 <span className="text-[10px] font-bold text-text-secondary uppercase tracking-[0.2em] opacity-40">{t('TacticalPulse')}</span>
-                 <div className="flex items-center gap-2 mt-1 px-3 py-1 bg-emerald-light/20 rounded-full border border-emerald/10">
-                    <div className="w-2 h-2 bg-emerald rounded-full animate-pulse shadow-[0_0_8px_#10B981]" />
-                    <span className="text-[9px] font-extrabold text-emerald uppercase tracking-widest italic">{t('LiveSyncActive')}</span>
-                 </div>
-              </div>
-
-              <button
-                onClick={() => setShowNotifications(!showNotifications)}
-                className="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center hover:bg-white transition shadow-sm relative group border border-border"
-              >
-                 <Bell size={24} className="text-navy group-hover:rotate-12 transition" />
-                 {unreadCount > 0 && (
-                    <div className="absolute top-4 right-4 w-5 h-5 bg-crimson rounded-full flex items-center justify-center border-4 border-white">
-                       <span className="text-[8px] font-black text-white">{unreadCount}</span>
-                    </div>
-                 )}
-              </button>
-
-              <button
-                onClick={signOut}
-                className="w-14 h-14 bg-navy text-white rounded-2xl flex items-center justify-center hover:bg-crimson transition shadow-xl group border border-transparent"
-              >
-                 <LogOut size={24} className="group-hover:-translate-x-1 transition-transform" />
-              </button>
-           </div>
-        </header>
+    <div className="min-h-screen bg-[#F0F8FF] p-6 lg:p-10 animate-fade-in relative">
+      <div className="max-w-7xl mx-auto space-y-10 mt-2">
 
         {/* Stats Row */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">

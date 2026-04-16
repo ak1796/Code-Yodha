@@ -20,6 +20,7 @@ export default function TicketDetail() {
   const [auditLog, setAuditLog] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isResolving, setIsResolving] = useState(false);
+  const { t } = useTranslation();
 
   useEffect(() => {
     fetchTicketData();

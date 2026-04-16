@@ -60,8 +60,8 @@ export default function NotificationPanel({ onClose }) {
                    <div className="absolute -top-1 -right-1 w-4 h-4 bg-crimson rounded-full border-2 border-white" />
                 </div>
                 <div>
-                   <h3 className="text-xl font-sora font-extrabold text-navy tracking-tighter uppercase">Tactical Signals</h3>
-                   <p className="text-[10px] font-bold text-text-secondary uppercase tracking-widest opacity-40">Zero-Latency Ingestion Feed</p>
+                   <h3 className="text-xl font-sora font-extrabold text-navy tracking-tighter uppercase">Recent Notifications</h3>
+                   <p className="text-[10px] font-bold text-text-secondary uppercase tracking-widest opacity-40">Real-time alert list</p>
                 </div>
              </div>
              <button onClick={onClose} className="p-3 hover:bg-gray-100 rounded-xl transition">
