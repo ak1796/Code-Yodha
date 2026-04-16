@@ -6,6 +6,7 @@ import SLATimer from "../../components/officer/SLATimer";
 import MapComponent from "../../components/map/MapComponent";
 import ResolutionModal from "../../components/officer/ResolutionModal";
 import { useAuth } from "../../context/AuthContext";
+import { useTranslation } from 'react-i18next';
 import { 
   MapPin, Info, Users, ArrowLeft, CheckCircle, MessageSquare, 
   AlertTriangle, ShieldAlert, Clock, Globe, ShieldCheck, Mail, History
@@ -153,6 +154,43 @@ export default function TicketDetail() {
                 </div>
                 <p className="text-xs font-bold text-text-secondary uppercase tracking-[0.2em] opacity-40 italic text-center">{t('VisualizingTelemetry')}</p>
              </div>
+
+             {/* Resolution Evidence Gallery */}
+             {ticket.status === 'resolved' && (
+               <div className="bg-white rounded-[3.5rem] p-12 shadow-soft border border-emerald/20 bg-emerald/5">
+                  <div className="flex items-center gap-4 mb-10">
+                     <div className="w-12 h-12 rounded-2xl bg-emerald text-white flex items-center justify-center">
+                        <CheckCircle size={24} />
+                     </div>
+                     <div>
+                        <h3 className="text-xl font-sora font-extrabold text-navy uppercase tracking-tighter">{t('ResolutionProof')}</h3>
+                        <p className="text-[10px] font-bold text-emerald uppercase tracking-widest">{t('VerifiedBySpecialist')}</p>
+                     </div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                     <div className="space-y-4">
+                        <p className="text-[10px] font-black uppercase tracking-widest text-text-secondary opacity-40">{t('BeforeIntervention')}</p>
+                        <div className="aspect-video rounded-[2.5rem] overflow-hidden border-2 border-border bg-gray-50 flex items-center justify-center">
+                           {ticket.before_image_url ? (
+                              <img src={ticket.before_image_url} alt="Before" className="w-full h-full object-cover" />
+                           ) : (
+                              <span className="text-xs font-bold text-text-secondary opacity-30">{t('NoImageAvailable')}</span>
+                           )}
+                        </div>
+                     </div>
+                     <div className="space-y-4">
+                        <p className="text-[10px] font-black uppercase tracking-widest text-text-secondary opacity-40">{t('AfterFulfillment')}</p>
+                        <div className="aspect-video rounded-[2.5rem] overflow-hidden border-2 border-emerald/20 bg-emerald/5 flex items-center justify-center">
+                           {ticket.after_image_url ? (
+                              <img src={ticket.after_image_url} alt="After" className="w-full h-full object-cover" />
+                           ) : (
+                              <span className="text-xs font-bold text-emerald/30">{t('NoImageAvailable')}</span>
+                           )}
+                        </div>
+                     </div>
+                  </div>
+               </div>
+             )}
 
              {/* Accountability Section: USP 9 SLA */}
              <div className="bg-white rounded-[3.5rem] p-12 shadow-soft border border-border grid grid-cols-1 md:grid-cols-2 gap-12">

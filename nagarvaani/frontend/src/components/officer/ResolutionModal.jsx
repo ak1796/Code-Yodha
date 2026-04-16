@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from "../../lib/supabaseClient";
 import axios from 'axios';
 import { Camera, MapPin, Search, CheckCircle, AlertTriangle, RefreshCw, X, ShieldCheck, Activity } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
 
 export default function ResolutionModal({ ticketId, onClose, onSuccess }) {
+  const { t } = useTranslation();
   const [step, setStep] = useState(1); // 1: Photos, 2: GPS, 3: AI Verifying
   const [beforePhoto, setBeforePhoto] = useState(null);
   const [afterPhoto, setAfterPhoto] = useState(null);
@@ -72,8 +74,7 @@ export default function ResolutionModal({ ticketId, onClose, onSuccess }) {
         formData,
         { 
           headers: { 
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'multipart/form-data'
+            Authorization: `Bearer ${token}`
           } 
         }
       );
