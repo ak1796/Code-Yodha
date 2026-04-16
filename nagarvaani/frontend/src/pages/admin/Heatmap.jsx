@@ -29,30 +29,30 @@ const normalizeWardValue = (value) => {
 // Mumbai ward labels aligned to BMC's 24 administrative wards.
 // Source references used: BMC/MCGM ward directory and ward office listings.
 const MUMBAI_WARD_LABELS = {
-  a: "Ward A (Colaba, Fort, Churchgate)",
-  b: "Ward B (Dongri, Bhendi Bazar, Masjid Bunder)",
-  c: "Ward C (Bhuleshwar, Kalbadevi)",
-  d: "Ward D (Grant Road, Malabar Hill, Walkeshwar)",
-  e: "Ward E (Byculla, Nagpada, Mazgaon)",
-  "f/n": "Ward F/North (Matunga, Sion, Wadala)",
-  "f/s": "Ward F/South (Parel, Sewri)",
-  "g/n": "Ward G/North (Dadar, Mahim, Dharavi)",
-  "g/s": "Ward G/South (Worli, Prabhadevi)",
-  "h/e": "Ward H/East (Santacruz East, Bandra East)",
-  "h/w": "Ward H/West (Bandra West, Khar West)",
-  "k/e": "Ward K/East (Andheri East, Jogeshwari East)",
-  "k/w": "Ward K/West (Andheri West, Oshiwara)",
-  l: "Ward L (Kurla, Sakinaka)",
-  "m/e": "Ward M/East (Govandi, Deonar, Mankhurd)",
-  "m/w": "Ward M/West (Chembur, Tilak Nagar)",
-  n: "Ward N (Ghatkopar, Vikhroli)",
-  "p/n": "Ward P/North (Malad, Aksa, Madh)",
-  "p/s": "Ward P/South (Goregaon)",
-  "r/n": "Ward R/North (Dahisar)",
-  "r/c": "Ward R/Central (Borivali)",
-  "r/s": "Ward R/South (Kandivali)",
-  s: "Ward S (Bhandup, Kanjurmarg, Powai)",
-  t: "Ward T (Mulund)",
+  a: "WARD_A",
+  b: "WARD_B",
+  c: "WARD_C",
+  d: "WARD_D",
+  e: "WARD_E",
+  "f/n": "WARD_FN",
+  "f/s": "WARD_FS",
+  "g/n": "WARD_GN",
+  "g/s": "WARD_GS",
+  "h/e": "WARD_HE",
+  "h/w": "WARD_HW",
+  "k/e": "WARD_KE",
+  "k/w": "WARD_KW",
+  l: "WARD_L",
+  "m/e": "WARD_ME",
+  "m/w": "WARD_MW",
+  n: "WARD_N",
+  "p/n": "WARD_PN",
+  "p/s": "WARD_PS",
+  "r/n": "WARD_RN",
+  "r/c": "WARD_RC",
+  "r/s": "WARD_RS",
+  s: "WARD_S",
+  t: "WARD_T",
 };
 
 const getWardIdentity = (feature, cityConfig) => {
@@ -91,10 +91,10 @@ const getWardOfficeIcon = (cityConfig) => {
   });
 };
 
-const getWardLabel = (feature, cityConfig, activeCity) => {
+const getWardLabel = (feature, cityConfig, activeCity, t) => {
   const { wardId, rawWardId } = getWardIdentity(feature, cityConfig);
   const wardDisplayName = activeCity === "Mumbai"
-    ? (MUMBAI_WARD_LABELS[wardId] || `Ward ${rawWardId || "Unknown"}`)
+    ? (MUMBAI_WARD_LABELS[wardId] ? t(MUMBAI_WARD_LABELS[wardId]) : `Ward ${rawWardId || "Unknown"}`)
     : (feature.properties[cityConfig.nameProp] ||
         feature.properties.WARD_NAME ||
         feature.properties.Ward_Name ||
@@ -304,13 +304,13 @@ export default function AdminHeatmap() {
     const office = officeKey ? cityConfig.offices[officeKey] : null;
 
     const statusColor = count === 0 ? '#10B981' : count <= 3 ? '#F59E0B' : count <= 8 ? '#F97316' : '#EF4444';
-    const statusLabel = count === 0 ? 'All Clear' : count <= 3 ? 'Low Activity' : count <= 8 ? 'Moderate' : 'High Density';
+    const statusLabel = count === 0 ? t('AllClear') : count <= 3 ? t('LowActivity') : count <= 8 ? t('Moderate') : t('HighDensity');
 
     layer.bindPopup(`
       <div style="font-family: 'Sora', sans-serif; min-width: 280px; border-radius: 16px; overflow: hidden; border: 1px solid #e5e7eb; box-shadow: 0 20px 40px rgba(0,0,0,0.12);">
         
         <div style="background: ${cityConfig.color}; padding: 14px 16px; color: white;">
-          <p style="font-size: 8px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.15em; opacity: 0.6; margin: 0 0 4px 0;">${cityConfig.org} Ward Intelligence</p>
+          <p style="font-size: 8px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.15em; opacity: 0.6; margin: 0 0 4px 0;">${cityConfig.org} ${t('WardIntelligence')}</p>
           <h4 style="font-size: 15px; font-weight: 900; text-transform: uppercase; margin: 0; letter-spacing: -0.02em;">${officeKey || wardDisplayName}</h4>
           ${office ? `<p style="font-size: 9px; font-weight: 600; opacity: 0.75; margin: 3px 0 0 0;">📍 ${office.address}</p>` : ''}
         </div>
@@ -322,14 +322,14 @@ export default function AdminHeatmap() {
             <div style="display: flex; align-items: center; gap: 10px;">
               <span style="font-size: 14px;">📞</span>
               <div>
-                <div style="font-size: 7px; font-weight: 900; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.1em;">Phone</div>
+                <div style="font-size: 7px; font-weight: 900; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.1em;">${t('Phone')}</div>
                 <div style="font-size: 11px; font-weight: 800; color: ${cityConfig.color};">${office.phone}</div>
               </div>
             </div>
             <div style="display: flex; align-items: center; gap: 10px;">
               <span style="font-size: 14px;">👤</span>
               <div>
-                <div style="font-size: 7px; font-weight: 900; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.1em;">Asst. Commissioner</div>
+                <div style="font-size: 7px; font-weight: 900; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.1em;">${t('AsstCommissioner')}</div>
                 <div style="font-size: 11px; font-weight: 800; color: #1e293b;">${office.commissioner}</div>
               </div>
             </div>
@@ -337,17 +337,17 @@ export default function AdminHeatmap() {
 
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px;">
             <div style="background: #f8fafc; padding: 10px; border-radius: 10px; text-align: center;">
-              <div style="font-size: 7px; font-weight: 900; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.1em;">Signals</div>
+              <div style="font-size: 7px; font-weight: 900; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.1em;">${t('Signals')}</div>
               <div style="font-size: 18px; font-weight: 900; color: #0f172a;">${count}</div>
             </div>
             <div style="background: #f8fafc; padding: 10px; border-radius: 10px; text-align: center;">
-              <div style="font-size: 7px; font-weight: 900; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.1em;">Pop. Est.</div>
+              <div style="font-size: 7px; font-weight: 900; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.1em;">${t('PopEst')}</div>
               <div style="font-size: 18px; font-weight: 900; color: #0f172a;">${(population / 1000).toFixed(1)}k</div>
             </div>
           </div>
 
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-            <span style="font-size: 8px; font-weight: 900; color: #9ca3af; text-transform: uppercase;">Status</span>
+            <span style="font-size: 8px; font-weight: 900; color: #9ca3af; text-transform: uppercase;">${t('Status')}</span>
             <span style="font-size: 9px; font-weight: 900; color: ${statusColor}; background: ${statusColor}18; padding: 3px 8px; border-radius: 999px;">● ${statusLabel}</span>
           </div>
           <div style="width: 100%; height: 5px; background: #f1f5f9; border-radius: 999px; overflow: hidden;">
@@ -471,18 +471,18 @@ export default function AdminHeatmap() {
                      <Popup className="premium-popup">
                         <div className="p-4 space-y-4 min-w-[200px]">
                            <div className="flex justify-between items-start">
-                              <span className="px-2 py-0.5 bg-navy text-white text-[8px] font-black rounded-full uppercase tracking-widest">NODE {t.id.substring(0, 5)}</span>
-                              <span className={`px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest ${t.status === 'resolved' ? 'bg-emerald text-white' : 'bg-saffron text-white'}`}>{t.status}</span>
+                              <span className="px-2 py-0.5 bg-navy text-white text-[8px] font-black rounded-full uppercase tracking-widest">{t('Node')} {t.id ? t.id.substring(0, 5) : ''}</span>
+                              <span className={`px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest ${t.status === 'resolved' ? 'bg-emerald text-white' : 'bg-saffron text-white'}`}>{t(t.status)}</span>
                            </div>
-                           <h4 className="font-sora font-extrabold text-navy tracking-tight uppercase leading-tight">{t.title}</h4>
+                           <h4 className="font-sora font-extrabold text-navy tracking-tight uppercase leading-tight">{t(t.title)}</h4>
                            <div className="grid grid-cols-2 gap-4 border-t border-border pt-4">
                               <div>
-                                 <p className="text-[8px] font-black text-text-secondary opacity-40 uppercase tracking-widest">Telemetry</p>
-                                 <p className="text-[10px] font-extrabold text-navy">Priority {t.priority_score}</p>
+                                 <p className="text-[8px] font-black text-text-secondary opacity-40 uppercase tracking-widest">{t('Telemetry')}</p>
+                                 <p className="text-[10px] font-extrabold text-navy">{t('Priority')} {t.priority_score}</p>
                               </div>
                               <div>
-                                 <p className="text-[8px] font-black text-text-secondary opacity-40 uppercase tracking-widest">Impact</p>
-                                 <p className="text-[10px] font-extrabold text-navy">{t.category}</p>
+                                 <p className="text-[8px] font-black text-text-secondary opacity-40 uppercase tracking-widest">{t('Impact')}</p>
+                                 <p className="text-[10px] font-extrabold text-navy">{t(t.category)}</p>
                               </div>
                            </div>
                         </div>
@@ -541,16 +541,16 @@ export default function AdminHeatmap() {
       <div className="absolute bottom-10 right-10 z-[1000] bg-white/90 backdrop-blur-xl rounded-[2.5rem] p-8 shadow-2xl border border-border min-w-[320px]">
          <div className="flex items-center justify-between mb-8">
             <h4 className="text-[10px] font-black text-navy uppercase tracking-[0.2em] opacity-40 flex items-center gap-2">
-                <History size={14} /> Geospatial Intelligence
+                <History size={14} /> {t('GeospatialIntelligence')}
             </h4>
             <div className="px-2 py-0.5 bg-navy/5 text-navy rounded-full text-[8px] font-black uppercase font-sora">
                {activeCity}
             </div>
          </div>
          <div className="space-y-6">
-            <MiniMetric label="Admin Wards Active" val={geoData?.features ? geoData.features.length : "..."} color="text-navy" />
-            <MiniMetric label="High Density Alerts" val={Object.values(wardStats).filter(v => v > 5).length} color="text-crimson" />
-            <MiniMetric label="Command Signal Nodes" val={tickets.length} color="text-emerald" />
+            <MiniMetric label={t('AdminWardsActive')} val={geoData?.features ? geoData.features.length : "..."} color="text-navy" />
+            <MiniMetric label={t('HighDensityAlerts')} val={Object.values(wardStats).filter(v => v > 5).length} color="text-crimson" />
+            <MiniMetric label={t('CommandSignalNodes')} val={tickets.length} color="text-emerald" />
          </div>
          
          <div className="mt-8 pt-8 border-t border-border/50">
@@ -559,8 +559,8 @@ export default function AdminHeatmap() {
                   <Zap size={18} className="text-saffron" />
                </div>
                <div>
-                  <p className="text-[10px] font-black text-navy uppercase leading-tight">Live Integration</p>
-                  <p className="text-[8px] font-bold text-navy/40 uppercase tracking-widest">{cityConfig.org} Satellite Sync Active</p>
+                  <p className="text-[10px] font-black text-navy uppercase leading-tight">{t('LiveIntegration')}</p>
+                  <p className="text-[8px] font-bold text-navy/40 uppercase tracking-widest">{cityConfig.org} {t('SatelliteSyncActive')}</p>
                </div>
             </div>
          </div>

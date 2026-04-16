@@ -1,14 +1,16 @@
 import React from 'react';
 import { formatDate } from '../../lib/utils';
 import { MapPin, Repeat, UserCheck, AlertTriangle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export default function CivicMemoryTable({ data = [] }) {
+  const { t } = useTranslation();
   if (data.length === 0) {
     return (
       <div className="bg-surface rounded-xl border border-[#162F6A]/30 p-12 text-center text-text-secondary">
         <Repeat className="mx-auto mb-4 opacity-10" size={64} />
-        <p className="font-medium text-navy text-lg">Civic Memory Initializing...</p>
-        <p className="text-sm mt-1">AI is analyzing 2-year history to identify recurring patterns.</p>
+        <p className="font-medium text-navy text-lg">{t('CM_Initializing')}</p>
+        <p className="text-sm mt-1">{t('CM_AIAnalyzing')}</p>
       </div>
     );
   }
@@ -18,11 +20,11 @@ export default function CivicMemoryTable({ data = [] }) {
       <table className="w-full text-left border-collapse">
         <thead className="bg-[#1A2D5A] text-white">
           <tr>
-            <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest">Location Zone</th>
-            <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest">Category</th>
-            <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest">Occurrence Count (2y)</th>
-            <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest">Linked Contractors</th>
-            <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest">Chronicity Risk</th>
+            <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest">{t('CM_LocationZone')}</th>
+            <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest">{t('CM_Category')}</th>
+            <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest">{t('CM_OccurrenceCount')}</th>
+            <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest">{t('CM_LinkedContractors')}</th>
+            <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest">{t('CM_ChronicityRisk')}</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-border">
@@ -40,7 +42,7 @@ export default function CivicMemoryTable({ data = [] }) {
               <td className="px-6 py-4">
                 <div className="flex items-center gap-2">
                   <Repeat size={14} className="text-saffron" />
-                  <span className="text-sm font-extrabold text-navy">{item.occurence_count} instances</span>
+                  <span className="text-sm font-extrabold text-navy">{item.occurence_count} {t('CM_Instances')}</span>
                 </div>
               </td>
               <td className="px-6 py-4">
@@ -56,7 +58,7 @@ export default function CivicMemoryTable({ data = [] }) {
                  <div className="flex items-center gap-1.5">
                     <div className={`w-2 h-2 rounded-full ${item.occurence_count > 5 ? 'bg-crimson' : 'bg-amber'}`} />
                     <span className={`text-[10px] font-bold uppercase tracking-widest ${item.occurence_count > 5 ? 'text-crimson' : 'text-amber'}`}>
-                       {item.occurence_count > 5 ? 'Chronic Problem Zone' : 'Emerging Pattern'}
+                       {item.occurence_count > 5 ? t('CM_ChronicProblemZone') : t('CM_EmergingPattern')}
                     </span>
                  </div>
               </td>

@@ -65,7 +65,7 @@ export default function AdminDashboard() {
        {/* Stats Row */}
        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-6">
           <StatCard label={t('ComplaintsToday')} val={stats.total} icon={<Zap size={20}/>} color="navy" sub={t('SincLastSync')} />
-          <StatCard label={t('ResolvedTodayLabel')} val={stats.resolved} icon={<CheckCircle size={20}/>} color="emerald" sub="35.2% efficiency" />
+          <StatCard label={t('ResolvedTodayLabel')} val={stats.resolved} icon={<CheckCircle size={20}/>} color="emerald" sub={`35.2% ${t('EfficiencyLabel')}`} />
           <StatCard label={t('SLABreachesLabel')} val={stats.breaches} icon={<AlertTriangle size={20}/>} color="crimson" pulse />
           <StatCard label={t('AvgResolution')} val={`${stats.avgTime}h`} icon={<Clock size={20}/>} color="navy" />
           <StatCard label={t('OfficersActive')} val={`${stats.activeOfficers}/24`} icon={<Users size={20}/>} color="navy" />
@@ -117,7 +117,7 @@ export default function AdminDashboard() {
                 </div>
              </div>
              <div className="pt-10 relative z-10 border-t border-white/10 italic text-[10px] font-medium opacity-40 leading-relaxed">
-                Aggregating {stats.total} signals across 2,400 municipal ward nodes in real-time.
+                {t('AggregateSignalsDesc', { total: stats.total })}
              </div>
              <div className="absolute -right-20 -bottom-20 w-80 h-80 bg-white/5 rounded-full blur-[100px]" />
           </div>

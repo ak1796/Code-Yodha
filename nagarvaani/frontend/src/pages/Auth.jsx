@@ -61,12 +61,12 @@ export default function Auth() {
             onChange={(e) => i18n.changeLanguage(e.target.value)}
             value={i18n.language}
           >
-            <option value="en">English</option>
-            <option value="hi">हिंदी</option>
-            <option value="mr">मराठी</option>
-            <option value="bn">বাংলা</option>
-            <option value="ta">தமிழ்</option>
-            <option value="ml">മലയാളം</option>
+            <option value="en">{t('Lang_en')}</option>
+            <option value="hi">{t('Lang_hi')}</option>
+            <option value="mr">{t('Lang_mr')}</option>
+            <option value="bn">{t('Lang_bn')}</option>
+            <option value="ta">{t('Lang_ta')}</option>
+            <option value="ml">{t('Lang_ml')}</option>
           </select>
         </div>
 
@@ -117,7 +117,7 @@ export default function Auth() {
 
           <div className="text-center mb-8">
             <h2 className="text-2xl font-sora font-extrabold text-[#162F6A] leading-tight">
-              {isLogin ? ROLE_CONFIG[activeRole].title : t('RegisterAs', { role: activeRole.charAt(0).toUpperCase() + activeRole.slice(1) })}
+              {isLogin ? ROLE_CONFIG[activeRole].title : t('RegisterAs', { role: t(activeRole.charAt(0).toUpperCase() + activeRole.slice(1)) })}
             </h2>
             <p className="text-xs text-text-secondary mt-1 font-medium">{isLogin ? ROLE_CONFIG[activeRole].desc : t('InitializeIdentity')}</p>
           </div>
@@ -134,7 +134,7 @@ export default function Auth() {
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                     className="w-full px-5 py-3 border border-border rounded-2xl outline-none focus:border-[#162F6A] focus:ring-4 focus:ring-[#162F6A]/5 text-sm font-bold transition"
-                    placeholder="e.g. Rohini Patil"
+                    placeholder={t('FullNamePlaceholder')}
                     required={!isLogin}
                   />
                 </div>
@@ -143,7 +143,7 @@ export default function Auth() {
 
             <div className="space-y-1.5 group">
               <label className="flex items-center gap-2 text-[10px] font-bold text-text-secondary uppercase tracking-widest ml-1 opacity-60 transition-opacity">
-                 <Mail size={12} className="text-[#162F6A]" /> {activeRole} {t('Email')}
+                 <Mail size={12} className="text-[#162F6A]" /> {t(activeRole.charAt(0).toUpperCase() + activeRole.slice(1))} {t('Email')}
               </label>
               <input
                 type="email"
@@ -174,7 +174,7 @@ export default function Auth() {
               disabled={loading}
               className={`w-full ${ROLE_CONFIG[activeRole].color} text-white py-5 rounded-2xl font-bold uppercase tracking-widest text-xs transition-all shadow-xl mt-4 flex items-center justify-center gap-2 group disabled:opacity-50`}
             >
-              {loading ? t('Authenticating') : t('EnterDashboard', { role: activeRole.charAt(0).toUpperCase() + activeRole.slice(1) })}
+              {loading ? t('Authenticating') : t('EnterDashboard', { role: t(activeRole.charAt(0).toUpperCase() + activeRole.slice(1)) })}
               {!loading && <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />}
             </button>
           </form>

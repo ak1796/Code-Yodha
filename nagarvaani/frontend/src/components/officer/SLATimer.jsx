@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Clock, AlertTriangle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export default function SLATimer({ deadline, isResolved }) {
+  const { t } = useTranslation();
   const [timeLeft, setTimeLeft] = useState(null);
   const [status, setStatus] = useState('NORMAL');
 
@@ -45,14 +47,14 @@ export default function SLATimer({ deadline, isResolved }) {
   if (status === 'RESOLVED') return (
     <div className="flex items-center gap-2 px-6 py-2 bg-emerald-light/20 text-emerald rounded-2xl border border-emerald/20">
        <div className="w-1.5 h-1.5 bg-emerald rounded-full" />
-       <span className="text-[10px] font-black uppercase tracking-widest leading-none">FULFILLED</span>
+       <span className="text-[10px] font-black uppercase tracking-widest leading-none">{t('SLA_StandardMet')}</span>
     </div>
   );
 
   if (status === 'BREACHED') return (
     <div className="px-6 py-2 bg-crimson text-white rounded-2xl flex items-center gap-2 shadow-lg shadow-crimson/20">
        <AlertTriangle size={14} />
-       <span className="text-[10px] font-black uppercase tracking-widest leading-none">BREACHED</span>
+       <span className="text-[10px] font-black uppercase tracking-widest leading-none">{t('SLA_BreachedLabel')}</span>
     </div>
   );
 
@@ -67,7 +69,7 @@ export default function SLATimer({ deadline, isResolved }) {
     <div className={`px-6 py-3 rounded-2xl border flex flex-col items-center transition-all duration-500 min-w-[120px] ${colors[status]}`}>
        <div className="flex items-center gap-2 opacity-60">
           <Clock size={12} />
-          <span className="text-[8px] font-black uppercase tracking-[0.2em] leading-none mb-0.5">SLA Remainder</span>
+          <span className="text-[8px] font-black uppercase tracking-[0.2em] leading-none mb-0.5">{t('SLARemainder')}</span>
        </div>
        <span className="text-xl font-sora font-extrabold tracking-tighter leading-tight mt-1 tabular-nums">
           {timeLeft || '--:--:--'}

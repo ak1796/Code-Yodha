@@ -12,20 +12,20 @@ import toast from 'react-hot-toast';
 // --- CONSTANTS & MAPPINGS ---
 
 const COMPLAINT_TYPES = [
-  { name: 'Drainage', internal: 'DRAINAGE' },
-  { name: 'Storm water drain', internal: 'DRAINAGE' },
-  { name: 'Water supply', internal: 'WATER' },
-  { name: 'Roads and traffic', internal: 'ROADS' },
-  { name: 'Solid Waste Management', internal: 'GARBAGE' },
-  { name: 'Health', internal: 'HEALTH' },
-  { name: 'Garden & Tree', internal: 'PARKS' },
-  { name: 'Buildings', internal: 'BUILDINGS' },
-  { name: 'Pest control', internal: 'PEST' },
-  { name: 'Encroachment', internal: 'ENCROACHMENT' },
-  { name: 'Electricity', internal: 'ELECTRICITY' },
-  { name: 'Licence', internal: 'OTHER' },
-  { name: 'Factories', internal: 'OTHER' },
-  { name: 'School', internal: 'OTHER' }
+  { labelKey: 'DRAINAGE', name: 'Drainage', internal: 'DRAINAGE' },
+  { labelKey: 'STORM_WATER_DRAIN', name: 'Storm water drain', internal: 'DRAINAGE' },
+  { labelKey: 'WATER_SUPPLY', name: 'Water supply', internal: 'WATER' },
+  { labelKey: 'ROADS_AND_TRAFFIC', name: 'Roads and traffic', internal: 'ROADS' },
+  { labelKey: 'SOLID_WASTE_MANAGEMENT', name: 'Solid Waste Management', internal: 'GARBAGE' },
+  { labelKey: 'HEALTH', name: 'Health', internal: 'HEALTH' },
+  { labelKey: 'GARDEN_TREE', name: 'Garden & Tree', internal: 'PARKS' },
+  { labelKey: 'BUILDINGS', name: 'Buildings', internal: 'BUILDINGS' },
+  { labelKey: 'PEST_CONTROL', name: 'Pest control', internal: 'PEST' },
+  { labelKey: 'ENCROACHMENT', name: 'Encroachment', internal: 'ENCROACHMENT' },
+  { labelKey: 'ELECTRICITY', name: 'Electricity', internal: 'ELECTRICITY' },
+  { labelKey: 'LICENCE', name: 'Licence', internal: 'OTHER' },
+  { labelKey: 'FACTORIES', name: 'Factories', internal: 'OTHER' },
+  { labelKey: 'SCHOOL', name: 'School', internal: 'OTHER' }
 ];
 
 const SUBTYPES = {
@@ -84,14 +84,7 @@ const STATES = [
 const LANGUAGES = [
   { code: 'en', name: 'English' },
   { code: 'hi', name: 'Hindi' },
-  { code: 'mr', name: 'Marathi' },
-  { code: 'ta', name: 'Tamil' },
-  { code: 'te', name: 'Telugu' },
-  { code: 'bn', name: 'Bengali' },
-  { code: 'gu', name: 'Gujarati' },
-  { code: 'kn', name: 'Kannada' },
-  { code: 'ml', name: 'Malayalam' },
-  { code: 'pa', name: 'Punjabi' }
+  { code: 'mr', name: 'Marathi' }
 ];
 
 // --- MAIN COMPONENT ---
@@ -184,16 +177,16 @@ export default function HighFidelityComplaintForm({ onSubmit, isSubmitting: pare
   // Save Draft
   const saveDraft = () => {
     localStorage.setItem('ugirp_complaint_draft', JSON.stringify(formData));
-    toast.success("Draft saved to cache", { duration: 1000 });
+    toast.success(t("DraftSaved"), { duration: 1000 });
   };
 
   const clearDraft = () => {
     localStorage.removeItem('ugirp_complaint_draft');
-    toast.success("Draft cleared");
+    toast.success(t("DraftCleared"));
   };
 
   const aiExtract = async (transcript) => {
-    const loadId = toast.loading("AI analyzing your voice...");
+    const loadId = toast.loading(t("AIAnalyzing"));
     try {
       const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
       const res = await fetch(`${backendUrl}/api/voice/process`, {
@@ -210,10 +203,10 @@ export default function HighFidelityComplaintForm({ onSubmit, isSubmitting: pare
         location_text: data.location_text || prev.location_text
       }));
       
-      toast.success("AI: Details extracted! Check steps 1-3.", { id: loadId });
+      toast.success(t("AIExtracted"), { id: loadId });
     } catch (err) {
       console.error("AI extraction failed", err);
-      toast.error("AI extraction failed. Please fill manually.", { id: loadId });
+      toast.error(t("AIExtractionFailed"), { id: loadId });
     }
   };
 
@@ -248,16 +241,16 @@ export default function HighFidelityComplaintForm({ onSubmit, isSubmitting: pare
   };
 
   const detectLocation = () => {
-    if (!navigator.geolocation) return toast.error("GPS Signal Unavailable");
+    if (!navigator.geolocation) return toast.error(t("GPSSignalUnavailable"));
     
-    toast.loading("Triangulating GPS Node...", { id: 'gps' });
+    toast.loading(t("TriangulatingGPS"), { id: 'gps' });
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         const { latitude, longitude } = pos.coords;
         setFormData(prev => ({ ...prev, lat: latitude, lng: longitude }));
-        toast.success("Location locked accurately ✓", { id: 'gps' });
+        toast.success(t("LocationLocked"), { id: 'gps' });
       },
-      () => toast.error("Satellite link failed. Select ward manually.", { id: 'gps' })
+      () => toast.error(t("SatelliteLinkFailed"), { id: 'gps' })
     );
   };
 
@@ -275,16 +268,16 @@ export default function HighFidelityComplaintForm({ onSubmit, isSubmitting: pare
 
   const validate = () => {
     const newErrors = {};
-    if (!formData.complaint_type) newErrors.complaint_type = "Complaint type is required";
-    if (!formData.complaint_subtype) newErrors.complaint_subtype = "Subtype is required";
-    if (formData.description.trim().split(/\s+/).length < 10) newErrors.description = "Minimum 10 words required";
-    if (!formData.street) newErrors.street = "Street name required";
-    if (!formData.area) newErrors.area = "Area name required";
-    if (!formData.ward) newErrors.ward = "Select a ward for jurisdictional routing";
-    if (!formData.first_name) newErrors.first_name = "First name is required";
-    if (!formData.last_name) newErrors.last_name = "Last name is required";
-    if (!/^[6-9]\d{9}$/.test(formData.mobile)) newErrors.mobile = "Enter valid 10-digit mobile number";
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) newErrors.email = "Invalid email format";
+    if (!formData.complaint_type) newErrors.complaint_type = t("ErrComplaintType");
+    if (!formData.complaint_subtype) newErrors.complaint_subtype = t("ErrSubtype");
+    if (formData.description.trim().split(/\s+/).length < 10) newErrors.description = t("ErrDescriptionMinWords");
+    if (!formData.street) newErrors.street = t("ErrStreet");
+    if (!formData.area) newErrors.area = t("ErrArea");
+    if (!formData.ward) newErrors.ward = t("ErrWard");
+    if (!formData.first_name) newErrors.first_name = t("ErrFirstName");
+    if (!formData.last_name) newErrors.last_name = t("ErrLastName");
+    if (!/^[6-9]\d{9}$/.test(formData.mobile)) newErrors.mobile = t("ErrMobile");
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) newErrors.email = t("ErrEmail");
     
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -293,7 +286,7 @@ export default function HighFidelityComplaintForm({ onSubmit, isSubmitting: pare
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validate()) {
-       toast.error("Please correct errors in the grid");
+       toast.error(t("ErrCorrectForm"));
        return;
     }
 
@@ -337,7 +330,7 @@ export default function HighFidelityComplaintForm({ onSubmit, isSubmitting: pare
 
       clearDraft();
     } catch (err) {
-      toast.error("Signal ingestion failed");
+      toast.error(t("SignalIngestionFailed"));
     } finally {
       setIsProcessing(false);
     }
@@ -350,23 +343,23 @@ export default function HighFidelityComplaintForm({ onSubmit, isSubmitting: pare
             <CheckCircle size={64} />
          </div>
          <div className="space-y-2">
-            <h2 className="text-2xl font-sora font-extrabold text-navy uppercase tracking-tight">Signal Ingested Successfully</h2>
-            <p className="text-sm font-bold text-text-secondary opacity-60">Your complaint has been synchronized with the municipal grid.</p>
+            <h2 className="text-2xl font-sora font-extrabold text-navy uppercase tracking-tight">{t('SignalIngestedSuccessfully')}</h2>
+            <p className="text-sm font-bold text-text-secondary opacity-60">{t('SynchronizedMunicipalGrid')}</p>
          </div>
 
          <div className="bg-bg p-8 rounded-3xl border border-border space-y-6 text-left">
             <div className="flex justify-between items-end border-b border-border pb-4">
-               <span className="text-[10px] font-black text-text-secondary uppercase tracking-[0.2em] opacity-40">Complaint Tracking ID</span>
+               <span className="text-[10px] font-black text-text-secondary uppercase tracking-[0.2em] opacity-40">{t('ComplaintTrackingID')}</span>
                <span className="text-2xl font-sora font-black text-navy">{successData.id}</span>
             </div>
             <div className="grid grid-cols-2 gap-8">
-               <DataPoint label="Category Detected" val={successData.category} />
-               <DataPoint label="Priority Node" val={successData.priority} color="text-saffron" />
-               <DataPoint label="Assigned Specialist" val={successData.officer} />
-               <DataPoint label="Haversine Delta" val={successData.distance} />
+               <DataPoint label={t('CategoryDetected')} val={t(successData.category)} />
+               <DataPoint label={t('PriorityNode')} val={successData.priority} color="text-saffron" />
+               <DataPoint label={t('AssignedSpecialist')} val={successData.officer} />
+               <DataPoint label={t('HaversineDelta')} val={successData.distance} />
             </div>
             <div className="pt-4 border-t border-border flex justify-between items-center text-xs font-bold">
-               <span className="text-text-secondary opacity-40 uppercase tracking-widest">SLA Deadline</span>
+               <span className="text-text-secondary opacity-40 uppercase tracking-widest">{t('SLADeadline')}</span>
                <span className="text-crimson animate-pulse">{successData.deadline}</span>
             </div>
          </div>
@@ -374,9 +367,9 @@ export default function HighFidelityComplaintForm({ onSubmit, isSubmitting: pare
          <div className="flex flex-col gap-4">
             <div className="bg-navy/5 p-4 rounded-xl border border-navy/10 flex items-center justify-between">
                <span className="text-[10px] font-bold text-navy truncate">ugirp.in/track/{successData.id}</span>
-               <button onClick={() => { navigator.clipboard.writeText(`ugirp.in/track/${successData.id}`); toast.success("Copied"); }} className="p-2 hover:bg-navy/10 rounded-lg text-navy"><Activity size={14} /></button>
+               <button onClick={() => { navigator.clipboard.writeText(`ugirp.in/track/${successData.id}`); toast.success(t('Copied')); }} className="p-2 hover:bg-navy/10 rounded-lg text-navy"><Activity size={14} /></button>
             </div>
-            <p className="text-[10px] font-medium opacity-60 italic leading-relaxed">"A confirmation has been sent to your email. You will receive real-time signal updates at every forensic stage."</p>
+            <p className="text-[10px] font-medium opacity-60 italic leading-relaxed">"{t('ConfirmationSentEmail')}"</p>
          </div>
       </div>
     );
@@ -394,13 +387,13 @@ export default function HighFidelityComplaintForm({ onSubmit, isSubmitting: pare
               </div>
            </div>
            <div className="space-y-4">
-              <h3 className="text-xl font-sora font-extrabold text-navy uppercase tracking-tighter">Processing Ingestion Node</h3>
+              <h3 className="text-xl font-sora font-extrabold text-navy uppercase tracking-tighter">{t("ProcessingIngestionNode")}</h3>
               <div className="flex flex-col gap-2">
                  {[1,2,3,4].map(s => (
                    <div key={s} className="flex items-center gap-3 justify-center text-[10px] font-black uppercase tracking-widest">
                       <div className={`w-2 h-2 rounded-full transition-colors ${processStep >= s ? 'bg-emerald' : 'bg-gray-200'}`} />
                       <span className={processStep >= s ? 'text-navy' : 'text-gray-300 opacity-40'}>
-                        {s === 1 ? "Signal Submission" : s === 2 ? "Gemini Logic Synthesis" : s === 3 ? "Haversine Dispatch" : "Confirmation Sync"}
+                        {s === 1 ? t("ProcessStep1") : s === 2 ? t("ProcessStep2") : s === 3 ? t("ProcessStep3") : t("ProcessStep4")}
                       </span>
                    </div>
                  ))}
@@ -413,9 +406,9 @@ export default function HighFidelityComplaintForm({ onSubmit, isSubmitting: pare
       <div className="p-10 border-b border-border bg-bg/50 flex justify-between items-center">
          <div>
             <h2 className="text-2xl font-sora font-extrabold text-navy tracking-tight uppercase flex items-center gap-3">
-               <ShieldCheck size={28} className="text-navy" /> Municipal Complaint Hub
+               <ShieldCheck size={28} className="text-navy" /> {t("MunicipalComplaintHub")}
             </h2>
-            <p className="text-[10px] font-black text-text-secondary uppercase tracking-[0.2em] opacity-40 mt-1 italic">Standards Compliance: BMC-MUMBAI/UGIRP-V2</p>
+            <p className="text-[10px] font-black text-text-secondary uppercase tracking-[0.2em] opacity-40 mt-1 italic">{t("StandardsCompliance")}</p>
          </div>
          <div className="flex items-center gap-4">
             <select 
@@ -434,54 +427,54 @@ export default function HighFidelityComplaintForm({ onSubmit, isSubmitting: pare
 
       <form onSubmit={handleSubmit} className="p-10 space-y-12">
         {/* SECTION 1: NATURE */}
-        <Section title="Define Nature of Complaint" icon={<Sparkles size={18}/>}>
+        <Section title={t("DefineNatureOfComplaint")} icon={<Sparkles size={18}/>}>
            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div className="space-y-2">
-                 <Label label="Complaint Type" required />
+                 <Label label={t("ComplaintType")} required />
                  <select 
                    value={formData.complaint_type} 
                    onChange={e => setFormData({ ...formData, complaint_type: e.target.value, complaint_subtype: '' })}
                    className={`w-full bg-bg border ${errors.complaint_type ? 'border-crimson' : 'border-border'} rounded-2xl px-6 py-4 text-xs font-bold tracking-widest text-navy outline-none`}
                  >
-                    <option value="">-- SELECT --</option>
-                    {COMPLAINT_TYPES.map(t => <option key={t.name} value={t.name}>{t.name}</option>)}
+                    <option value="">{t("SelectPlaceholder")}</option>
+                    {COMPLAINT_TYPES.map(tOption => <option key={tOption.name} value={tOption.name}>{t(tOption.labelKey || tOption.name)}</option>)}
                  </select>
               </div>
               <div className="space-y-2">
-                 <Label label="Complaint Subtype" required />
+                 <Label label={t("ComplaintSubtype")} required />
                  <select 
                    value={formData.complaint_subtype} 
                    onChange={e => setFormData({ ...formData, complaint_subtype: e.target.value })}
                    className={`w-full bg-bg border ${errors.complaint_subtype ? 'border-crimson' : 'border-border'} rounded-2xl px-6 py-4 text-xs font-bold tracking-widest text-navy outline-none`}
                  >
-                    <option value="">-- SELECT --</option>
+                    <option value="">{t("SelectPlaceholder")}</option>
                     {(SUBTYPES[formData.complaint_type] || SUBTYPES['DEFAULT']).map(s => <option key={s} value={s}>{s}</option>)}
                  </select>
               </div>
               <div className="space-y-2">
-                 <Label label="PPO No (Public Property Order)" />
+                 <Label label={t("PPONo")} />
                  <input 
                    type="text" 
-                   placeholder="Enter PPO number if available"
+                   placeholder={t("EnterPPONo")}
                    className="w-full bg-bg border border-border rounded-2xl px-6 py-4 text-xs font-bold tracking-widest text-navy outline-none"
                    value={formData.ppo_no}
                    onChange={e => setFormData({ ...formData, ppo_no: e.target.value })}
                  />
-                 <p className="text-[8px] font-bold text-text-secondary opacity-40 ml-2 uppercase">Order reference for municipal assets</p>
+                 <p className="text-[8px] font-bold text-text-secondary opacity-40 ml-2 uppercase">{t("OrderReference")}</p>
               </div>
            </div>
 
            <div className="space-y-4">
               <div className="flex justify-between items-end">
-                 <Label label="Description in Brief" required />
+                 <Label label={t("DescriptionInBrief")} required />
                  <span className={`text-[9px] font-black uppercase tracking-widest ${formData.description.length > 130 ? 'text-crimson animate-pulse' : 'text-text-secondary opacity-40'}`}>
-                    {formData.description.length} / 150 CHARACTERS
+                    {formData.description.length} / {t("OutOf150Chars")}
                  </span>
               </div>
               <div className="relative">
                  <textarea 
                    maxLength={150}
-                   placeholder="Describe your complaint briefly (Semantic analysis will be performed)"
+                   placeholder={t("DescribeBriefly")}
                    className={`w-full h-32 bg-bg border ${errors.description ? 'border-crimson' : 'border-border'} rounded-2xl px-6 py-4 text-xs font-bold tracking-widest text-navy outline-none resize-none`}
                    value={formData.description}
                    onChange={e => setFormData({ ...formData, description: e.target.value })}
@@ -497,49 +490,49 @@ export default function HighFidelityComplaintForm({ onSubmit, isSubmitting: pare
               <div className="bg-navy/5 p-4 rounded-xl border border-navy/10 flex items-center gap-3">
                  <Sparkles size={16} className="text-navy" />
                  <p className="text-[9px] font-medium text-navy opacity-60 leading-relaxed italic">
-                   "Our Gemini Neural Node will automatically detect language, translate signal, and categorize jurisdictional priority based on this text."
+                   "{t("GeminiNodeInfo")}"
                  </p>
               </div>
            </div>
         </Section>
 
         {/* SECTION 2: LOCATION */}
-        <Section title="Specify Location of Signal" icon={<Map size={18}/>}>
+        <Section title={t("SpecifyLocation")} icon={<Map size={18}/>}>
            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <Input label="House No" placeholder="Building / Unit" val={formData.house_no} onChange={v => setFormData({ ...formData, house_no: v })} />
-              <Input label="Street" placeholder="Street Name" required val={formData.street} onChange={v => setFormData({ ...formData, street: v })} error={errors.street} />
-              <Input label="Area" placeholder="Locality" required val={formData.area} onChange={v => setFormData({ ...formData, area: v })} error={errors.area} />
-              <Input label="City" placeholder="MUMBAI" val={formData.city} onChange={v => setFormData({ ...formData, city: v })} />
+              <Input label={t("HouseNo")} placeholder={t("BuildingUnit")} val={formData.house_no} onChange={v => setFormData({ ...formData, house_no: v })} />
+              <Input label={t("Street")} placeholder={t("StreetName")} required val={formData.street} onChange={v => setFormData({ ...formData, street: v })} error={errors.street} />
+              <Input label={t("Area")} placeholder={t("Locality")} required val={formData.area} onChange={v => setFormData({ ...formData, area: v })} error={errors.area} />
+              <Input label={t("City")} placeholder={t("City")} val={formData.city} onChange={v => setFormData({ ...formData, city: v })} />
               <div className="md:col-span-2 space-y-2">
-                 <Label label="Landmark (Max 60 chars)" />
+                 <Label label={t("LandmarkMax60")} />
                  <textarea 
                    maxLength={60}
                    className="w-full bg-bg border border-border rounded-2xl px-6 py-4 text-xs font-bold tracking-widest text-navy outline-none h-14 resize-none"
-                   placeholder="Nearby identified landmark"
+                   placeholder={t("NearbyLandmark")}
                    value={formData.landmark}
                    onChange={e => setFormData({ ...formData, landmark: e.target.value })}
                  />
               </div>
               <div className="space-y-2">
-                 <Label label="Select Ward Node" required />
+                 <Label label={t("SelectWardNode")} required />
                  <select 
                    value={formData.ward} 
                    onChange={handleWardChange}
                    className={`w-full bg-bg border ${errors.ward ? 'border-crimson' : 'border-border'} rounded-2xl px-6 py-4 text-xs font-bold tracking-widest text-navy outline-none`}
                  >
-                    <option value="">-- SELECT --</option>
+                    <option value="">{t("SelectPlaceholder")}</option>
                     {WARDS.map(w => <option key={w.name} value={w.name}>{w.name}</option>)}
                  </select>
               </div>
-              <Input label="Connection Code" placeholder="Water/Electricity Ref" val={formData.connection_code} onChange={v => setFormData({ ...formData, connection_code: v })} />
+              <Input label={t("ConnectionCode")} placeholder={t("WaterElecRef")} val={formData.connection_code} onChange={v => setFormData({ ...formData, connection_code: v })} />
               <div className="space-y-2">
-                 <Label label="Name of Council" />
+                 <Label label={t("NameOfCouncil")} />
                  <select 
                    value={formData.council} 
                    onChange={e => setFormData({ ...formData, council: e.target.value })}
                    className="w-full bg-bg border border-border rounded-2xl px-6 py-4 text-xs font-bold tracking-widest text-navy outline-none"
                  >
-                    <option value="">-- SELECT --</option>
+                    <option value="">{t("SelectPlaceholder")}</option>
                     {COUNCILS.map(c => <option key={c} value={c}>{c}</option>)}
                  </select>
               </div>
@@ -551,11 +544,11 @@ export default function HighFidelityComplaintForm({ onSubmit, isSubmitting: pare
                 onClick={detectLocation}
                 className="flex items-center gap-3 bg-navy text-white px-8 py-5 rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-2xl hover:scale-105 transition active:scale-95"
               >
-                 <MapPin size={18} /> Detect My Spatial Coordinate
+                 <MapPin size={18} /> {t("DetectSpatialCoord")}
               </button>
               {formData.lat && (
                 <div className="flex items-center gap-2 text-emerald text-[9px] font-black uppercase tracking-[0.2em] animate-fade-in">
-                   <ShieldCheck size={14} /> Global GPS Sync Verified: {formData.lat.toFixed(4)}, {formData.lng.toFixed(4)}
+                   <ShieldCheck size={14} /> {t("GlobalGPSSyncVerified")}: {formData.lat.toFixed(4)}, {formData.lng.toFixed(4)}
                 </div>
               )}
            </div>
@@ -563,39 +556,39 @@ export default function HighFidelityComplaintForm({ onSubmit, isSubmitting: pare
 
         {/* SECTION 3 & 4: COMPLAINANT */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-            <Section title="Specialist ID / Name" icon={<User size={18}/>}>
+            <Section title={t("SpecialistIDName")} icon={<User size={18}/>}>
                <div className="space-y-8">
-                  <Input label="First Name" placeholder="Complainant First Name" required val={formData.first_name} onChange={v => setFormData({ ...formData, first_name: v })} error={errors.first_name} />
-                  <Input label="Last Name" placeholder="Complainant Surname" required val={formData.last_name} onChange={v => setFormData({ ...formData, last_name: v })} error={errors.last_name} />
+                  <Input label={t("FirstName")} placeholder={t("ComplainantFirstName")} required val={formData.first_name} onChange={v => setFormData({ ...formData, first_name: v })} error={errors.first_name} />
+                  <Input label={t("LastName")} placeholder={t("ComplainantSurname")} required val={formData.last_name} onChange={v => setFormData({ ...formData, last_name: v })} error={errors.last_name} />
                </div>
             </Section>
-            <Section title="Communication Sync" icon={<Mail size={18}/>}>
+            <Section title={t("CommunicationSync")} icon={<Mail size={18}/>}>
                <div className="space-y-8">
-                  <Input label="Mobile No" placeholder="+91 XXXXXXXXXX" required val={formData.mobile} onChange={v => setFormData({ ...formData, mobile: v })} error={errors.mobile} />
-                  <Input label="Email Address" placeholder="forensic@ugirp.in" required val={formData.email} onChange={v => setFormData({ ...formData, email: v })} error={errors.email} />
+                  <Input label={t("MobileNo")} placeholder="+91 XXXXXXXXXX" required val={formData.mobile} onChange={v => setFormData({ ...formData, mobile: v })} error={errors.mobile} />
+                  <Input label={t("EmailAddress")} placeholder="forensic@ugirp.in" required val={formData.email} onChange={v => setFormData({ ...formData, email: v })} error={errors.email} />
                </div>
             </Section>
         </div>
 
         {/* SECTION 5: ADDITIONAL */}
-        <Section title="Forensic Evidence & Privacy" icon={<Filter size={18}/>}>
+        <Section title={t("ForensicEvidencePrivacy")} icon={<Filter size={18}/>}>
            <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
               <div className="space-y-6">
-                 <Label label="Attach Evidence (Photo/Video)" />
+                 <Label label={t("AttachEvidence")} />
                  <label className="w-full flex items-center gap-6 p-8 bg-bg border-2 border-dashed border-border rounded-[2rem] cursor-pointer group hover:border-navy transition duration-500">
                     <div className="w-16 h-16 bg-white rounded-3xl flex items-center justify-center text-navy shadow-soft group-hover:scale-110 transition duration-500">
                        <Camera size={28} />
                     </div>
                     <div>
-                       <span className="text-xs font-black text-navy uppercase tracking-widest block">Upload Media Node</span>
-                       <span className="text-[9px] font-bold text-text-secondary opacity-40 uppercase tracking-widest italic">JPG, PNG, MP4 Supported</span>
+                       <span className="text-xs font-black text-navy uppercase tracking-widest block">{t("UploadMediaNode")}</span>
+                       <span className="text-[9px] font-bold text-text-secondary opacity-40 uppercase tracking-widest italic">{t("MediaSupported")}</span>
                     </div>
                     <input type="file" className="hidden" accept="image/*,video/*" />
                  </label>
               </div>
 
               <div className="space-y-6">
-                 <Label label="Whistleblower Protection" />
+                 <Label label={t("WhistleblowerProtection")} />
                  <div 
                    onClick={() => setFormData({ ...formData, is_anonymous: !formData.is_anonymous })}
                    className={`p-8 rounded-[2rem] border transition-all duration-500 cursor-pointer flex items-center gap-6 ${formData.is_anonymous ? 'bg-navy text-white border-navy shadow-2xl' : 'bg-bg border-border'}`}
@@ -605,12 +598,12 @@ export default function HighFidelityComplaintForm({ onSubmit, isSubmitting: pare
                     </div>
                     <div className="flex-1">
                        <div className="flex justify-between items-center mb-1">
-                          <span className="text-xs font-black uppercase tracking-widest">Anonymous Protocol</span>
+                          <span className="text-xs font-black uppercase tracking-widest">{t("AnonymousProtocol")}</span>
                           <div className={`w-8 h-4 rounded-full p-1 transition-colors ${formData.is_anonymous ? 'bg-emerald' : 'bg-gray-200'}`}>
                              <div className={`w-2 h-2 bg-white rounded-full transition-transform ${formData.is_anonymous ? 'translate-x-4' : ''}`} />
                           </div>
                        </div>
-                       <p className="text-[9px] font-medium opacity-60 italic leading-relaxed">Identity obfuscation node: Personal telemetry will be scrubbed from specialist rosters.</p>
+                       <p className="text-[9px] font-medium opacity-60 italic leading-relaxed">{t("IdentityObfuscationNode")}</p>
                     </div>
                  </div>
               </div>
@@ -624,7 +617,7 @@ export default function HighFidelityComplaintForm({ onSubmit, isSubmitting: pare
              onClick={clearDraft}
              className="flex-1 bg-white border border-border text-navy px-10 py-6 rounded-2xl font-black uppercase tracking-widest text-[10px] hover:bg-bg transition"
            >
-              Discard Intelligence
+              {t('DiscardIntelligence')}
            </button>
            <button 
              type="submit" 
@@ -632,7 +625,7 @@ export default function HighFidelityComplaintForm({ onSubmit, isSubmitting: pare
              className="flex-[2] bg-navy text-white px-10 py-6 rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-2xl hover:scale-[1.02] transition active:scale-95 disabled:opacity-20 flex items-center justify-center gap-4"
            >
               {isProcessing ? <Activity className="animate-spin" size={20} /> : <Zap size={20} />}
-              {isProcessing ? "Processing Signal..." : "Commit Signal to Municipal Grid"}
+              {isProcessing ? t('ProcessingSignal') : t('CommitSignal')}
               {!isProcessing && <Sparkles size={16} className="text-saffron" />}
            </button>
         </div>

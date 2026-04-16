@@ -50,7 +50,7 @@ export default function OfficerDashboard() {
                  <h1 className="text-3xl font-sora font-extrabold text-navy tracking-tight">{profile?.full_name}</h1>
                  <div className="flex items-center gap-3 mt-1.5">
                     <span className="px-3 py-1 bg-blue-100 text-blue-600 text-[9px] font-extrabold rounded-full uppercase tracking-widest border border-blue-200">
-                       {profile?.department} {t('Specialist')}
+                       {t(profile?.department)} {t('Specialist')}
                     </span>
                     <span className="text-[10px] font-bold text-text-secondary opacity-40 uppercase tracking-widest">
                        {t('Ward')}: {profile?.ward_name || t('MumbaiHQ')}

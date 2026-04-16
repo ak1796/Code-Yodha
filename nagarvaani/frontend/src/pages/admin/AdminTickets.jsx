@@ -87,9 +87,9 @@ export default function AdminTickets() {
               className="bg-transparent text-xs font-bold uppercase tracking-widest text-navy outline-none"
             >
               <option value="ALL">{t('AllCities')}</option>
-              <option value="Mumbai">Mumbai</option>
-              <option value="Nashik">Nashik</option>
-              <option value="Thane">Thane</option>
+              <option value="Mumbai">{t('Mumbai')}</option>
+              <option value="Nashik">{t('Nashik')}</option>
+              <option value="Thane">{t('Thane')}</option>
             </select>
             <select 
               value={filter.department} 

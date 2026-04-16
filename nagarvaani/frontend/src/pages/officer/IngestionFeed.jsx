@@ -25,7 +25,7 @@ export default function IngestionFeed() {
               </div>
               <h1 className="text-4xl font-sora font-extrabold text-navy tracking-tight">{t('LiveIngestionPool')}</h1>
            </div>
-           <p className="text-text-secondary font-medium opacity-60">{t('IngestionPulseDesc', { dept: profile?.department, city: profile?.city })}</p>
+           <p className="text-text-secondary font-medium opacity-60">{t('IngestionPulseDesc', { dept: t(profile?.department), city: profile?.city })}</p>
         </header>
 
         {loading ? (

@@ -59,7 +59,7 @@ export default function Officers() {
                       <div className="text-right">
                          <span className="text-[10px] font-bold bg-emerald-light text-emerald px-2 py-1 rounded-full uppercase tracking-widest leading-none">{t('VettedActive')}</span>
                          <div className="flex items-center gap-1 mt-2 text-saffron justify-end">
-                            <Award size={14} /> <span className="text-xs font-bold font-mono">MVP</span>
+                            <Award size={14} /> <span className="text-xs font-bold font-mono">{t('OFF_MVP')}</span>
                          </div>
                       </div>
                    </div>
@@ -76,18 +76,18 @@ export default function Officers() {
 
                    <div className="grid grid-cols-2 gap-4 border-y border-border py-6 mb-6">
                       <div className="space-y-1">
-                         <p className="text-[10px] font-bold text-text-secondary uppercase tracking-widest">SLA Score</p>
+                         <p className="text-[10px] font-bold text-text-secondary uppercase tracking-widest">{t('OFF_SLAScore')}</p>
                          <p className="text-lg font-sora font-extrabold text-navy">{officer.sla_compliance || 90}%</p>
                       </div>
                       <div className="space-y-1">
-                         <p className="text-[10px] font-bold text-text-secondary uppercase tracking-widest">Resolved</p>
+                         <p className="text-[10px] font-bold text-text-secondary uppercase tracking-widest">{t('OFF_Resolved')}</p>
                          <p className="text-lg font-sora font-extrabold text-navy">{officer.tickets_resolved || 0}</p>
                       </div>
                    </div>
 
                    <div className="flex gap-2">
                       <button className="flex-1 bg-gray-50 text-navy py-3 rounded-xl font-bold uppercase tracking-widest text-[10px] hover:bg-navy hover:text-white transition flex items-center justify-center gap-2">
-                         Profile Detail
+                         {t('OFF_ProfileDetail')}
                       </button>
                       <button className="p-3 bg-gray-50 rounded-xl text-navy hover:bg-navy hover:text-white transition"><Mail size={16} /></button>
                       <button className="p-3 bg-gray-50 rounded-xl text-navy hover:bg-navy hover:text-white transition"><Phone size={16} /></button>
