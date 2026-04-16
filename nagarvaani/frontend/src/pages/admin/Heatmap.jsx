@@ -7,7 +7,7 @@ import {
 } from "react-leaflet";
 import { 
   Shield, History, MapPin, Zap, Filter, 
-  AlertTriangle, Users2, Phone, Activity, ChevronDown
+  AlertTriangle, Users2, Phone, Activity, ChevronDown, Mail
 } from "lucide-react";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
@@ -475,14 +475,24 @@ export default function AdminHeatmap() {
                               <span className={`px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest ${t.status === 'resolved' ? 'bg-emerald text-white' : 'bg-saffron text-white'}`}>{t.status}</span>
                            </div>
                            <h4 className="font-sora font-extrabold text-navy tracking-tight uppercase leading-tight">{t.title}</h4>
-                           <div className="grid grid-cols-2 gap-4 border-t border-border pt-4">
-                              <div>
-                                 <p className="text-[8px] font-black text-text-secondary opacity-40 uppercase tracking-widest">Telemetry</p>
-                                 <p className="text-[10px] font-extrabold text-navy">Priority {t.priority_score}</p>
+                           <div className="grid grid-cols-1 gap-2 border-t border-border pt-4">
+                              <div className="flex justify-between items-center">
+                                 <p className="text-[8px] font-black text-text-secondary opacity-40 uppercase tracking-widest">Department</p>
+                                 <p className="text-[10px] font-extrabold text-navy uppercase">{t.category}</p>
                               </div>
-                              <div>
-                                 <p className="text-[8px] font-black text-text-secondary opacity-40 uppercase tracking-widest">Impact</p>
-                                 <p className="text-[10px] font-extrabold text-navy">{t.category}</p>
+                              <div className="flex justify-between items-center">
+                                 <p className="text-[8px] font-black text-text-secondary opacity-40 uppercase tracking-widest">Source</p>
+                                 {t.source === 'EMAIL' ? (
+                                   <span className="px-2 py-0.5 bg-blue-100 text-blue-800 text-[8px] font-black rounded-full uppercase tracking-widest flex items-center gap-1">
+                                     <Mail size={8} /> EMAIL SUBMISSION
+                                   </span>
+                                 ) : (
+                                   <p className="text-[10px] font-extrabold text-navy uppercase">WEB PORTAL</p>
+                                 )}
+                              </div>
+                              <div className="flex justify-between items-center">
+                                 <p className="text-[8px] font-black text-text-secondary opacity-40 uppercase tracking-widest">Priority</p>
+                                 <p className="text-[10px] font-extrabold text-navy">NODE P{t.priority_score}</p>
                               </div>
                            </div>
                         </div>

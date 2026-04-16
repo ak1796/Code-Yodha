@@ -5,6 +5,17 @@ const { sendEmail } = require('../services/notificationService');
 
 const { reassignOfficer } = require('../services/autoAssignService');
 const { scrapeApifySignals } = require('../services/socialScraper');
+const { processIncomingEmails } = require('../services/emailIngestionService');
+
+// Every 5 minutes: Ingest signals from Gmail inbox (hackathon USP)
+cron.schedule('*/5 * * * *', async () => {
+  console.log('📡 Scanning NagarVaani inbox for new signals...');
+  try {
+    await processIncomingEmails();
+  } catch (error) {
+    console.error('❌ Email Ingestion Engine Failure:', error.message);
+  }
+});
 
 // Every hour: detect SLA breaches and escalations (Gap 1)
 cron.schedule('0 * * * *', async () => {
