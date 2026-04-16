@@ -250,14 +250,12 @@ export default function AdminHeatmap() {
     const intensity = maxCount > 0 ? (count / maxCount) : 0;
 
     let fillColor, borderColor;
-    if (count === 0) {
-      fillColor = '#10B981'; borderColor = '#059669'; // Green — no complaints
-    } else if (intensity <= 0.33) {
-      fillColor = '#FDE047'; borderColor = '#EAB308'; // Light Yellow — low relative density
+    if (intensity <= 0.33) {
+      fillColor = '#10B981'; borderColor = '#059669'; // Green — low relative density (0-33%)
     } else if (intensity <= 0.66) {
-      fillColor = '#FACC15'; borderColor = '#CA8A04'; // Bright Yellow — moderate density
+      fillColor = '#FACC15'; borderColor = '#CA8A04'; // Yellow — moderate relative density (33-66%)
     } else {
-      fillColor = '#F87171'; borderColor = '#EF4444'; // Soft Red — high relative density
+      fillColor = '#EF4444'; borderColor = '#DC2626'; // Red — high relative density (66%+)
     }
 
     return {
