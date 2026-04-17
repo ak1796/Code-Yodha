@@ -54,7 +54,7 @@ async function sendConfirmationToCitizen(citizenEmail, complaintId, category, de
   const mailOptions = {
     from: `"NagarVaani" <${process.env.GMAIL_USER}>`,
     to: citizenEmail,
-    subject: `Complaint Registered Successfully Ã”Ã‡Ã¶ NagarVaani #${complaintId.substring(0, 8).toUpperCase()}`,
+    subject: `Complaint Registered Successfully - NagarVaani #${complaintId.substring(0, 8).toUpperCase()}`,
     html: `<!DOCTYPE html>
 <html>
 <body style="font-family: Arial, sans-serif; background: #f5f5f5; padding: 20px;">
@@ -64,7 +64,7 @@ async function sendConfirmationToCitizen(citizenEmail, complaintId, category, de
       <p style="color: #666; margin: 5px 0;">Civic Intelligence Platform</p>
     </div>
     <div style="background: #f0fdf4; border: 1px solid #86efac; border-radius: 6px; padding: 15px; margin-bottom: 20px;">
-      <h2 style="color: #15803d; margin: 0 0 5px 0;">Ã”Â£Ã´ Complaint Registered Successfully</h2>
+      <h2 style="color: #15803d; margin: 0 0 5px 0;">✅ Complaint Registered Successfully</h2>
       <p style="color: #166534; margin: 0;">Your complaint has been received and is being processed.</p>
     </div>
     <h3 style="color: #333; border-bottom: 2px solid #f97316; padding-bottom: 8px;">Complaint Details</h3>
@@ -80,7 +80,7 @@ async function sendConfirmationToCitizen(citizenEmail, complaintId, category, de
     </div>
     <p style="color: #666; font-size: 13px; margin-top: 20px;">Track your complaint at: <a href="http://localhost:5173/track/${complaintId}" style="color: #f97316;">nagarvaani.gov.in/track/${complaintId.substring(0, 8)}</a></p>
     <div style="border-top: 1px solid #eee; margin-top: 20px; padding-top: 15px; text-align: center;">
-      <p style="color: #999; font-size: 12px; margin: 0;">NagarVaani Ã”Ã‡Ã¶ Civic Intelligence Platform</p>
+      <p style="color: #999; font-size: 12px; margin: 0;">NagarVaani - Civic Intelligence Platform</p>
       <p style="color: #999; font-size: 12px; margin: 5px 0 0 0;">Do not reply to this email. For queries contact nagarvaani@gmail.com</p>
     </div>
   </div>
@@ -100,7 +100,7 @@ async function sendNotificationToOfficer(officerEmail, officerName, complaintId,
   const mailOptions = {
     from: `"NagarVaani System" <${process.env.GMAIL_USER}>`,
     to: officerEmail,
-    subject: `Â­Æ’Ã¶Ã¶ New Complaint Assigned Ã”Ã‡Ã¶ ${category}, ${location} Ã”Ã‡Ã¶ #${complaintId.substring(0, 8).toUpperCase()}`,
+    subject: `📬 New Complaint Assigned - ${category}, ${location} - #${complaintId.substring(0, 8).toUpperCase()}`,
     html: `<!DOCTYPE html>
 <html>
 <body style="font-family: 'Segoe UI', Arial, sans-serif; background: #0f172a; color: #f8fafc; padding: 20px;">
@@ -122,7 +122,7 @@ async function sendNotificationToOfficer(officerEmail, officerName, complaintId,
       <p style="margin: 0; line-height: 1.6;">${description}</p>
     </div>
 
-    <p style="font-size: 12px; color: #64748b;">Source: <strong style="color: #38bdf8;">Ã”Â£Ã« EMAIL SUBMISSION</strong></p>
+    <p style="font-size: 12px; color: #64748b;">Source: <strong style="color: #38bdf8;">📥 EMAIL SUBMISSION</strong></p>
 
     <a href="http://localhost:5173/officer/dashboard" style="display: block; background: #f97316; color: white; text-align: center; padding: 18px; border-radius: 12px; text-decoration: none; font-weight: bold; margin-top: 30px; box-shadow: 0 4px 14px rgba(249, 115, 22, 0.4);">LOGIN TO DISPATCH CENTER</a>
     
@@ -148,7 +148,7 @@ exports.processIncomingEmails = async () => {
 
         imap.search(['UNSEEN'], (err, results) => {
           if (err || !results || !results.length) {
-            console.log("Â­Æ’Ã´Â¡ No unread signals found in inbox.");
+            console.log("📭 No unread signals found in inbox.");
             imap.end();
             return resolve();
           }
@@ -168,16 +168,16 @@ exports.processIncomingEmails = async () => {
 
                 // Skip system/bounce emails
                 if (senderEmail === process.env.GMAIL_USER || senderEmail.includes('mailer-daemon') || senderEmail.includes('noreply')) {
-                  console.log(`Ã”Ã…Â¡Â´Â©Ã… Skipping non-citizen signal from ${senderEmail}`);
+                  console.log(`❌ Skipping non-citizen signal from ${senderEmail}`);
                   return;
                 }
 
-                console.log(`Â­Æ’Ã´Ã­ Ingesting Signal from ${senderEmail}: "${emailSubject.substring(0, 30)}..."`);
+                console.log(`📩 Ingesting Signal from ${senderEmail}: "${emailSubject.substring(0, 30)}..."`);
 
                 try {
                   // STEP 3: Gemini Extraction
                   const extracted = await geminiExtractFromEmail(emailSubject, emailBody);
-                  console.log(`Â­Æ’Ã±Ã» AI Extraction Result: [Dept: ${extracted?.department}] [Severity: ${extracted?.severity}]`);
+                  console.log(`🤖 AI Extraction Result: [Dept: ${extracted?.department}] [Severity: ${extracted?.severity}]`);
                   if (!extracted || !extracted.is_complaint) {
                     console.log(`🤖 Signal rejected by AI: Not a valid complaint or spam.`);
                     return;
@@ -241,7 +241,7 @@ exports.processIncomingEmails = async () => {
                     await supabase.from('officer_assignments').insert({
                       ticket_id: ticket.id,
                       officer_id: officer.id,
-                      assignment_reason: 'Email complaint Ã”Ã‡Ã¶ auto assigned by department',
+                      assignment_reason: 'Email complaint - auto assigned by department',
                       was_auto_assigned: true
                     });
 
@@ -278,7 +278,7 @@ exports.processIncomingEmails = async () => {
     });
 
     imap.once('error', (err) => reject(err));
-    imap.once('end', () => console.log('Â­Æ’Ã¶Ã® IMAP Connection Terminated.'));
+    imap.once('end', () => console.log('🔌 IMAP Connection Terminated.'));
     imap.connect();
   });
 };

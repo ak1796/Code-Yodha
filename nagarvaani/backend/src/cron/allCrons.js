@@ -9,7 +9,7 @@ const { processIncomingEmails } = require('../services/emailIngestionService');
 
 // Every 5 minutes: Ingest signals from Gmail inbox (hackathon USP)
 cron.schedule('*/5 * * * *', async () => {
-  console.log('ðŸ“¡ Scanning NagarVaani inbox for new signals...');
+  console.log('📡 Scanning NagarVaani inbox for new signals...');
   try {
     await processIncomingEmails();
   } catch (error) {
@@ -33,7 +33,7 @@ cron.schedule('0 * * * *', async () => {
   if (critical) {
     const { escalateToDeptHead } = require('../services/autoAssignService');
     for (const ticket of critical) {
-      console.log(`ðŸ“¡ CRITICAL SLA ESCALATION: Ticket ${ticket.id} passed 6h threshold.`);
+      console.log(`📡 CRITICAL SLA ESCALATION: Ticket ${ticket.id} passed 6h threshold.`);
       await escalateToDeptHead(ticket.id);
       await auditService.log({ ticket_id: ticket.id, action: 'SLA_CRITICAL_ESCALATION', new_value: 'DEPARTMENT_HEAD' });
     }

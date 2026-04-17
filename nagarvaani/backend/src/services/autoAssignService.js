@@ -21,7 +21,7 @@ function haversineKm(lat1, lon1, lat2, lon2) {
  */
 exports.autoAssignOfficer = async (ticketId, category, lat, lng, city, ward) => {
   try {
-    console.log(`ðŸ¤– Universal Dispatcher: Solving optimal routing for Ticket ${ticketId} in Ward ${ward}...`);
+    console.log(`🤖 Universal Dispatcher: Solving optimal routing for Ticket ${ticketId} in Ward ${ward}...`);
 
     // 1. Fetch ALL capable officers in city (Step 4)
     const { data: officers, error } = await supabase

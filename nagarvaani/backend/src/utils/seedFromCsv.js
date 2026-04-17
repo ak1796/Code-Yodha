@@ -8,7 +8,7 @@ async function seedFromCsv() {
   const results = [];
   const csvPath = path.join(__dirname, '../../data/Mumbai_BMC_Complaints.csv');
 
-  console.log('ðŸš€ Starting BMC Complaint Data Ingestion...');
+  console.log('🚀 Starting BMC Complaint Data Ingestion...');
 
   // 1. Group by Ward for Year 2024
   const wardAggregates = {};
@@ -29,7 +29,7 @@ async function seedFromCsv() {
       }
     })
     .on('end', async () => {
-      console.log('ðŸ“Š Aggregate analysis complete. Refreshing database...');
+      console.log('📊 Aggregate analysis complete. Refreshing database...');
 
       // â”€â”€ STEP 1: Fetch existing Mumbai ticket IDs for cascading delete â”€â”€â”€â”€â”€â”€
       const { data: existingTickets, error: fetchErr } = await supabase
@@ -109,7 +109,7 @@ async function seedFromCsv() {
         }
       }
 
-      console.log(`ðŸ“¡ Bulk inserting ${ticketsToInsert.length} land-safe data points...`);
+      console.log(`📡 Bulk inserting ${ticketsToInsert.length} land-safe data points...`);
       
       const chunkSize = 100;
       for (let i = 0; i < ticketsToInsert.length; i += chunkSize) {

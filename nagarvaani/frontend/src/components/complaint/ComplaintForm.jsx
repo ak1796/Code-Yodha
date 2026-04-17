@@ -539,7 +539,7 @@ export default function HighFidelityComplaintForm({ onSubmit, isSubmitting: pare
                   </span>
                   <span className="text-[9px] font-bold text-text-secondary opacity-60 uppercase tracking-widest italic">
                     {formData.media
-                      ? `${(formData.media.size / 1024).toFixed(0)} KB Â· ${formData.media.type}`
+                      ? `${(formData.media.size / 1024).toFixed(0)} KB · ${formData.media.type}`
                       : t("MediaSupported")}
                   </span>
                   {formData.mediaPreview && (

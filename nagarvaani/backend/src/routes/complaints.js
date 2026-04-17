@@ -23,7 +23,7 @@ const upload = multer({ storage: multer.memoryStorage() });
 
 // POST /api/complaints
 router.post('/', upload.single('photo'), complaintLimiter, async (req, res) => {
-  console.log('ðŸ“¡ Signal Received at Command HQ:', req.body);
+  console.log('📡 Signal Received at Command HQ:', req.body);
   
   const { 
     description, raw_text, lat, lng, is_anonymous, location_text, user_id,
@@ -71,7 +71,7 @@ router.post('/', upload.single('photo'), complaintLimiter, async (req, res) => {
     }
 
     // 2. AI COGNITIVE SYNTHESIS
-    console.log('ðŸ§  Triggering AI Synthesis for description:', cleanedText.substring(0, 30));
+    console.log('🧠 Triggering AI Synthesis for description:', cleanedText.substring(0, 30));
     
     // Translation Pipeline
     let englishText = cleanedText;
@@ -156,7 +156,7 @@ router.post('/', upload.single('photo'), complaintLimiter, async (req, res) => {
     }
 
     // 4. COMPLAINT RECORD INGESTION
-    console.log('ðŸ“¡ Logging Forensic Complaint trace for Master Ticket:', masterTicketId);
+    console.log('📡 Logging Forensic Complaint trace for Master Ticket:', masterTicketId);
     const { error: complaintError } = await supabase.from('complaints').insert({
       master_ticket_id: masterTicketId,
       description: englishText,
@@ -180,7 +180,7 @@ router.post('/', upload.single('photo'), complaintLimiter, async (req, res) => {
 
     // 4.5 SEND CONFIRMATION EMAIL TO CITIZEN
     if (email) {
-      console.log('ðŸ“§ Dispatching Confirmation Pulse to Citizen:', email);
+      console.log('📧 Dispatching Confirmation Pulse to Citizen:', email);
       sendCitizenConfirmation(email, masterTicketId, category).catch(e => console.error('Email error:', e.message));
     }
 
@@ -204,7 +204,7 @@ router.post('/', upload.single('photo'), complaintLimiter, async (req, res) => {
       autoAssignOfficer(masterTicketId, category, lat, lng, city || 'Mumbai', ward);
 
       // JURISDICTIONAL PULSE: Notify nearby citizens (Gap 5)
-      console.log('ðŸ“¡ Broadcasting Neural Pulse to nearby citizens...');
+      console.log('📡 Broadcasting Neural Pulse to nearby citizens...');
       const { data: nearbyUsers } = await supabase.rpc('find_nearby_citizens', {
         comp_lat: parseFloat(lat),
         comp_lng: parseFloat(lng),

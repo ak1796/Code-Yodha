@@ -60,8 +60,8 @@ const initTelegramBot = () => {
                 if (message.text === '/start') {
                     const welcomeMsg = 
                         "Welcome to NagarVaani Mumbai! ðŸ™ï¸\n" +
-                        "à¤¨à¤—à¤°à¤µà¤¾à¤£à¥€ à¤®à¥à¤‚à¤¬à¤ˆà¤®à¤§à¥à¤¯à¥‡ à¤†à¤ªà¤²à¥‡ à¤¸à¥à¤µà¤¾à¤—à¤¤ à¤†à¤¹à¥‡! ðŸš©\n" +
-                        "à¤¨à¤—à¤°à¤µà¤¾à¤£à¥€ à¤®à¥à¤‚à¤¬à¤ˆ à¤®à¥‡à¤‚ à¤†à¤ªà¤•à¤¾ à¤¸à¥à¤µà¤¾à¤—à¤¤ à¤¹à¥ˆ! ðŸ‡®ðŸ‡³\n\n" +
+                        "à¤¨à¤—à¤°à¤µà¤¾à¤£à¥€ à¤®à¥à¤‚à¤¬à¤ˆà¤®à¤§à¥à¤¯à¥‡ à¤†à¤ªà¤²à¥‡ à¤¸à¥à¤µà¤¾à¤—à¤¤ à¤†à¤¹à¥‡! 🚩\n" +
+                        "à¤¨à¤—à¤°à¤µà¤¾à¤£à¥€ à¤®à¥à¤‚à¤¬à¤ˆ à¤®à¥‡à¤‚ à¤†à¤ªà¤•à¤¾ à¤¸à¥à¤µà¤¾à¤—à¤¤ à¤¹à¥ˆ! 🇮🇳\n\n" +
                         "I am your digital civic assistant. Please describe the problem (e.g., 'Pot hole on MG Road').\n" +
                         "à¤®à¥€ à¤¤à¥à¤®à¤šà¤¾ à¤¡à¤¿à¤œà¤¿à¤Ÿà¤² à¤¨à¤¾à¤—à¤°à¥€ à¤¸à¤¹à¤¾à¤¯à¥à¤¯à¤• à¤†à¤¹à¥‡. à¤•à¥ƒà¤ªà¤¯à¤¾ à¤¸à¤®à¤¸à¥à¤¯à¤¾ à¤¸à¤¾à¤‚à¤—à¤¾ (à¤‰à¤¦à¤¾. 'MG à¤°à¥‹à¤¡à¤µà¤° à¤–à¤¡à¥à¤¡à¤¾ à¤†à¤¹à¥‡').\n" +
                         "à¤®à¥ˆà¤‚ à¤†à¤ªà¤•à¤¾ à¤¡à¤¿à¤œà¤¿à¤Ÿà¤² à¤¨à¤¾à¤—à¤°à¤¿à¤• à¤¸à¤¹à¤¾à¤¯à¤• à¤¹à¥‚à¤à¥¤ à¤•à¥ƒà¤ªà¤¯à¤¾ à¤¸à¤®à¤¸à¥à¤¯à¤¾ à¤¬à¤¤à¤¾à¤à¤‚ (à¤‰à¤¦à¤¾. 'MG à¤°à¥‹à¤¡ à¤ªà¤° à¤—à¤¡à¥à¤¢à¤¾ à¤¹à¥ˆ')à¥¤";
@@ -69,12 +69,12 @@ const initTelegramBot = () => {
                     return;
                 }
 
-                console.log(`ðŸ“¡ Telegram Signal Ingested: ${message.text} from ${telegramUserId}`);
+                console.log(`📡 Telegram Signal Ingested: ${message.text} from ${telegramUserId}`);
                 
                 // STEP 1.5: Spam Check
                 const spamCheck = await filterSpam(message.text);
                 if (spamCheck.status === 'rejected' || spamCheck.status === 'flagged') {
-                  console.log(`ðŸš« Telegram Signal Rejected: ${spamCheck.reason}`);
+                  console.log(`🚫 Telegram Signal Rejected: ${spamCheck.reason}`);
                   await bot.sendMessage(chatId, "âš ï¸ Invalid Signal / à¤…à¤®à¤¾à¤¨à¥à¤¯ à¤¸à¤¿à¤—à¥à¤¨à¤² / à¤…à¤®à¤¾à¤¨à¥à¤¯ à¤¸à¤‚à¤¦à¥‡à¤¶\n\nPlease provide a clear description (e.g., 'Water leak').\nà¤•à¥ƒà¤ªà¤¯à¤¾ à¤¸à¥à¤ªà¤·à¥à¤Ÿ à¤µà¤°à¥à¤£à¤¨ à¤¦à¥à¤¯à¤¾ (à¤‰à¤¦à¤¾. 'पाणी गळती').\nà¤•à¥ƒà¤ªà¤¯à¤¾ à¤¸à¥à¤ªà¤·à¥à¤Ÿ à¤µà¤¿à¤µà¤°à¤£ à¤¦à¥‡à¤‚ (à¤‰à¤¦à¤¾. 'पानी का रिसाव')à¥¤");
                   return;
                 }
@@ -90,7 +90,7 @@ const initTelegramBot = () => {
                     "Thank you! Now please share your LOCATION ðŸ“\n" +
                     "à¤§à¤¨à¥à¤¯à¤µà¤¾à¤¦! à¤†à¤¤à¤¾ à¤•à¥ƒà¤ªà¤¯à¤¾ à¤¤à¥à¤®à¤šà¥‡ à¤¸à¥à¤¥à¤¾à¤¨ (LOCATION) à¤¶à¥‡à¤…à¤° à¤•à¤°à¤¾ ðŸ“\n" +
                     "à¤§à¤¨à¥à¤¯à¤µà¤¾à¤¦! à¤…à¤¬ à¤•à¥ƒà¤ªà¤¯à¤¾ à¤…à¤ªà¤¨à¤¾ à¤¸à¥à¤¥à¤¾à¤¨ (LOCATION) à¤¸à¤¾à¤à¤¾ à¤•à¤°à¥‡à¤‚ ðŸ“\n\n" +
-                    "ðŸ“Ž Tap ðŸ“Ž -> Location -> Share My Live Location";
+                    "📎 Tap 📎 -> Location -> Share My Live Location";
                 await bot.sendMessage(chatId, locationReq);
             }
         } catch (err) {
@@ -100,7 +100,7 @@ const initTelegramBot = () => {
 
     bot.on('polling_error', (error) => {
         if (error.code === 'ETELEGRAM' && error.message.includes('401')) {
-            console.error('ðŸ›‘ [TELEGRAM STOPPED] 401 Unauthorized: Your TELEGRAM_BOT_TOKEN is invalid.');
+            console.error('🛑 [TELEGRAM STOPPED] 401 Unauthorized: Your TELEGRAM_BOT_TOKEN is invalid.');
             console.error('Please get a fresh token from @BotFather and restart the server.');
             bot.stopPolling();
         } else {
@@ -108,7 +108,7 @@ const initTelegramBot = () => {
         }
     });
 
-    console.log('ðŸ¤– Telegram Bot initialized in Polling Mode');
+    console.log('🤖 Telegram Bot initialized in Polling Mode');
 };
 
 async function handleLocationStep(chatId, message) {
@@ -127,7 +127,7 @@ async function handleLocationStep(chatId, message) {
     }
 
         // AI Pipeline
-        console.log("ðŸ§  Triggering AI Pipeline for Telegram Signal:", session.originalText);
+        console.log("🧠 Triggering AI Pipeline for Telegram Signal:", session.originalText);
         
         try {
             const [catResult, embedding, keywordScore, sentimentScore] = await Promise.all([
@@ -186,13 +186,13 @@ async function handleLocationStep(chatId, message) {
 
             const dispatch = await autoAssignOfficer(ticket.id, category, lat, lng, 'Mumbai');
 
-            const reply = `<b>Your complaint has been registered successfully! ðŸŽ‰</b>\n\n` +
-                `ðŸ“Œ <b>ID:</b> #${ticket.id.substring(0, 8)}\n` +
-                `ðŸ“‚ <b>Category:</b> ${category}\n` +
+            const reply = `<b>Your complaint has been registered successfully! 🎉</b>\n\n` +
+                `📌 <b>ID:</b> #${ticket.id.substring(0, 8)}\n` +
+                `📂 <b>Category:</b> ${category}\n` +
                 `⚡ <b>Priority:</b> ${priority}/5\n` +
                 `ðŸ‘¨â€âœˆï¸ <b>Assigned:</b> ${dispatch.success ? dispatch.officer_name : 'Municipal Specialist'}\n` +
-                `ðŸ•’ <b>SLA Deadline:</b> ${formatDate(slaDeadline)}\n\n` +
-                `ðŸ”— <a href="http://localhost:5173/track/${ticket.id}">Track Live Here</a>\n\n` +
+                `🕒 <b>SLA Deadline:</b> ${formatDate(slaDeadline)}\n\n` +
+                `🔗 <a href="http://localhost:5173/track/${ticket.id}">Track Live Here</a>\n\n` +
                 `I will notify you here when the status changes.`;
             
             await bot.sendMessage(chatId, reply, { parse_mode: 'HTML' });

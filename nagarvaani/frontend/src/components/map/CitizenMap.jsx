@@ -339,7 +339,7 @@ export default function CitizenMap({ tickets = [], currentUserId }) {
 
                     {/* People reported */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: '#f8fafc', borderRadius: '10px', padding: '8px 10px' }}>
-                      <span style={{ fontSize: '18px' }}>ðŸ‘¥</span>
+                      <span style={{ fontSize: '18px' }}>👥</span>
                       <div>
                         <p style={{ fontSize: '11px', fontWeight: 800, color: '#0f172a', margin: 0 }}>
                           <span style={{ color: isUserIncluded ? '#2563EB' : '#0f172a' }}>{youText}</span> reported this

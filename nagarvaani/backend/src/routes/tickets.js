@@ -78,7 +78,7 @@ router.patch('/:id/status', authenticate, isOfficer, async (req, res) => {
       } else {
         try {
           await sendCitizenUpdateEmail(complaint.email, status, ticket);
-          console.log('ðŸ“¬ Citizen notified of state transition');
+          console.log('📫 Citizen notified of state transition');
         } catch (e) {
           console.warn('âš ï¸ Notification hub unavailable');
         }
@@ -107,11 +107,11 @@ router.patch('/:id/status', authenticate, isOfficer, async (req, res) => {
 // PATCH /api/tickets/:id/resolve (Step 8)
 router.patch('/:id/resolve', authenticate, isOfficer, upload.any(), async (req, res) => {
   const { id } = req.params;
-  console.log(`ðŸ“¸ Initiating Cloud Forensic Sync for Ticket ${id}...`);
+  console.log(`📸 Initiating Cloud Forensic Sync for Ticket ${id}...`);
 
   try {
     const files = req.files || [];
-    console.log(`ðŸ“¸ Resolution Payload for Ticket ${id}:`, {
+    console.log(`📸 Resolution Payload for Ticket ${id}:`, {
       count: files.length,
       fields: files.map(f => f.fieldname)
     });
