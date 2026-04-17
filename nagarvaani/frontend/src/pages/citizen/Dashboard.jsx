@@ -34,7 +34,8 @@ export default function CitizenDashboard() {
         if (formData.is_anonymous) {
           localStorage.setItem(`token_${response.data.ticket_id}`, response.data.anonymous_token);
         }
-        setShowForm(false);
+        // setShowForm(false); // REMOVED: Let ComplaintForm show successData
+        return response.data; // Return data for ComplaintForm
       }
     } catch (error) {
       console.error(error);

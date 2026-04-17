@@ -284,7 +284,17 @@ export default function HighFidelityComplaintForm({ onSubmit, isSubmitting: pare
         fd.append('photo', formData.media);
       }
 
-      await onSubmit(fd);
+      const result = await onSubmit(fd);
+      if (result) {
+        setSuccessData({
+          id: result.anonymous_token || result.ticket_id || 'UNKNOWN',
+          category: fields.category,
+          priority: 'Calculating...', 
+          officer: 'Auto-Assigning...',
+          distance: 'Detecting...',
+          deadline: 'See details'
+        });
+      }
       clearDraft();
     } catch (err) {
       toast.error(t("SignalIngestionFailed"));

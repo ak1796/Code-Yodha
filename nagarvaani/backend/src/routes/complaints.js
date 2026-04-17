@@ -30,6 +30,9 @@ router.post('/', upload.single('photo'), complaintLimiter, async (req, res) => {
     complaint_type, complaint_subtype, ward, city, email
   } = req.body;
   
+  const crypto = require('crypto');
+  const anonymousToken = (is_anonymous === 'true') ? crypto.randomBytes(12).toString('hex') : null;
+  
   const finalDescription = description || raw_text || req.body.raw_text;
   const ip_address = req.ip;
 
@@ -119,7 +122,7 @@ router.post('/', upload.single('photo'), complaintLimiter, async (req, res) => {
         priority_score: priority,
         sla_deadline: slaDeadline.toISOString(),
         embedding: embedding,
-        creator_id: user_id || null,
+        creator_id: (user_id && user_id !== 'null' && user_id !== '') ? user_id : null,
         email: email
       }).select().single();
 
@@ -144,7 +147,8 @@ router.post('/', upload.single('photo'), complaintLimiter, async (req, res) => {
       status: 'open',
       source: 'WEB',
       is_anonymous: is_anonymous === 'true',
-      user_id: user_id || null
+      anonymous_token: anonymousToken,
+      user_id: (user_id && user_id !== 'null' && user_id !== '') ? user_id : null
     });
 
     if (complaintError) {
@@ -198,7 +202,8 @@ router.post('/', upload.single('photo'), complaintLimiter, async (req, res) => {
     
     return res.status(201).json({
       message: 'Signal ingest successful',
-      ticket_id: masterTicketId
+      ticket_id: masterTicketId,
+      anonymous_token: anonymousToken
     });
 
   } catch (error) {

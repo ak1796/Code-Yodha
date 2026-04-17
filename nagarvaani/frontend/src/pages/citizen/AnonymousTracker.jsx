@@ -16,13 +16,32 @@ export default function AnonymousTracker() {
     if (token.length < 16) return toast.error(t('InvalidTokenFormat'));
     setLoading(true);
     try {
-      const { data, error } = await supabase
+      // 1. Fetch Complaint by token
+      const { data: complaint, error: compErr } = await supabase
         .from('complaints')
-        .select('*, master_tickets(*, audit_log(*))')
+        .select('*')
         .eq('anonymous_token', token)
         .single();
-      if (error || !data) throw error;
-      setTicket(data.master_tickets);
+      
+      if (compErr || !complaint) throw new Error('Complaint not found');
+
+      // 2. Fetch Master Ticket
+      const { data: ticket, error: ticketErr } = await supabase
+        .from('master_tickets')
+        .select('*')
+        .eq('id', complaint.master_ticket_id)
+        .single();
+      
+      if (ticketErr || !ticket) throw new Error('Ticket not found');
+
+      // 3. Fetch Audit Logs
+      const { data: logs } = await supabase
+        .from('audit_log')
+        .select('*')
+        .eq('ticket_id', ticket.id)
+        .order('created_at', { ascending: true });
+
+      setTicket({ ...ticket, audit_log: logs || [] });
     } catch (error) {
       toast.error(t('ComplaintNotFound'));
     } finally {
