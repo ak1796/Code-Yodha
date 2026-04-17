@@ -158,7 +158,7 @@ export default function Auth() {
                  value={password}
                  onChange={(e) => setPassword(e.target.value)}
                  className="w-full px-6 py-4 bg-white/40 border border-[#162F6A]/10 rounded-2xl outline-none focus:border-[#162F6A] focus:bg-white text-sm font-bold transition shadow-sm"
-                 placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
+                 placeholder="••••••••"
                  required
                />
             </div>
