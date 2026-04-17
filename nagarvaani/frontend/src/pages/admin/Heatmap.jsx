@@ -111,7 +111,7 @@ const getWardOfficePoints = (cityConfig) => {
   return Object.entries(cityConfig.offices).map(([zoneName, details]) => ({
     key: zoneName,
     wardCode: zoneName,
-    wardName: `${cityConfig.org} ï¿½ï¿½ï¿½ ${zoneName}`,
+    wardName: `${cityConfig.org} -> ${zoneName}`,
     lat: details.lat,
     lng: details.lng,
     address: details.address,
@@ -245,19 +245,19 @@ export default function AdminHeatmap() {
       };
     }
 
-    // Density mode: Green ï¿½ï¿½ï¿½ Yellow ï¿½ï¿½ï¿½ Red based on relative intensity
+    // Density mode: Green -> Yellow -> Red based on relative intensity
     const count = wardStats[wardId] || 0;
     const intensity = maxCount > 0 ? (count / maxCount) : 0;
 
     let fillColor, borderColor;
     if (count === 0) {
-      fillColor = '#10B981'; borderColor = '#059669'; // Green ï¿½ï¿½ï¿½ no complaints
+      fillColor = '#10B981'; borderColor = '#059669'; // Green -> no complaints
     } else if (intensity <= 0.33) {
-      fillColor = '#FDE047'; borderColor = '#EAB308'; // Light Yellow ï¿½ï¿½ï¿½ low relative density
+      fillColor = '#FDE047'; borderColor = '#EAB308'; // Light Yellow -> low relative density
     } else if (intensity <= 0.66) {
-      fillColor = '#FACC15'; borderColor = '#CA8A04'; // Bright Yellow ï¿½ï¿½ï¿½ moderate density
+      fillColor = '#FACC15'; borderColor = '#CA8A04'; // Bright Yellow -> moderate density
     } else {
-      fillColor = '#F87171'; borderColor = '#EF4444'; // Soft Red ï¿½ï¿½ï¿½ high relative density
+      fillColor = '#F87171'; borderColor = '#EF4444'; // Soft Red -> high relative density
     }
 
     return {
@@ -296,7 +296,7 @@ export default function AdminHeatmap() {
     const population = getEstimatedPopulation(activeCity, wardDisplayName);
     const ratio = Math.round(population / (count + 1));
 
-    // Match office from citiesConfig ï¿½ï¿½ï¿½ try "Ward X" key format first, then direct key
+    // Match office from citiesConfig -> try "Ward X" key format first, then direct key
     const officeKey = Object.keys(cityConfig.offices || {}).find(k =>
       normalizeWardValue(k) === normalizeWardValue(`Ward ${wardId}`) ||
       normalizeWardValue(k) === normalizeWardValue(wardId)

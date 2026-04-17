@@ -179,7 +179,7 @@ exports.processIncomingEmails = async () => {
                   const extracted = await geminiExtractFromEmail(emailSubject, emailBody);
                   console.log(`Â­Æ’Ã±Ã» AI Extraction Result: [Dept: ${extracted?.department}] [Severity: ${extracted?.severity}]`);
                   if (!extracted || !extracted.is_complaint) {
-                    console.log(`Â­Æ’ÃœÂ½ Signal rejected by AI: Not a valid complaint or spam.`);
+                    console.log(`🤖 Signal rejected by AI: Not a valid complaint or spam.`);
                     return;
                   }
 

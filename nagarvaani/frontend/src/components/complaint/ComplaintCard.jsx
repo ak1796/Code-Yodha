@@ -12,7 +12,7 @@ const STATUS_CONFIG = {
 
 const CATEGORY_ICONS = {
   WATER: '­’Æº',
-  ELECTRICITY: 'ÔÜí',
+  ELECTRICITY: '⚡',
   ROADS: '­’øú´©Å',
   GARBAGE: '­’ùæ´©Å',
   PARKS: '­’î%',

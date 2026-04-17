@@ -1,6 +1,6 @@
 const { geminiClassifySpam } = require('../lib/gemini');
 
-// Devanagari Unicode block: U+0900â€“U+097F
+// Devanagari Unicode block: U+0900—U+097F
 const DEVANAGARI_RE = /[\u0900-\u097F]/;
 
 /**
@@ -57,7 +57,7 @@ exports.filterSpam = async function(text) {
     }
     return { status: 'clean', ...result };
   } catch (error) {
-    console.warn('[SpamFilter] Gemini API unavailable â€” applying fallback pass.');
+    console.warn('[SpamFilter] Gemini API unavailable — applying fallback pass.');
     return { status: 'clean', confidence: 0.5, reason: 'api_fallback' };
   }
 };

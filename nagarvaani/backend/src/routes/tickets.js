@@ -143,7 +143,7 @@ router.patch('/:id/resolve', authenticate, isOfficer, upload.any(), async (req, 
         if (uploadData) {
           const { data: publicUrlData } = supabase.storage.from('evidence').getPublicUrl(uploadData.path);
           beforeUrl = publicUrlData.publicUrl;
-          console.log("âœ… Before Image Sync Complete:", beforeUrl);
+          console.log("✅ Before Image Sync Complete:", beforeUrl);
         }
       } catch (e) {
         console.error("âŒ Before Image Upload Exception:", e.message);
@@ -175,7 +175,7 @@ router.patch('/:id/resolve', authenticate, isOfficer, upload.any(), async (req, 
         if (uploadData) {
           const { data: publicUrlData } = supabase.storage.from('evidence').getPublicUrl(uploadData.path);
           afterUrl = publicUrlData.publicUrl;
-          console.log("âœ… After Image Sync Complete:", afterUrl);
+          console.log("✅ After Image Sync Complete:", afterUrl);
         }
       } catch (e) {
         console.error("âŒ After Image Upload Exception:", e.message);

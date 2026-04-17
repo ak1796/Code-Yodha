@@ -172,9 +172,9 @@ export default function CitizenMap({ tickets = [], currentUserId }) {
 
   // â”€â”€ Ward choropleth: priority = AATS score, fallback = silence detection â”€
   const getAatsColor = (score) => {
-    if (score >= 70) return '#10B981'; // green  â€” high trust
-    if (score >= 40) return '#F59E0B'; // amber  â€” medium trust
-    return '#EF4444';                  // red    â€” low trust
+    if (score >= 70) return '#10B981'; // green  — high trust
+    if (score >= 40) return '#F59E0B'; // amber  — medium trust
+    return '#EF4444';                  // red    — low trust
   };
 
   const getWardStyle = (feature) => {
@@ -191,7 +191,7 @@ export default function CitizenMap({ tickets = [], currentUserId }) {
     if (aats !== undefined) {
       return { fillColor: getAatsColor(aats), fillOpacity: 0.28, color: '#007AFF', weight: 1.5, opacity: 0.6 };
     }
-    // No data yet â€” neutral outline
+    // No data yet — neutral outline
     return { fillColor: 'transparent', fillOpacity: 0, color: '#007AFF', weight: 2, opacity: 0.6 };
   };
 
@@ -239,7 +239,7 @@ export default function CitizenMap({ tickets = [], currentUserId }) {
           </div>
           <div className="flex items-center gap-3">
             <div className="w-3 h-3 rounded-sm" style={{ background: '#F59E0B', opacity: 0.7 }} />
-            <span className="text-[10px] font-extrabold uppercase text-navy">Medium 40â€“69</span>
+            <span className="text-[10px] font-extrabold uppercase text-navy">Medium 40—69</span>
           </div>
           <div className="flex items-center gap-3">
             <div className="w-3 h-3 rounded-sm" style={{ background: '#EF4444', opacity: 0.7 }} />

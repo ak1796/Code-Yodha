@@ -49,7 +49,7 @@ async function seedFromCsv() {
           .delete()
           .in('ticket_id', ticketIds);
         if (assignErr) console.error('âš ï¸ officer_assignments cleanup failed:', assignErr.message);
-        else console.log('   âœ… officer_assignments cleared.');
+        else console.log('   ✅ officer_assignments cleared.');
 
         // â”€â”€ STEP 3: Delete complaints (FK child of master_tickets) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         const { error: compErr } = await supabase
@@ -57,7 +57,7 @@ async function seedFromCsv() {
           .delete()
           .in('master_ticket_id', ticketIds);
         if (compErr) console.error('âš ï¸ complaints cleanup failed:', compErr.message);
-        else console.log('   âœ… complaints cleared.');
+        else console.log('   ✅ complaints cleared.');
       }
 
       // â”€â”€ STEP 4: Now safely delete master_tickets â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -66,7 +66,7 @@ async function seedFromCsv() {
         .delete()
         .eq('city', 'Mumbai');
       if (delError) console.error('âš ï¸ master_tickets cleanup failed:', delError.message);
-      else console.log('   âœ… master_tickets cleared.');
+      else console.log('   ✅ master_tickets cleared.');
 
       const ticketsToInsert = [];
       const SCALE_FACTOR = 0.05; 
@@ -118,7 +118,7 @@ async function seedFromCsv() {
         if (error) console.error(`âŒ Batch error:`, error.message);
       }
 
-      console.log('âœ… Ingestion complete. Map is now land-accurate.');
+      console.log('✅ Ingestion complete. Map is now land-accurate.');
     });
 }
 

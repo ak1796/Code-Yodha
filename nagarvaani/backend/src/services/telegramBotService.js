@@ -75,7 +75,7 @@ const initTelegramBot = () => {
                 const spamCheck = await filterSpam(message.text);
                 if (spamCheck.status === 'rejected' || spamCheck.status === 'flagged') {
                   console.log(`ðŸš« Telegram Signal Rejected: ${spamCheck.reason}`);
-                  await bot.sendMessage(chatId, "âš ï¸ Invalid Signal / à¤…à¤®à¤¾à¤¨à¥à¤¯ à¤¸à¤¿à¤—à¥à¤¨à¤² / à¤…à¤®à¤¾à¤¨à¥à¤¯ à¤¸à¤‚à¤¦à¥‡à¤¶\n\nPlease provide a clear description (e.g., 'Water leak').\nà¤•à¥ƒà¤ªà¤¯à¤¾ à¤¸à¥à¤ªà¤·à¥à¤Ÿ à¤µà¤°à¥à¤£à¤¨ à¤¦à¥à¤¯à¤¾ (à¤‰à¤¦à¤¾. 'à¤ªà¤¾à¤£à¥€ à¤—à¤³à¤¤à¥€').\nà¤•à¥ƒà¤ªà¤¯à¤¾ à¤¸à¥à¤ªà¤·à¥à¤Ÿ à¤µà¤¿à¤µà¤°à¤£ à¤¦à¥‡à¤‚ (à¤‰à¤¦à¤¾. 'à¤ªà¤¾à¤¨à¥€ à¤•à¤¾ à¤°à¤¿à¤¸à¤¾à¤µ')à¥¤");
+                  await bot.sendMessage(chatId, "âš ï¸ Invalid Signal / à¤…à¤®à¤¾à¤¨à¥à¤¯ à¤¸à¤¿à¤—à¥à¤¨à¤² / à¤…à¤®à¤¾à¤¨à¥à¤¯ à¤¸à¤‚à¤¦à¥‡à¤¶\n\nPlease provide a clear description (e.g., 'Water leak').\nà¤•à¥ƒà¤ªà¤¯à¤¾ à¤¸à¥à¤ªà¤·à¥à¤Ÿ à¤µà¤°à¥à¤£à¤¨ à¤¦à¥à¤¯à¤¾ (à¤‰à¤¦à¤¾. 'पाणी गळती').\nà¤•à¥ƒà¤ªà¤¯à¤¾ à¤¸à¥à¤ªà¤·à¥à¤Ÿ à¤µà¤¿à¤µà¤°à¤£ à¤¦à¥‡à¤‚ (à¤‰à¤¦à¤¾. 'पानी का रिसाव')à¥¤");
                   return;
                 }
 
@@ -137,7 +137,7 @@ async function handleLocationStep(chatId, message) {
                 geminiSentimentScore(session.originalText)
             ]);
 
-            console.log("âœ… AI Insights Generated:", catResult);
+            console.log("✅ AI Insights Generated:", catResult);
 
             const category = catResult?.category || simpleKeywordCategorizer(session.originalText);
             const title = catResult?.summary || session.originalText.substring(0, 50) || "New Telegram Report";
@@ -189,7 +189,7 @@ async function handleLocationStep(chatId, message) {
             const reply = `<b>Your complaint has been registered successfully! ðŸŽ‰</b>\n\n` +
                 `ðŸ“Œ <b>ID:</b> #${ticket.id.substring(0, 8)}\n` +
                 `ðŸ“‚ <b>Category:</b> ${category}\n` +
-                `âš¡ <b>Priority:</b> ${priority}/5\n` +
+                `⚡ <b>Priority:</b> ${priority}/5\n` +
                 `ðŸ‘¨â€âœˆï¸ <b>Assigned:</b> ${dispatch.success ? dispatch.officer_name : 'Municipal Specialist'}\n` +
                 `ðŸ•’ <b>SLA Deadline:</b> ${formatDate(slaDeadline)}\n\n` +
                 `ðŸ”— <a href="http://localhost:5173/track/${ticket.id}">Track Live Here</a>\n\n` +

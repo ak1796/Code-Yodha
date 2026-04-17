@@ -163,7 +163,7 @@ export default function TrustPanel() {
                   <h3 className="text-2xl font-sora font-black text-navy uppercase tracking-tighter flex items-center gap-3">
                      <BarChart3 className="text-navy opacity-20" /> Jurisdictional Trust Matrix
                   </h3>
-                  <p className="text-[10px] font-bold text-text-secondary opacity-40 uppercase tracking-widest mt-1 italic">Normalized Stacked Regression â€¢ All 14 Municipal Signals</p>
+                  <p className="text-[10px] font-bold text-text-secondary opacity-40 uppercase tracking-widest mt-1 italic">Normalized Stacked Regression • All 14 Municipal Signals</p>
                </div>
                <div className="flex flex-wrap gap-x-4 gap-y-1 justify-end max-w-xl">
                   {DEPARTMENTS.slice(0, 7).map(d => (
