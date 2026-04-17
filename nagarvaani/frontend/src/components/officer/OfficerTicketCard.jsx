@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MapPin, Users, Zap, Clock, ChevronRight, AlertTriangle } from 'lucide-react';
+import { MapPin, Users, Zap, Clock, ChevronRight, AlertTriangle, Globe } from 'lucide-react';
 import SLATimer from './SLATimer';
 
 export default function OfficerTicketCard({ ticket, isNew }) {
@@ -40,9 +40,14 @@ export default function OfficerTicketCard({ ticket, isNew }) {
                   <span className={`px-3 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest ${getPriorityBadge(ticket.priority_score)}`}>
                     P{ticket.priority_score} {ticket.priority_score >= 4 ? 'CRITICAL' : ''}
                   </span>
-                  {ticket.source === 'EMAIL' && (
+                  {ticket.source?.toUpperCase() === 'EMAIL' && (
                     <span className="bg-blue-100 text-blue-800 px-3 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-widest flex items-center gap-1">
                       <Zap size={10} fill="currentColor" /> EMAIL
+                    </span>
+                  )}
+                  {ticket.source?.toUpperCase() === 'WEB' && (
+                    <span className="bg-emerald-100 text-emerald-800 px-3 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-widest flex items-center gap-1">
+                      <Globe size={10} /> WEB
                     </span>
                   )}
                </div>

@@ -87,6 +87,27 @@ router.post('/', upload.single('photo'), complaintLimiter, async (req, res) => {
     console.log('ðŸ” Deduplication complete:', dedupResult.merged ? 'MERGED' : 'NEW SIGNAL');
 
     let masterTicketId = dedupResult.master_ticket_id;
+    let proofImageUrl = null;
+
+    // 2.5 HANDLE PHOTO UPLOAD (Gap Fix from tanay4)
+    if (req.file) {
+      console.log('📸 Processing Proof Image Node...');
+      const fileName = `proof_${Date.now()}_${Math.random().toString(36).substring(7)}.jpg`;
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('evidence')
+        .upload(fileName, req.file.buffer, {
+          contentType: req.file.mimetype,
+          upsert: true
+        });
+
+      if (!uploadError && uploadData) {
+        const { data: publicUrlData } = supabase.storage.from('evidence').getPublicUrl(uploadData.path);
+        proofImageUrl = publicUrlData.publicUrl;
+        console.log('✅ Proof Image synchronized with cloud:', proofImageUrl);
+      } else {
+        console.error('❌ Proof image synchronization failed:', uploadError);
+      }
+    }
 
     if (!dedupResult.merged) {
       // 3. MASTER TICKET INGESTION
@@ -123,7 +144,8 @@ router.post('/', upload.single('photo'), complaintLimiter, async (req, res) => {
         sla_deadline: slaDeadline.toISOString(),
         embedding: embedding,
         creator_id: (user_id && user_id !== 'null' && user_id !== '') ? user_id : null,
-        email: email
+        email: email,
+        before_image_url: proofImageUrl
       }).select().single();
 
       if (ticketError) {
@@ -209,6 +231,35 @@ router.post('/', upload.single('photo'), complaintLimiter, async (req, res) => {
   } catch (error) {
     console.error("Cognitive Ingestion Fatal:", error);
     res.status(500).json({ error: 'Ingestion Backend Failure', details: error.message });
+  }
+});
+
+// GET /api/complaints/my-complaints
+router.get('/my-complaints', authenticate, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const userEmail = req.user.email;
+
+    console.log('📡 Fetching personal signals for:', { userId, userEmail });
+
+    const { data: tickets, error } = await supabase
+      .from('master_tickets')
+      .select('*')
+      .or(`creator_id.eq.${userId},email.eq."${userEmail}"`)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('❌ Personal signals fetch error:', error);
+      return res.status(500).json({ error: error.message });
+    }
+
+    res.json({
+      personal_signals: tickets || [],
+      personal_count: tickets?.length || 0
+    });
+  } catch (error) {
+    console.error("Jurisdictional Fetch Error:", error);
+    res.status(500).json({ error: error.message });
   }
 });
 
