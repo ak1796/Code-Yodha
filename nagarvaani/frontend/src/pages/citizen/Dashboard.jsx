@@ -18,10 +18,27 @@ export default function CitizenDashboard() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { t } = useTranslation();
 
-  const myTickets = tickets.filter(t =>
-    t.creator_id === profile?.id ||
-    (t.id && localStorage.getItem(`token_${t.id}`))
-  );
+  const [myTickets, setMyTickets] = useState([]);
+  const [personalLoading, setPersonalLoading] = useState(true);
+
+  React.useEffect(() => {
+    const fetchPersonalSignals = async () => {
+      try {
+        const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
+        const response = await axios.get(`${backendUrl}/api/complaints/my-complaints`);
+        setMyTickets(response.data.personal_signals || []);
+      } catch (err) {
+        console.error("Personal fetch error", err);
+      } finally {
+        setPersonalLoading(false);
+      }
+    };
+    if (profile?.id) {
+       fetchPersonalSignals();
+    } else {
+       setPersonalLoading(false);
+    }
+  }, [profile]);
 
   const handleFormSubmit = async (formData) => {
     setIsSubmitting(true);
@@ -139,7 +156,7 @@ export default function CitizenDashboard() {
               <div className="text-[10px] font-bold text-text-secondary uppercase tracking-[0.2em]">{t('LatestUpdatesFirst')}</div>
            </div>
 
-           {loading ? (
+           {personalLoading ? (
               <div className="py-24 text-center text-text-secondary font-sora font-bold animate-pulse">{t('SyncingNagarVaani')}</div>
            ) : myTickets.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">

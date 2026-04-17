@@ -196,6 +196,35 @@ router.post('/', upload.single('photo'), complaintLimiter, async (req, res) => {
     res.status(500).json({ error: 'Ingestion Backend Failure', details: error.message });
   }
 });
+// GET /api/complaints/my-complaints
+router.get('/my-complaints', authenticate, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const userEmail = req.user.email;
+
+    console.log('Fetching complaints for:', { userId, userEmail });
+
+    const { data: tickets, error } = await supabase
+      .from('master_tickets')
+      .select('*')
+      .or(`creator_id.eq.${userId},email.eq."${userEmail}"`)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Complaints fetch error:', error);
+      return res.status(500).json({ error: error.message });
+    }
+
+    res.json({
+      personal_signals: tickets || [],
+      personal_count: tickets?.length || 0
+    });
+
+  } catch (error) {
+    console.error('Route error:', error);
+    res.status(500).json({ error: 'Failed to fetch complaints' });
+  }
+});
 
 // GET /api/complaints/:id (Tracking)
 router.get('/:id', async (req, res) => {
