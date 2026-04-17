@@ -312,7 +312,7 @@ export default function AdminHeatmap() {
         <div style="background: ${cityConfig.color}; padding: 14px 16px; color: white;">
           <p style="font-size: 8px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.15em; opacity: 0.6; margin: 0 0 4px 0;">${cityConfig.org} Ward Intelligence</p>
           <h4 style="font-size: 15px; font-weight: 900; text-transform: uppercase; margin: 0; letter-spacing: -0.02em;">${officeKey || wardDisplayName}</h4>
-          ${office ? `<p style="font-size: 9px; font-weight: 600; opacity: 0.75; margin: 3px 0 0 0;">ï¿½ï¿½ï¿½ï¿½ ${office.address}</p>` : ''}
+          ${office ? `<p style="font-size: 9px; font-weight: 600; opacity: 0.75; margin: 3px 0 0 0;">📍 ${office.address}</p>` : ''}
         </div>
 
         <div style="background: white; padding: 14px 16px;">
@@ -320,14 +320,14 @@ export default function AdminHeatmap() {
           ${office ? `
           <div style="display: flex; flex-direction: column; gap: 8px; padding-bottom: 12px; border-bottom: 1px solid #f3f4f6; margin-bottom: 12px;">
             <div style="display: flex; align-items: center; gap: 10px;">
-              <span style="font-size: 14px;">ï¿½ï¿½ï¿½ï¿½</span>
+              <span style="font-size: 14px;">📞</span>
               <div>
                 <div style="font-size: 7px; font-weight: 900; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.1em;">Phone</div>
                 <div style="font-size: 11px; font-weight: 800; color: ${cityConfig.color};">${office.phone}</div>
               </div>
             </div>
             <div style="display: flex; align-items: center; gap: 10px;">
-              <span style="font-size: 14px;">ï¿½ï¿½ï¿½ï¿½</span>
+              <span style="font-size: 14px;">👤</span>
               <div>
                 <div style="font-size: 7px; font-weight: 900; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.1em;">Asst. Commissioner</div>
                 <div style="font-size: 11px; font-weight: 800; color: #1e293b;">${office.commissioner}</div>
@@ -348,7 +348,7 @@ export default function AdminHeatmap() {
 
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
             <span style="font-size: 8px; font-weight: 900; color: #9ca3af; text-transform: uppercase;">Status</span>
-            <span style="font-size: 9px; font-weight: 900; color: ${statusColor}; background: ${statusColor}18; padding: 3px 8px; border-radius: 999px;">ï¿½ï¿½ï¿½ ${statusLabel}</span>
+            <span style="font-size: 9px; font-weight: 900; color: ${statusColor}; background: ${statusColor}18; padding: 3px 8px; border-radius: 999px;">● ${statusLabel}</span>
           </div>
           <div style="width: 100%; height: 5px; background: #f1f5f9; border-radius: 999px; overflow: hidden;">
             <div style="height: 100%; width: ${Math.min(100, count * 10)}%; background: ${statusColor}; border-radius: 999px; transition: width 0.4s ease;"></div>

@@ -6,10 +6,10 @@ export default function AdminLayout({ children }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-[#F0F8FF] flex font-sans antialiased text-navy overflow-hidden relative">
+    <div className="min-h-screen bg-[#F0F8FF] flex font-sans antialiased text-navy relative">
       <AdminSidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
       
-      <main className="flex-1 overflow-y-auto relative h-screen scrollbar-hide">
+      <main className="flex-1 w-full relative">
         {/* Persistent Tactical Toggle */}
         <button 
           onClick={() => setIsSidebarOpen(true)}
