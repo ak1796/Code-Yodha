@@ -141,7 +141,7 @@ export default function OfficerAudit() {
     return <FileText size={16} />;
   };
 
-  return (
+   return (
     <div className="p-10 space-y-10">
         {/* Tactical Search */}
         <div className="relative group">
@@ -280,7 +280,6 @@ export default function OfficerAudit() {
              )}
           </div>
         )}
-      </div>
     </div>
   );
 }
