@@ -446,7 +446,10 @@ export default function AdminHeatmap() {
         onClick={() => setSelectedWard(null)}
       >
         <ChangeView center={cityConfig.center} zoom={11.5} />
-        <TileLayer url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png" />
+        <TileLayer 
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" 
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        />
         
         <LayersControl position="bottomleft">
           <LayersControl.Overlay checked name="Grid Boundaries">
