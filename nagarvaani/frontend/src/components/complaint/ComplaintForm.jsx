@@ -311,7 +311,7 @@ export default function HighFidelityComplaintForm({ onSubmit, isSubmitting: pare
         ward: formData.ward_code || formData.ward,
         category: typeObj?.internal || 'OTHER',
         raw_text: formData.description,
-        source: 'web',
+        source: 'WEB',
         filed_at: new Date().toISOString()
       };
 

@@ -4,7 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useTranslation } from 'react-i18next';
 import { 
   Activity, Zap, MapPin, Clock, Send, MessageSquare, 
-  Globe, Smartphone, Filter 
+  Globe, Smartphone, Filter, Mail, ChevronDown
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
@@ -13,6 +13,7 @@ const SOURCES = [
   { id: 'TELEGRAM', label: 'Telegram', icon: Send },
   { id: 'WHATSAPP', label: 'WhatsApp', icon: MessageSquare },
   { id: 'WEB', label: 'Web', icon: Globe },
+  { id: 'EMAIL', label: 'Email', icon: Mail },
   { id: 'TWITTER', label: 'Twitter', icon: Globe },
   { id: 'SMS', label: 'SMS', icon: Smartphone },
 ];
@@ -22,16 +23,17 @@ export default function IngestionFeed() {
   const { profile } = useAuth();
   const { t } = useTranslation();
   const [activeFilter, setActiveFilter] = useState('ALL');
+  const [showDropdown, setShowDropdown] = useState(false);
 
   const filteredTickets = tickets.filter(t => {
-    const matchesDept = t.category === profile?.department || profile?.role === 'admin';
-    const matchesCity = t.city === profile?.city;
-    const matchesSource = activeFilter === 'ALL' || t.source === activeFilter;
+    const matchesDept = !profile?.department || t.category?.toUpperCase() === profile.department?.toUpperCase() || profile?.role === 'admin';
+    const matchesCity = !profile?.city || t.city?.toUpperCase() === profile.city?.toUpperCase() || profile?.role === 'admin';
+    const matchesSource = activeFilter === 'ALL' || t.source?.toUpperCase() === activeFilter;
     return matchesDept && matchesCity && matchesSource;
   }).sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
   const getSourceIcon = (source) => {
-    const found = SOURCES.find(s => s.id === source);
+    const found = SOURCES.find(s => s.id === source?.toUpperCase());
     if (!found) return <Globe size={14} />;
     const Icon = found.icon;
     return <Icon size={14} />;
@@ -51,25 +53,51 @@ export default function IngestionFeed() {
               <p className="text-text-secondary font-medium opacity-60">{t('IngestionPulseDesc', { dept: profile?.department, city: profile?.city })}</p>
            </div>
            
-           <div className="bg-white p-2 rounded-2xl shadow-soft border border-border flex flex-wrap gap-1">
-              {SOURCES.map(source => {
-                const Icon = source.icon;
-                const isActive = activeFilter === source.id;
-                return (
-                  <button
-                    key={source.id}
-                    onClick={() => setActiveFilter(source.id)}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
-                      isActive 
-                        ? 'bg-navy text-white shadow-lg' 
-                        : 'text-text-secondary hover:bg-gray-50'
-                    }`}
-                  >
-                    <Icon size={14} />
-                    <span className={isActive ? 'block' : 'hidden lg:block'}>{source.label}</span>
-                  </button>
-                );
-              })}
+           <div className="relative">
+              <button 
+                 onClick={() => setShowDropdown(!showDropdown)}
+                 className="bg-white border-2 border-border rounded-2xl px-6 py-4 flex items-center gap-6 shadow-xl hover:border-navy transition-all group"
+              >
+                 <Filter size={18} className="text-navy opacity-40 group-hover:opacity-100" />
+                 <div className="flex flex-col items-start">
+                    <span className="text-[8px] font-black text-text-secondary opacity-40 uppercase tracking-[0.2em]">{t('SignalSource')}</span>
+                    <span className="text-xs font-extrabold text-navy uppercase tracking-widest flex items-center gap-3">
+                       {SOURCES.find(s => s.id === activeFilter)?.label}
+                       <ChevronDown size={14} className={`transition-transform duration-300 ${showDropdown ? 'rotate-180' : ''}`} />
+                    </span>
+                 </div>
+              </button>
+
+              {showDropdown && (
+                 <div className="absolute top-full right-0 mt-4 w-72 bg-white rounded-3xl shadow-2xl border border-border overflow-hidden z-[100] animate-slide-in-up">
+                    <div className="p-3 grid grid-cols-1 gap-1">
+                       {SOURCES.map(source => {
+                          const Icon = source.icon;
+                          const isActive = activeFilter === source.id;
+                          return (
+                             <button
+                                key={source.id}
+                                onClick={() => {
+                                   setActiveFilter(source.id);
+                                   setShowDropdown(false);
+                                }}
+                                className={`flex items-center justify-between px-5 py-4 rounded-2xl transition-all ${
+                                   isActive ? 'bg-navy text-white shadow-lg shadow-navy/20' : 'hover:bg-bg text-navy'
+                                }`}
+                             >
+                                <div className="flex items-center gap-4">
+                                   <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${isActive ? 'bg-white/10' : 'bg-navy/5'}`}>
+                                      <Icon size={16} className={isActive ? 'text-white' : 'text-navy opacity-60'} />
+                                   </div>
+                                   <span className="text-[10px] font-black uppercase tracking-widest">{source.label}</span>
+                                </div>
+                                {isActive && <div className="w-1.5 h-1.5 bg-saffron rounded-full animate-pulse" />}
+                             </button>
+                          );
+                       })}
+                    </div>
+                 </div>
+              )}
            </div>
         </header>
 

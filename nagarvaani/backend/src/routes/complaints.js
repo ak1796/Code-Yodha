@@ -109,6 +109,7 @@ router.post('/', upload.single('photo'), complaintLimiter, async (req, res) => {
         embedding: embedding,
         creator_id: user_id || null,
         email: email,
+        source: req.body.source || 'WEB',
         before_image_url: proofImageUrl
       }).select().single();
 
