@@ -137,32 +137,6 @@ export default function SilentCrisis() {
                 </table>
              )}
           </div>
-                         <td className="py-8 px-10">
-                            <div className="flex items-center gap-4">
-                               <MapPin size={18} className="text-navy opacity-30" />
-                               <span className="text-sm font-extrabold text-navy uppercase tracking-tighter">{ward.name}</span>
-                            </div>
-                         </td>
-                         <td className="py-8 font-bold text-navy opacity-60 text-xs">{ward.population.toLocaleString()}</td>
-                         <td className="py-8 font-bold text-navy opacity-60 text-xs">{ward.complaints} {t('Filed')}</td>
-                         <td className="py-8">
-                            <div className="flex flex-col">
-                               <span className="text-xs font-black text-navy opacity-80">1:{ward.ratio.toLocaleString()}</span>
-                               <div className="w-24 h-1 bg-gray-100 rounded-full mt-2 overflow-hidden">
-                                  <div className="h-full bg-crimson" style={{ width: `${Math.min(100, (ward.ratio/1000))}%` }} />
-                               </div>
-                            </div>
-                         </td>
-                         <td className="py-8">
-                            <div className={`px-3 py-1 rounded-full text-[8px] font-black text-white uppercase tracking-widest inline-block ${ward.color}`}>
-                               {ward.risk}
-                            </div>
-                         </td>
-                      </tr>
-                   ))}
-                </tbody>
-             </table>
-          </div>
 
           {/* Intervention Sidebar */}
           <div className="lg:col-span-4 h-full">
