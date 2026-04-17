@@ -235,7 +235,7 @@ export default function CitizenMap({ tickets = [], currentUserId }) {
           <p className="text-[9px] font-black uppercase tracking-[0.15em] text-navy opacity-40">AATS Ward Trust</p>
           <div className="flex items-center gap-3">
             <div className="w-3 h-3 rounded-sm" style={{ background: '#10B981', opacity: 0.7 }} />
-            <span className="text-[10px] font-extrabold uppercase text-navy">High â‰¥70</span>
+            <span className="text-[10px] font-extrabold uppercase text-navy">High ≥ 70</span>
           </div>
           <div className="flex items-center gap-3">
             <div className="w-3 h-3 rounded-sm" style={{ background: '#F59E0B', opacity: 0.7 }} />
