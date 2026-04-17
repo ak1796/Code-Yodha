@@ -9,7 +9,7 @@ import {
   TrendingUp, TrendingDown, Minus, ShieldAlert, Zap, 
   Droplets, Trash2, Construction, Activity, Award,
   Heart, Leaf, Building2, Bug, Zap as Electricity, 
-  FileCheck, Factory, School, BarChart3, Activity as Pulse
+  FileCheck, Factory, School, BarChart3, Activity as Pulse, RefreshCw
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -31,13 +31,13 @@ const DEPARTMENTS = [
 ];
 
 const MOCK_FALLBACK = [
-  { day: 'SUN', drainage: 1, water: 1, roads: 1, garbage: 1, storm: 1, health: 1, garden: 1, buildings: 1, pest: 1, encroach: 1, elec: 1, licence: 1, factories: 1, school: 1 },
-  { day: 'MON', drainage: 2, water: 2, roads: 2, garbage: 2, storm: 2, health: 2, garden: 2, buildings: 2, pest: 2, encroach: 2, elec: 2, licence: 2, factories: 2, school: 2 },
-  { day: 'TUE', drainage: 3, water: 3, roads: 3, garbage: 3, storm: 3, health: 3, garden: 3, buildings: 3, pest: 3, encroach: 3, elec: 3, licence: 3, factories: 3, school: 3 },
-  { day: 'WED', drainage: 4, water: 4, roads: 4, garbage: 4, storm: 4, health: 4, garden: 4, buildings: 4, pest: 4, encroach: 4, elec: 4, licence: 4, factories: 4, school: 4 },
-  { day: 'THU', drainage: 5, water: 5, roads: 5, garbage: 5, storm: 5, health: 5, garden: 5, buildings: 5, pest: 5, encroach: 5, elec: 5, licence: 5, factories: 5, school: 5 },
-  { day: 'FRI', drainage: 6, water: 6, roads: 6, garbage: 6, storm: 6, health: 6, garden: 6, buildings: 6, pest: 6, encroach: 6, elec: 6, licence: 6, factories: 6, school: 6 },
-  { day: 'SAT', drainage: 7, water: 7, roads: 7, garbage: 7, storm: 7, health: 7, garden: 7, buildings: 7, pest: 7, encroach: 7, elec: 7, licence: 7, factories: 7, school: 7 },
+  { day: 'MON', drainage: 45, water: 82, roads: 34, garbage: 65, storm: 21, health: 12, garden: 9, buildings: 15, pest: 8, encroach: 22, elec: 42, licence: 11, factories: 5, school: 3 },
+  { day: 'TUE', drainage: 52, water: 75, roads: 41, garbage: 70, storm: 18, health: 15, garden: 8, buildings: 20, pest: 12, encroach: 18, elec: 38, licence: 14, factories: 7, school: 2 },
+  { day: 'WED', drainage: 38, water: 88, roads: 29, garbage: 60, storm: 25, health: 10, garden: 12, buildings: 18, pest: 9, encroach: 30, elec: 45, licence: 12, factories: 6, school: 4 },
+  { day: 'THU', drainage: 60, water: 65, roads: 45, garbage: 55, storm: 30, health: 18, garden: 7, buildings: 22, pest: 15, encroach: 25, elec: 50, licence: 16, factories: 8, school: 5 },
+  { day: 'FRI', drainage: 42, water: 90, roads: 32, garbage: 75, storm: 22, health: 14, garden: 15, buildings: 16, pest: 10, encroach: 20, elec: 40, licence: 10, factories: 4, school: 6 },
+  { day: 'SAT', drainage: 30, water: 95, roads: 25, garbage: 80, storm: 15, health: 8, garden: 20, buildings: 12, pest: 5, encroach: 15, elec: 35, licence: 8, factories: 3, school: 8 },
+  { day: 'SUN', drainage: 25, water: 100, roads: 20, garbage: 85, storm: 10, health: 5, garden: 25, buildings: 10, pest: 4, encroach: 12, elec: 30, licence: 6, factories: 2, school: 10 },
 ];
 
 export default function TrustPanel() {
@@ -54,8 +54,11 @@ export default function TrustPanel() {
   const fetchTrustData = async () => {
     setLoading(true);
     try {
-      const { data: tickets } = await supabase.from('master_tickets').select('category, status, sla_deadline, updated_at');
+      const { data: tickets, error: ticketError } = await supabase.from('master_tickets').select('category, status, sla_deadline, created_at');
       
+      if (ticketError) {
+         console.error("Supabase Tickets Error:", ticketError);
+      }
       const deptStats = {};
       const CATEGORIES = [
         { id: 'drainage', name: 'DRAINAGE', icon: <Droplets />, color: '#FF3B30' },
@@ -77,20 +80,27 @@ export default function TrustPanel() {
       CATEGORIES.forEach(c => {
          const dTickets = tickets?.filter(t => t.category === c.name) || [];
          const total = dTickets.length;
-         const resolved = dTickets.filter(t => t.status === 'resolved').length;
-         const slaOk = dTickets.filter(t => t.status === 'resolved' && new Date(t.updated_at) < new Date(t.sla_deadline)).length;
          
-         const resRate = total > 0 ? (resolved / total) : 0;
-         const slaRate = resolved > 0 ? (slaOk / resolved) : 0;
-         const score = total > 0 ? Math.round(resRate * 40 + slaRate * 30 + 30) : 0;
+         if (total === 0) {
+            // Fallback to static baseline if no historical data from citizens yet
+            const mock = DEPARTMENTS.find(d => d.id === c.id);
+            deptStats[c.id] = { ...c, ...(mock || {}), score: mock?.score || 0 };
+         } else {
+            const resolved = dTickets.filter(t => t.status === 'resolved').length;
+            const slaOk = dTickets.filter(t => t.status === 'resolved' && new Date(t.created_at || Date.now()) < new Date(t.sla_deadline)).length;
+            
+            const resRate = resolved / total;
+            const slaRate = resolved > 0 ? (slaOk / resolved) : 0;
+            const score = Math.round(resRate * 40 + slaRate * 30 + 30);
 
-         deptStats[c.id] = {
-           ...c,
-           score,
-           res: `${Math.round(resRate * 100)}%`,
-           sla: `${Math.round(slaRate * 100)}%`,
-           trend: score > 50 ? 'up' : 'down'
-         };
+            deptStats[c.id] = {
+              ...c,
+              score,
+              res: `${Math.round(resRate * 100)}%`,
+              sla: `${Math.round(slaRate * 100)}%`,
+              trend: score > 50 ? 'up' : 'down'
+            };
+         }
       });
 
       const avgTrust = Object.values(deptStats).length > 0 
@@ -102,7 +112,8 @@ export default function TrustPanel() {
 
       // Fetch Real History from Analytics API
       try {
-        const response = await fetch('/api/complaints/analytics/weekly-matrix');
+        const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
+        const response = await fetch(`${backendUrl}/api/complaints/analytics/weekly-matrix`);
         const hData = await response.json();
         if (hData && Array.isArray(hData) && hData.length > 0) {
             setHistory(hData);

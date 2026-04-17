@@ -39,7 +39,7 @@ export default function Performance() {
       .select('*')
       .eq('assigned_to', profile?.id)
       .eq('status', 'resolved')
-      .order('resolved_at', { ascending: false });
+      .order('created_at', { ascending: false });
     setHistory(data || []);
   };
 

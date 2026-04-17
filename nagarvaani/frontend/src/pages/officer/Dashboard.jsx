@@ -36,7 +36,7 @@ export default function OfficerDashboard() {
   }, [tickets, filter]);
 
   return (
-    <OfficerLayout>
+    <>
       <div className="p-10 space-y-10">
 
         {/* Stats Row */}
@@ -81,7 +81,7 @@ export default function OfficerDashboard() {
            </div>
         </div>
       </div>
-    </OfficerLayout>
+    </>
   );
 }
 

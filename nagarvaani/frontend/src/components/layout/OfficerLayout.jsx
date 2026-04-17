@@ -3,7 +3,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useTranslation } from 'react-i18next';
 import { 
   Bell, LogOut, LayoutDashboard, Database, 
-  Settings, Shield, ChevronRight, Menu 
+  Settings, Shield, ChevronRight, Menu, Activity, TrendingUp 
 } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import NotificationPanel from '../officer/NotificationPanel';
@@ -18,44 +18,61 @@ export default function OfficerLayout({ children }) {
   const navItems = [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/officer/dashboard' },
     { icon: Database, label: 'SovereignAuditTitle', path: '/officer/audit' },
-    { icon: Settings, label: 'Settings', path: '/officer/settings' },
+    { icon: Activity, label: 'Ingestion Feed', path: '/officer/ingestion' },
+    { icon: TrendingUp, label: 'Performance Tracker', path: '/officer/performance' }
   ];
+
+  const handleLogout = (e) => {
+    e.preventDefault();
+    signOut();
+  };
 
   return (
     <div className="flex min-h-screen bg-[#F0F2F5] font-sans">
       {/* Sidebar Navigation */}
       <aside className={`bg-white border-r border-border transition-all duration-500 overflow-hidden relative z-30 ${isSidebarOpen ? 'w-80' : 'w-24'}`}>
-         <div className="p-8 h-full flex flex-col">
-            <div className="flex items-center gap-4 mb-16 overflow-hidden">
+         <div className={`h-full flex flex-col py-8 ${isSidebarOpen ? 'px-8' : 'px-4 items-center'}`}>
+            <div className={`flex items-center overflow-hidden mb-16 ${isSidebarOpen ? 'gap-4' : 'justify-center w-full'}`}>
                <div className="w-10 h-10 bg-navy rounded-xl flex items-center justify-center shrink-0 shadow-lg shadow-navy/20">
                   <Shield size={20} className="text-saffron" />
                </div>
-               <span className={`font-sora font-black text-lg text-navy tracking-tighter uppercase transition-opacity duration-300 ${isSidebarOpen ? 'opacity-100' : 'opacity-0'}`}>
+               <span className={`font-sora font-black text-lg text-navy tracking-tighter uppercase transition-opacity duration-300 ${isSidebarOpen ? 'opacity-100 w-auto' : 'opacity-0 w-0'}`}>
                   NagarVaani
                </span>
             </div>
 
-            <nav className="flex-1 space-y-3">
+            <nav className="flex-1 space-y-3 w-full">
                {navItems.map((item) => {
                   const isActive = location.pathname === item.path;
                   return (
                     <Link
                       key={item.path}
                       to={item.path}
-                      className={`flex items-center gap-4 px-6 py-4 rounded-2xl transition-all group ${
+                      className={`flex items-center py-4 rounded-2xl transition-all group ${
                         isActive 
                           ? 'bg-navy text-white shadow-xl shadow-navy/10' 
                           : 'text-text-secondary hover:bg-gray-50'
-                      }`}
+                      } ${isSidebarOpen ? 'px-6 gap-4' : 'px-0 justify-center mx-auto w-12 h-12'}`}
                     >
-                       <item.icon size={20} className={isActive ? 'text-saffron' : 'group-hover:text-navy'} />
-                       <span className={`font-bold text-sm tracking-tight transition-opacity duration-300 whitespace-nowrap ${isSidebarOpen ? 'opacity-100' : 'opacity-0'}`}>
+                       <item.icon size={20} className={isActive ? 'text-saffron' : 'group-hover:text-navy shrink-0'} />
+                       <span className={`font-bold text-sm tracking-tight transition-opacity duration-300 whitespace-nowrap overflow-hidden ${isSidebarOpen ? 'opacity-100 w-auto' : 'opacity-0 w-0'}`}>
                           {t(item.label)}
                        </span>
-                       {isActive && isSidebarOpen && <ChevronRight size={14} className="ml-auto opacity-40" />}
+                       {isActive && isSidebarOpen && <ChevronRight size={14} className="ml-auto opacity-40 shrink-0" />}
                     </Link>
                   );
                })}
+               
+               {/* Logout Button */}
+               <button
+                  onClick={handleLogout}
+                  className={`w-full flex items-center py-4 rounded-2xl transition-all group text-crimson hover:bg-crimson/10 ${isSidebarOpen ? 'px-6 gap-4' : 'px-0 justify-center mx-auto w-12 h-12'}`}
+               >
+                  <LogOut size={20} className="shrink-0" />
+                  <span className={`font-bold text-sm tracking-tight transition-opacity duration-300 whitespace-nowrap overflow-hidden ${isSidebarOpen ? 'opacity-100 w-auto' : 'opacity-0 w-0'}`}>
+                     Logout
+                  </span>
+               </button>
             </nav>
 
             <button 
